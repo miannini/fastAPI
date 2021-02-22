@@ -55,6 +55,7 @@ class OperarioT(Base):
 class FincaT(Base):
     __tablename__ = "Finca"
     ID_FINCA = Column(Integer, primary_key=True, index=True)
+    ID_cliente = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
     NOMBRE = Column(String(32), nullable=True)
     DESCRIPCION = Column(String(134), nullable=True)
     lotes_list = relationship("LotesT", back_populates="finca_madre")
@@ -63,7 +64,7 @@ class FincaT(Base):
 class LotesT(Base):
     __tablename__ = "lotes"
     ID_LOTE = Column(Integer, primary_key=True, index=True)
-    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
+    #ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
     ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     NOMBRE_LOTE = Column(String(32))
     LATITUD = Column(Float, nullable=True)

@@ -73,7 +73,7 @@ class OperarioT(BaseModel):
 
 class LotesT(BaseModel): 
     ID_LOTE: int
-    ID_CLIENTE: int
+    #ID_CLIENTE: int
     ID_FINCA: int
     NOMBRE_LOTE: Optional[str] = None
     LATITUD: Optional[float] = None
@@ -94,6 +94,7 @@ class LotesT(BaseModel):
         
 class FincaT(BaseModel):
     ID_FINCA: int
+    ID_cliente: int
     NOMBRE: Optional[str] = None
     DESCRIPCION: Optional[str] = None
     lotes_list: List[LotesT] = []

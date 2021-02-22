@@ -9,11 +9,12 @@ from typing import List, Union
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta, date, datetime
 from typing import Optional
 from jose import JWTError
-from . import crud, models, schemas, app_utils
+from . import crud, models, schemas, app_utils, secrets
 from .database import SessionLocal, engine
 
 
@@ -24,6 +25,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 models.Base.metadata.create_all(bind=engine)
 # APP
 app = FastAPI()
+
+### CORS
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=secrets.origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Dependency
@@ -97,46 +109,23 @@ def update_user_status(USERNAME: str, user_t: schemas.User, db: Session = Depend
     return db_user_id
 
 @app.get("/clientes/", response_model=List[schemas.ClientesT])  # sT
-def read_clientes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    clientes = crud.get_clientes(db, skip=skip, limit=limit)
+def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None):
+    clientes = crud.get_clientes(db, ciudad=ciudad, departamento=departamento, nombre=nombre, date1= date1, id_cliente=id_cliente)
     return clientes
 
-
+'''
 @app.get("/clientes/{ID_CLIENTE}", response_model=schemas.ClientesT)  # sT
 def read_client(ID_CLIENTE: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     db_client = crud.get_client(db, cliente_id=ID_CLIENTE)
     if db_client is None:
         raise HTTPException(status_code=404, detail="Client not found")
     return db_client
-
+'''
 
 @app.get("/Operario", response_model=List[schemas.OperarioT])  # List[
-def read_operarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    operarios = crud.get_operarios(db, skip=skip, limit=limit)
+def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    operarios = crud.get_operarios(db, finca=finca, rol=rol, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
     return operarios
-
-
-@app.get("/Operario/{ID_OPERARIO}", response_model=schemas.OperarioT)  # sT
-def read_oper_id(ID_OPERARIO: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    db_operario_id = crud.get_oper_by_id(db, id_operario=ID_OPERARIO)
-    if db_operario_id is None:
-        raise HTTPException(status_code=404, detail="Operario_ID not found")
-    return db_operario_id
-
-@app.get("/Operario_name/{NombreOperario}", response_model=schemas.OperarioT)
-def read_operario(NombreOperario: str, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    name_oper = crud.get_oper_by_name(db, NombreOperario=NombreOperario)
-    if name_oper is None:
-        raise HTTPException(status_code=404, detail="Operario not found")
-    return name_oper
-
-
-@app.get("/Operario_rol/{RolOperario}", response_model=schemas.OperarioT)  # sT
-def read_operario_rol(RolOperario: str, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    rol_oper = crud.get_oper_by_rol(db, rol_operario=RolOperario)
-    if rol_oper is None:
-        raise HTTPException(status_code=404, detail="Rol Operario not found")
-    return rol_oper
 
 
 @app.post("/Operario/", response_model=schemas.OperarioCreate)
@@ -157,8 +146,8 @@ def erase_operario(ID_OPERARIO: int, db: Session = Depends(get_db), current_user
 
 
 @app.get("/Fincas/", response_model=List[schemas.FincaT])
-def read_fincas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    fincas = crud.get_fincas(db, skip=skip, limit=limit)
+def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), finca:Optional[int]=None, nombre:Optional[str]=None):
+    fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     return fincas
 
 
@@ -168,8 +157,8 @@ def write_lote_for_finca(finca_id: int, lote: schemas.LotesT, db: Session = Depe
 
 
 @app.get("/Lotes/", response_model=List[schemas.LotesT])
-def read_lotes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    lotes = crud.get_lotes(db, skip=skip, limit=limit)
+def read_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre:Optional[str]=None):
+    lotes = crud.get_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre=nombre)
     return lotes
 
 @app.get("/UbicacionVacas/", response_model=List[schemas.Ubicacion_VacasT])
@@ -177,13 +166,14 @@ def read_ubva(db: Session = Depends(get_db), current_user: schemas.UserInfo = De
     ub_va = crud.get_ubva(db)
     return ub_va
 
+'''
 @app.get("/Lotes/{ID_LOTE}", response_model=schemas.LotesT)  # sT
 def read_lotes_id(ID_LOTE: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     db_lote_id = crud.get_lote_by_id(db, id_lote=ID_LOTE)
     if db_lote_id is None:
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_lote_id
-
+'''
 
 @app.delete("/Lotes_del/{ID_LOTE}", )
 def erase_lote(ID_LOTE: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -207,8 +197,8 @@ def update_lotes_id(ID_LOTE: int, lote: schemas.LotesT, db: Session = Depends(ge
 
 
 @app.get("/Hatos/", response_model=List[schemas.HatosT])
-def read_hatos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    hatos = crud.get_hatos(db, skip=skip, limit=limit)
+def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, tipo=tipo, id_cliente = current_user.ID_CLIENTE)
     return hatos
 
 @app.get("/Leche_Hatos/", response_model=List[schemas.Leche_Hatosi]) 
@@ -220,13 +210,14 @@ def read_leche_hatos(db: Session = Depends(get_db), current_user: schemas.UserIn
 def wr_leche_hatos(le_ha: schemas.Leche_Hatosi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_hatos(db=db, le_ha=le_ha)
 
+'''
 @app.get("/Hatos/{ID_HATO}", response_model=schemas.HatosT)  # sT
 def read_hatos_id(ID_HATO: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     db_hato_id = crud.get_hato_by_id(db, id_hato=ID_HATO)
     if db_hato_id is None:
         raise HTTPException(status_code=404, detail="HATO_ID not found")
     return db_hato_id
-
+'''
 
 @app.get("/Vacas/", response_model=List[schemas.VacasT])
 def read_vacas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -241,7 +232,7 @@ def read_leche_vaca(db: Session = Depends(get_db), current_user: schemas.UserInf
 @app.post("/Wr_Leche_vacas/", status_code=201) #, response_model=schemas.Leche_Vacai)
 def wr_leche_vacas(le_va: schemas.Leche_Vacai, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_vacas(db=db, le_va=le_va)
-
+'''
 @app.get("/Vacas/{ID_VACA}", response_model=schemas.VacasT)  # sT
 def read_vacas_id(ID_VACA: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     db_vaca_id = crud.get_vaca_by_id(db, id_vaca=ID_VACA)
@@ -256,7 +247,7 @@ def read_vacas_name(NAME_VACA: str, db: Session = Depends(get_db), current_user:
     if db_vaca_name is None:
         raise HTTPException(status_code=404, detail="VACA_NOMBRE not found")
     return db_vaca_name
-
+'''
 
 @app.post("/Mastitis/", response_model=Union[schemas.MastitisT, schemas.ActInfo])
 async def write_mastitis(mastitis: schemas.MastitisT, av:schemas.ActInfo, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -291,5 +282,10 @@ async def read_mastitis(date1: str='2020-01-01', date2: str = datetime.now().str
 @app.post("/Meteo/", response_model=schemas.MeteorologiaT)
 def write_meteo(meteo: schemas.MeteorologiaT, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.registrar_meteo(db=db, meteo=meteo)
+
+@app.get("/Meteo_get/", response_model=List[schemas.MeteorologiaT])
+async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+    meteo_data = crud.get_meteo(db, date1=date1, date2=date2, finca=finca, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
+    return meteo_data
 
 ##################################################

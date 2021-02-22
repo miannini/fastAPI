@@ -17,24 +17,43 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ##########################
 
 #CRUD = Create, Read, Update and Delete
-
+'''
 def get_client(db: Session, cliente_id: int):
     return db.query(models.ClientesT).filter(models.ClientesT.ID_CLIENTE == cliente_id).first()
+'''
 
-def get_clientes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.ClientesT).offset(skip).limit(limit).all()
+### Clientes
+def get_clientes(db: Session, ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None): #date1: str = datetime.now().strftime("%Y-%m-%d")
+    filtros=[]
+    if id_cliente:
+        filtros.append(models.ClientesT.ID_CLIENTE == id_cliente)
+    if ciudad:
+        filtros.append((models.ClientesT.CIUDAD.contains(ciudad)))
+    if departamento:
+        filtros.append((models.ClientesT.DEPARTAMENTO.contains(departamento)))    
+    if nombre:
+        filtros.append((models.ClientesT.NOMBRE.contains(nombre)))            
+    if date1:
+        filtros.append(func.DATE(models.ClientesT.FECHA_CONTRATO) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    if len(filtros)>0:
+        return db.query(models.ClientesT).filter(*filtros).all()
+    else:
+        return db.query(models.ClientesT).all()
 
-def get_oper_by_name(db: Session, NombreOperario: str):
-    return db.query(models.OperarioT).filter(models.OperarioT.NombreOperario == NombreOperario).first()
 
-def get_oper_by_id(db: Session, id_operario: int):
-    return db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).first()
 
-def get_oper_by_rol(db: Session, rol_operario: str):
-    return db.query(models.OperarioT).filter(models.OperarioT.Rol == rol_operario).first()
-
-def get_operarios(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.OperarioT).offset(skip).limit(limit).all()
+### Operarios
+def get_operarios(db: Session, finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None,  id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.OperarioT.ID_CLIENTE == id_cliente)
+    if finca:
+        filtros.append((models.OperarioT.ID_FINCA == finca))
+    if rol:
+        filtros.append((models.OperarioT.Rol == rol))
+    if nombre:
+        filtros.append((models.OperarioT.NombreOperario.contains(nombre)))   
+    return db.query(models.OperarioT).filter(*filtros).all()
+    #return db.query(models.OperarioT).all()
 
 def create_operario(db: Session, operario: schemas.OperarioCreate):
     db_operario = models.OperarioT(**operario.dict())
@@ -47,13 +66,35 @@ def delete_operario(db: Session, id_operario: int): #operario: schemas.OperarioD
     db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).delete()
     db.commit()
  
-#get Finca    
-def get_fincas(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.FincaT).offset(skip).limit(limit).all()
 
-#get lotes    
-def get_lotes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.LotesT).offset(skip).limit(limit).all()
+
+### Fincas    
+def get_fincas(db: Session, finca:Optional[int]=None, id_cliente: str = 0, nombre:Optional[str]=None):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if finca:
+        filtros.append((models.FincaT.ID_FINCA == finca))
+    if nombre:
+        filtros.append((models.FincaT.NOMBRE.contains(nombre))) 
+    return db.query(models.FincaT).filter(*filtros).all()
+
+
+
+### Lotes    
+def get_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre:Optional[str]=None):
+    filtros=[]
+    if id_finca:
+        filtros.append(models.LotesT.ID_FINCA == id_finca)   
+    if id_lote:
+        filtros.append(models.LotesT.ID_LOTE == id_lote) 
+    if nombre:
+        filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre)))            
+    if len(filtros)>0:
+        return db.query(models.LotesT).filter(*filtros).all()
+    else:
+        return db.query(models.LotesT).all()
+    
+
 
 #create lote_de_finca
 def create_finca_lote(db: Session, lote: schemas.LotesT, finca_id: int):
@@ -63,10 +104,6 @@ def create_finca_lote(db: Session, lote: schemas.LotesT, finca_id: int):
     db.refresh(db_lote)
     return db_lote
 
-
-def get_lote_by_id(db: Session, id_lote: int):
-    return db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).first()
-
 def delete_lote(db: Session, id_lote: int): #operario: schemas.OperarioDelete,
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).delete()
     db.commit()
@@ -74,10 +111,26 @@ def delete_lote(db: Session, id_lote: int): #operario: schemas.OperarioDelete,
 def update_lote(db: Session, lote: schemas.LotesT, id_lote: int):
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).update(lote.dict(exclude_unset=True))
     db.commit()    
+
+
     
-#get hatos    
-def get_hatos(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.HatosT).offset(skip).limit(limit).all()
+### Hatos    
+def get_hatos(db: Session, id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None,  id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA == id_finca))
+    if id_hato:
+        filtros.append((models.HatosT.ID_HATO == id_hato))
+    if nombre:
+        filtros.append((models.HatosT.Nombre_Hato.contains(nombre))) 
+    if tipo:
+        filtros.append((models.HatosT.TIPO_Hato.contains(tipo)))
+    
+    return db.query(models.HatosT).filter(*filtros).all()
+
+
+
 
 def get_leche_hatos(db: Session): #, date1: str='2020-01-01'
     return db.query(models.Leche_HatosT).all() #filter(models.Leche_HatosT.FECHA_ACTIVIDAD >= date1)#.all()
@@ -88,10 +141,10 @@ def create_leche_hatos(db: Session, le_ha: schemas.Leche_Hatosi):
     db.commit()
     #db.refresh(db_le_ha)
     return "post_leche_hatos=Success"
-
+'''
 def get_hato_by_id(db: Session, id_hato: int):
     return db.query(models.HatosT).filter(models.HatosT.ID_HATO == id_hato).first()
-
+'''
 #get vacas    
 def get_vacas(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.VacasT).offset(skip).limit(limit).all()
@@ -105,24 +158,37 @@ def create_leche_vacas(db: Session, le_va: schemas.Leche_Vacai):
     db.commit()
     #db.refresh(db_le_va)
     return "post_leche_vacas=Success"
-
+'''
 def get_vaca_by_id(db: Session, id_vaca: int):
     return db.query(models.VacasT).filter(models.VacasT.ID_VACA == id_vaca).first()
 
 def get_vaca_by_name(db: Session, name_vaca: int):
     return db.query(models.VacasT).filter(models.VacasT.Nombre_Vaca == name_vaca).first()
-
+'''
 #get lotes    
 def get_ubva(db: Session):
     return db.query(models.Ubicacion_VacasT).all()
 
-#meteorologia
+
+
+
+### meteorologia
 def registrar_meteo(db: Session, meteo: schemas.MeteorologiaT):
     reg_meteo = models.MeteorologiaT(**meteo.dict())
     db.add(reg_meteo)
     db.commit()
     db.refresh(reg_meteo)
     return reg_meteo
+
+def get_meteo(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, id_cliente: str = 0) : 
+    filtros=[]
+    filtros.append(models.MeteorologiaT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.MeteorologiaT.FECHA_HORA) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.MeteorologiaT.FECHA_HORA) <= datetime.strptime(date2,'%Y-%m-%d').date())    
+    if finca:
+        filtros.append((models.MeteorologiaT.ID_FINCA == finca))
+    return db.query(models.MeteorologiaT).filter(*filtros).all()
+
 
 '''
 def create_operario(db: Session, operario: schemas.OperarioCreate):
@@ -178,9 +244,10 @@ def authenticate_user(db: Session, username: str, password: str):
 
 ####################################################
 #last ID_Actividad
+'''
 def get_last_actividad(db: Session):
     return db.query(models.ActividadesVacasT).order_by(models.ActividadesVacasT.ID_Actividad.desc()).first()
-
+'''
 #actividades_vacas
 def reg_actividades_vacas(db: Session, av: schemas.ActInfo):
     reg_av = models.ActividadesVacasT(ID_VACA=av.ID_VACA, ID_TipoOperacion=av.ID_TipoOperacion, ID_Resultado=av.ID_Resultado,
