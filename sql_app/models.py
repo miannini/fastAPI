@@ -7,7 +7,7 @@ Created on Tue Dec 15 19:18:16 2020
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float#, Date
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import Date
+from sqlalchemy.types import Date, DateTime
 from .database import Base
 
 '''
@@ -22,7 +22,7 @@ And when accessing the attribute owner in an Item, it will contain a User SQLAlc
 class ClientesT(Base):
     __tablename__ = "clientes" #nombre de la tabla de la DB
     ID_CLIENTE = Column(Integer, primary_key=True, index=True) #
-    NOMBRE = Column(String(32), unique=True, nullable=True) #definicion de cada columna, con tipo
+    NOMBRE = Column(String(32), nullable=True) #definicion de cada columna, con tipo
     NIT_CC = Column(Integer, nullable=True)
     RAZON_SOCIAL = Column(String(32), nullable=True)
     TELEFONO = Column(Integer, nullable=True)
@@ -103,7 +103,7 @@ class VacasT(Base):
     ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     ElectronicID = Column(String(32), nullable=True)
     Nombre_Vaca = Column(String(32))
-    Raza = Column(String(32), nullable=True)
+    Raza = Column(Integer, nullable=True)
     Sexo = Column(Integer, nullable=True)
     VacaMadre = Column(Integer, nullable=True)
     IDparto = Column(Integer, nullable=True)
@@ -206,3 +206,17 @@ class Ubicacion_VacasT(Base):
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True, index=True)
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"), primary_key=True, index=True)
     ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"), primary_key=True, index=True)
+    
+class Traslado_VacasT(Base):
+    __tablename__ = "Traslado_Vacas"
+    ID_TRASLADO = Column(Integer, primary_key=True, index=True)
+    Fecha_Traslado = Column(DateTime)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+
+class Traslado_HatosT(Base):
+    __tablename__ = "Traslado_Hatos"
+    ID_TRASLADO_HATO = Column(Integer, primary_key=True, index=True)
+    Fecha_Traslado = Column(DateTime)
+    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))

@@ -32,12 +32,30 @@ class ClientesT(BaseModel):
     class Config:
         orm_mode = True
 
+class Clientes_id(BaseModel):
+    ID_CLIENTE: int
+    
+class ClientesCreate(Clientes_id):
+    NOMBRE: Optional[str] = None
+    NIT_CC: Optional[int] = None
+    RAZON_SOCIAL: Optional[str] = None
+    TELEFONO: Optional[int] = None
+    EMAIL: Optional[str] = None
+    DIRECCION: Optional[str] = None
+    DESCRIPCION: Optional[str] = None
+    CIUDAD: Optional[str] = None
+    DEPARTAMENTO: Optional[str] = None
+    FECHA_CONTRATO: Optional[date] = None
+    class Config:
+        orm_mode = True
+        
+
 
 #other tables    
 #class OperarioBase(BaseModel):
 #    NombreOperario: str
 
-
+'''
 class OperarioCreate(BaseModel):
     ID_OPERARIO: int
     ID_CLIENTE: int
@@ -52,12 +70,14 @@ class OperarioCreate(BaseModel):
     class Config:
         orm_mode = True
     #pass
-
+'''
 #class OperarioDelete(BaseModel):
 #    ID_OPERARIO: int #= Field(..., example="Enter ID to delete")
 
-class OperarioT(BaseModel): 
+class Operario_id(BaseModel): 
     ID_OPERARIO: int
+    
+class OperarioT(Operario_id): 
     ID_CLIENTE: int
     ID_FINCA: int
     NombreOperario: str
@@ -135,7 +155,7 @@ class VacasT(BaseModel):
     ID_FINCA : int
     ElectronicID : Optional[str] = None
     Nombre_Vaca : str
-    Raza : Optional[str] = None
+    Raza : Optional[int] = None
     Sexo : Optional[int] = None
     #FECHA_NACIMIENTO : Optional[date] = None
     VacaMadre : Optional[int] = None
@@ -217,6 +237,7 @@ class UserCreate(UserInfoBase):
     full_name: str
     password: str
     email: str
+    ID_CLIENTE : Optional[int] = None
     #active_status : Optional[int] = None
    
 class UserAuthenticate(UserInfoBase):
@@ -312,8 +333,27 @@ class Act_Requi(BaseModel):
 '''
  
 class Ubicacion_VacasT(BaseModel):
+    ID_VACA : Optional [int] = None
+    ID_HATO : Optional [int] = None
+    ID_LOTE : Optional [int] = None
+    class Config:
+        orm_mode = True 
+
+        
+class Traslado_Vacas_id(BaseModel):
+    ID_TRASLADO : int   
+class Traslado_VacasT(Traslado_Vacas_id):
+    Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ID_VACA : int
+    ID_HATO : int
+    class Config:
+        orm_mode = True
+
+class Traslado_Hatos_id(BaseModel):
+    ID_TRASLADO_HATO : int
+class Traslado_HatosT(Traslado_Hatos_id):
+    Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ID_HATO : int
     ID_LOTE : int
     class Config:
-        orm_mode = True 
+        orm_mode = True
