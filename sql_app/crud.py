@@ -37,7 +37,6 @@ def get_clientes(db: Session, ciudad:Optional[str]=None, departamento:Optional[s
     else:
         return db.query(models.ClientesT).all()
 
-#-- create and edit clientes
 def create_cliente(db: Session, cliente: schemas.ClientesCreate):
     #cliente2 = cliente.pop('ID_CLIENTE')
     db_cliente = models.ClientesT(**cliente.dict(exclude_unset=True)) #cliente.dict().pop('ID_CLIENTE'))
@@ -46,6 +45,7 @@ def create_cliente(db: Session, cliente: schemas.ClientesCreate):
     db.commit()
     db.refresh(db_cliente)
     return db_cliente
+#edit clientes
 
 ### Operarios
 def get_operarios(db: Session, finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None,  id_cliente: str = 0):
@@ -83,6 +83,7 @@ def get_fincas(db: Session, finca:Optional[int]=None, id_cliente: str = 0, nombr
         filtros.append((models.FincaT.NOMBRE.contains(nombre))) 
     return db.query(models.FincaT).filter(*filtros).all()
 
+#get lista basica
 #-- create and edit
 
 ### Lotes    
@@ -379,7 +380,7 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
         filtros.append(models.Ubicacion_VacasT.ID_VACA == id_vaca)
     if id_lote:
         filtros.append(models.Ubicacion_VacasT.ID_LOTE == id_lote)
-    return db.query(models.Ubicacion_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all()
+    return db.query(models.Ubicacion_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
 
 
 ### Traslado vacas    

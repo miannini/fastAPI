@@ -27,8 +27,6 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 ### CORS
-
-
 app.add_middleware(
     CORSMiddleware,
     #allow_origins=secrets.origins,
@@ -38,7 +36,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -46,7 +43,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
 
 # OATH
 #################################
@@ -155,7 +151,7 @@ def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = 
     fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     return fincas
 
-
+#get finca basico
 @app.post("/Fincas/{finca_id}/Lotes/", response_model=schemas.LotesT)
 def write_lote_for_finca(finca_id: int, lote: schemas.LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_finca_lote(db=db, lote=lote, finca_id=finca_id)

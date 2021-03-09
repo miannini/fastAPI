@@ -103,6 +103,11 @@ class LotesT(BaseModel):
     #finca_madre: int
     class Config:
         orm_mode = True
+
+class LotesT2(BaseModel): 
+    NOMBRE_LOTE: Optional[str] = None
+    class Config:
+        orm_mode = True
         
 #class Lote_list(LotesT):
 #    ID_LOTE: int
@@ -129,6 +134,11 @@ class HatosT(BaseModel):
     Nombre_Hato : Optional[str] = None
     TIPO_Hato : Optional[str] = None
     Descripcion : Optional[str] = None
+    class Config:
+        orm_mode = True
+        
+class HatosT2(BaseModel):
+    Nombre_Hato : Optional[str] = None
     class Config:
         orm_mode = True
         
@@ -170,7 +180,13 @@ class VacasT(BaseModel):
     Estado : Optional[int] = None
     Estado_Final : Optional[int] = None 
     class Config:
-        orm_mode = True    
+        orm_mode = True   
+        
+class VacasT2(BaseModel):
+    #ID_VACA : int
+    Nombre_Vaca : str
+    class Config:
+        orm_mode = True 
         
 class Leche_VacaT(BaseModel):
     #ID_Leche_vaca : int   
@@ -336,6 +352,12 @@ class Ubicacion_VacasT(BaseModel):
     ID_VACA : Optional [int] = None
     ID_HATO : Optional [int] = None
     ID_LOTE : Optional [int] = None
+    #Nombre_Vaca : str
+    #Nombre_Vaca: Optional[str] = None
+    nombre_vaca: VacasT2 = None
+    nombre_hato: HatosT2 = None
+    nombre_lote: LotesT2 = None
+    
     class Config:
         orm_mode = True 
 

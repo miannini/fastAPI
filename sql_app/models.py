@@ -72,6 +72,7 @@ class LotesT(Base):
     AREA = Column(Float, nullable=True)
     DESCRIPCION = Column(String(45), nullable=True)
     finca_madre = relationship("FincaT", back_populates="lotes_list")
+    ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
     
 class HatosT(Base):
     __tablename__ = "Hatos"
@@ -81,6 +82,7 @@ class HatosT(Base):
     Nombre_Hato = Column(String(45), nullable=True)
     TIPO_Hato = Column(String(32), nullable=True)
     Descripcion = Column(String(32), nullable=True)
+    ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_hato")
     
 class Leche_HatosT(Base):
     __tablename__ = "Leche_Hatos"
@@ -116,6 +118,7 @@ class VacasT(Base):
     Sire = Column(Integer, nullable=True)
     Estado = Column(Integer, nullable=True)
     Estado_Final = Column(Integer, nullable=True)
+    ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
   
     
 class Leche_VacaT(Base):
@@ -206,6 +209,10 @@ class Ubicacion_VacasT(Base):
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True, index=True)
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"), primary_key=True, index=True)
     ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"), primary_key=True, index=True)
+    nombre_vaca = relationship("VacasT", backref="Ubicacion_Vacas", lazy='joined')
+    nombre_hato = relationship("HatosT", backref="Ubicacion_Vacas", lazy='joined')
+    nombre_lote = relationship("LotesT", backref="Ubicacion_Vacas", lazy='joined')
+    
     
 class Traslado_VacasT(Base):
     __tablename__ = "Traslado_Vacas"
