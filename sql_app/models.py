@@ -209,7 +209,7 @@ class Ubicacion_VacasT(Base):
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True, index=True)
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"), primary_key=True, index=True)
     ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"), primary_key=True, index=True)
-    nombre_vaca = relationship("VacasT", backref="Ubicacion_Vacas", lazy='joined')
+    nombre_vaca = relationship("VacasT", backref="Ubicacion_Vacas", lazy='joined') #https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html
     nombre_hato = relationship("HatosT", backref="Ubicacion_Vacas", lazy='joined')
     nombre_lote = relationship("LotesT", backref="Ubicacion_Vacas", lazy='joined')
     

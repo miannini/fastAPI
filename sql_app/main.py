@@ -254,7 +254,7 @@ async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[st
     return hist_trasvacas
 
 @app.post("/Traslado_vaca/", status_code=201)
-async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     #actualizar datos de ubicacion
     updated = crud.update_ubica_vaca(db=db, sch_ubi=sch_ubi, id_cliente= current_user.ID_CLIENTE)
     if updated == 'ok':
@@ -283,7 +283,7 @@ async def read_hist_trashatos(db: Session = Depends(get_db), id_hato:Optional[st
     return hist_trashatos
 
 @app.post("/Traslado_hato/", status_code=201)
-async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     #actualizar datos de ubicacion
     updated = crud.update_ubica_hato(db=db, sch_ubi=sch_ubi, id_cliente= current_user.ID_CLIENTE)
     if updated == 'ok':

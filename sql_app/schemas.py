@@ -361,6 +361,13 @@ class Ubicacion_VacasT(BaseModel):
     class Config:
         orm_mode = True 
 
+class Ubicacion_VacasBasic(BaseModel):
+    ID_VACA : Optional [int] = None
+    ID_HATO : Optional [int] = None
+    ID_LOTE : Optional [int] = None    
+    class Config:
+        orm_mode = True 
+
         
 class Traslado_Vacas_id(BaseModel):
     ID_TRASLADO : int   

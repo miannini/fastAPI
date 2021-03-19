@@ -384,7 +384,7 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
 
 
 ### Traslado vacas    
-def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0):
+def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0):
     reg_uv = models.Ubicacion_VacasT(**sch_ubi.dict())  
     db.add(reg_uv)
     db.commit()
@@ -392,7 +392,7 @@ def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: s
     return reg_uv
 
 
-def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0): #vaca:Optional[str]=None
+def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0): #vaca:Optional[str]=None
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
@@ -403,7 +403,7 @@ def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente
         db.commit() 
         return "ok"
  
-def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), id_cliente: str = 0):
+def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), id_cliente: str = 0):
     reg_tv = models.Traslado_VacasT(ID_VACA=sch_ubi.ID_VACA, Fecha_Traslado=Fecha_Traslado, ID_HATO=sch_ubi.ID_HATO)  
     db.add(reg_tv)
     db.commit()
@@ -424,7 +424,7 @@ def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=
 
 
 # traslado hatos
-def update_ubica_hato(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0): #vaca:Optional[str]=None
+def update_ubica_hato(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0): #vaca:Optional[str]=None
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     filtros.append(models.FincaT.ID_cliente == id_cliente)
@@ -436,7 +436,7 @@ def update_ubica_hato(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente
         db.commit() 
         return "ok"
 
-def write_trashato(db: Session, sch_ubi: schemas.Ubicacion_VacasT, Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), id_cliente: str = 0):
+def write_trashato(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), id_cliente: str = 0):
     reg_th = models.Traslado_HatosT(ID_HATO=sch_ubi.ID_HATO, Fecha_Traslado=Fecha_Traslado, ID_LOTE=sch_ubi.ID_LOTE)  
     db.add(reg_th)
     db.commit()
