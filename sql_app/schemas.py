@@ -109,12 +109,14 @@ class LotesT2(BaseModel):
     class Config:
         orm_mode = True
         
-#class Lote_list(LotesT):
-#    ID_LOTE: int
-#    ID_FINCA: int
-#    NOMBRE_LOTE: str
-#    class Config:
-#        orm_mode = True
+class Actividades_LotesT(BaseModel):
+    ID_ACT_LOTE : int
+    ID_LOTE : int
+    FECHA_ACTIVIDAD  : date
+    ID_OPERARIO : int
+    Comentario : Optional[str] = None
+    class Config:
+        orm_mode = True
 
         
 class FincaT(BaseModel):
@@ -125,10 +127,28 @@ class FincaT(BaseModel):
     lotes_list: List[LotesT] = []
     class Config:
         orm_mode = True
-        
+  
+class FincaP(BaseModel):
+    #ID_FINCA: int #posiblemente quitar, para que no se defina por el usuario
+    ID_cliente: int
+    NOMBRE: Optional[str] = None
+    DESCRIPCION: Optional[str] = None
+    #lotes_list: List[LotesT] = []
+    class Config:
+        orm_mode = True
 
 class HatosT(BaseModel):
     ID_HATO : int
+    ID_CLIENTE : int
+    ID_FINCA : int
+    Nombre_Hato : Optional[str] = None
+    TIPO_Hato : Optional[str] = None
+    Descripcion : Optional[str] = None
+    class Config:
+        orm_mode = True
+        
+class HatosP(BaseModel):
+    ID_HATO : int = 0 #posiblemente quitar, para que no se defina por el usuario
     ID_CLIENTE : int
     ID_FINCA : int
     Nombre_Hato : Optional[str] = None
@@ -185,6 +205,14 @@ class VacasT(BaseModel):
 class VacasT2(BaseModel):
     #ID_VACA : int
     Nombre_Vaca : str
+    class Config:
+        orm_mode = True 
+
+class CriasT(BaseModel):
+    ID_CRIA : int
+    ID_VACA : int
+    ID_INSEMINACION : Optional[int] = None
+    FECHA_NACIMIENTO : date
     class Config:
         orm_mode = True 
         

@@ -145,16 +145,22 @@ def erase_operario(ID_OPERARIO: int, db: Session = Depends(get_db), current_user
         "message": "User deleted"
     }
 
-
+### Fincas
 @app.get("/Fincas/", response_model=List[schemas.FincaT])
 def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), finca:Optional[int]=None, nombre:Optional[str]=None):
     fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     return fincas
 
-#get finca basico
+@app.post("/Fincas/", status_code=201) #response_model=schemas.Leche_Hatosi)
+def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_finca(db=db, finca=finca, id_cliente= current_user.ID_CLIENTE)
+#solo funciona si tabla lotes tiene finca_id creada ... cambiar SQL, sino se puede, APP debera crear finca y lote al tiempo
+#obteniendo max finca_id, asignando en tabla lotes y despues en tabla fincas
+
+
 @app.post("/Fincas/{finca_id}/Lotes/", response_model=schemas.LotesT)
 def write_lote_for_finca(finca_id: int, lote: schemas.LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    return crud.create_finca_lote(db=db, lote=lote, finca_id=finca_id)
+    return crud.create_finca_lote(db=db, lote=lote, finca_id=finca_id, id_cliente= current_user.ID_CLIENTE)
 
 
 @app.get("/Lotes/", response_model=List[schemas.LotesT])
@@ -190,10 +196,27 @@ def update_lotes_id(ID_LOTE: int, lote: schemas.LotesT, db: Session = Depends(ge
     return db_lote_id
 
 
+@app.get("/Acti_Lotes/", response_model=List[schemas.Actividades_LotesT])
+def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, nombre_oper:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d")):
+    acti_lotes = crud.get_acti_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre_lote=nombre_lote, nombre_oper=nombre_oper, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE)
+    return acti_lotes
+
+@app.post("/Wr_Acti_Lotes/", status_code=201) #response_model=schemas.Leche_Hatosi)
+def wr_acti_lotes(ac_lo: schemas.Actividades_LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_acti_lotes(db=db, ac_lo=ac_lo)
+#funciona, pero duplica ID_acti_lote, sino se puede corregir SQL, entonces hacer get max ID y crear con +1
+
+
 @app.get("/Hatos/", response_model=List[schemas.HatosT])
 def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, tipo=tipo, id_cliente = current_user.ID_CLIENTE)
     return hatos
+
+@app.post("/Hatos/", status_code=201) #response_model=schemas.Leche_Hatosi)
+def wr_hato(hato: schemas.HatosP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_hato(db=db, hato=hato, id_cliente= current_user.ID_CLIENTE)
+#funciona, pero duplica ID_hato, sino se puede corregir SQL, entonces hacer get max ID y crear con +1
+
 
 @app.get("/Leche_Hatos/", response_model=List[schemas.Leche_Hatosi]) 
 def read_leche_hatos(db: Session = Depends(get_db), id_hato:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d") ,current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: str='2020-01-01'

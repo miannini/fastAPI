@@ -73,6 +73,15 @@ class LotesT(Base):
     DESCRIPCION = Column(String(45), nullable=True)
     finca_madre = relationship("FincaT", back_populates="lotes_list")
     ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
+
+class Actividades_LotesT(Base):
+    __tablename__ = "Actividades_Lotes"
+    ID_ACT_LOTE = Column(Integer, primary_key=True, index=True)
+    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
+    FECHA_ACTIVIDAD = Column(Date)
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"))
+    Comentario = Column(String(45), nullable=True)
+    #productos = relationship("FincaT", back_populates="lotes_list")
     
 class HatosT(Base):
     __tablename__ = "Hatos"
@@ -120,6 +129,13 @@ class VacasT(Base):
     Estado_Final = Column(Integer, nullable=True)
     ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
   
+class CriaT(Base):
+    __tablename__ = "Cria"
+    ID_CRIA = Column(Integer, primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    ID_INSEMINACION = Column(Integer, nullable=True)
+    FECHA_NACIMIENTO = Column(Date)
+
     
 class Leche_VacaT(Base):
     __tablename__ = "Leche_Vaca"

@@ -83,8 +83,14 @@ def get_fincas(db: Session, finca:Optional[int]=None, id_cliente: str = 0, nombr
         filtros.append((models.FincaT.NOMBRE.contains(nombre))) 
     return db.query(models.FincaT).filter(*filtros).all()
 
-#get lista basica
-#-- create and edit
+def create_finca(db: Session, finca: schemas.FincaP, id_cliente: str = 0): 
+    db_finca = models.FincaT(**finca.dict(exclude_unset=True))
+    db.add(db_finca)
+    db.commit()
+    #db.refresh(db_finca)
+    return "post_finca=Success"
+
+#-- edit
 
 ### Lotes    
 def get_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre:Optional[str]=None, id_cliente: str = 0):
@@ -120,7 +126,31 @@ def update_lote(db: Session, lote: schemas.LotesT, id_lote: int):
     db.commit()    
 ### **************************************************
 
-   
+### Acti Lotes
+def get_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, nombre_oper:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0): #
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    filtros.append(models.OperarioT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.Actividades_LotesT.FECHA_ACTIVIDAD) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Actividades_LotesT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    if id_finca:
+        filtros.append(models.LotesT.ID_FINCA == id_finca)   
+    if id_lote:
+        filtros.append(models.LotesT.ID_LOTE == id_lote) 
+    if nombre_lote:
+        filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre_lote)))
+    if nombre_oper:
+        filtros.append((models.OperarioT.NombreOperario.contains(nombre_oper)))               
+    return db.query(models.Actividades_LotesT).join(models.OperarioT).join(models.LotesT).join(models.FincaT).filter(*filtros).all()  
+
+
+def create_acti_lotes(db: Session, ac_lo: schemas.Actividades_LotesT):
+    db_ac_lo = models.Actividades_LotesT(**ac_lo.dict(exclude_unset=True))
+    db.add(db_ac_lo)
+    db.commit()
+    db.refresh(db_ac_lo)
+    return "post_acti_lotes=Success"
+
  
 ### Hatos    
 def get_hatos(db: Session, id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None,  id_cliente: str = 0):
@@ -136,6 +166,13 @@ def get_hatos(db: Session, id_finca:Optional[int]=None, id_hato:Optional[int]=No
         filtros.append((models.HatosT.TIPO_Hato.contains(tipo)))
     
     return db.query(models.HatosT).filter(*filtros).all()
+
+def create_hato(db: Session, hato: schemas.HatosP, id_cliente: str = 0): 
+    db_hato = models.HatosT(**hato.dict(exclude_unset=True))
+    db.add(db_hato)
+    db.commit()
+    db.refresh(db_hato)
+    return db_hato.ID_HATO
 
 # -- create hato and edit
 
