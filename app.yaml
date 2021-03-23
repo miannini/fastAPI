@@ -1,2 +1,4 @@
+service: test_env
+version: v1
 runtime: python37
 entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker sql_app.main:app
