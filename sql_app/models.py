@@ -72,7 +72,7 @@ class LotesT(Base):
     AREA = Column(Float, nullable=True)
     DESCRIPCION = Column(String(45), nullable=True)
     finca_madre = relationship("FincaT", back_populates="lotes_list")
-    ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
+    #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
 
 class Actividades_LotesT(Base):
     __tablename__ = "Actividades_Lotes"
@@ -91,7 +91,7 @@ class HatosT(Base):
     Nombre_Hato = Column(String(45), nullable=True)
     TIPO_Hato = Column(String(32), nullable=True)
     Descripcion = Column(String(32), nullable=True)
-    ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_hato")
+    #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_hato")
     
 class Leche_HatosT(Base):
     __tablename__ = "Leche_Hatos"
@@ -127,7 +127,7 @@ class VacasT(Base):
     Sire = Column(Integer, nullable=True)
     Estado = Column(Integer, nullable=True)
     Estado_Final = Column(Integer, nullable=True)
-    ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
+    #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
   
 class CriaT(Base):
     __tablename__ = "Cria"
