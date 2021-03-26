@@ -148,7 +148,7 @@ class HatosT(BaseModel):
         orm_mode = True
         
 class HatosP(BaseModel):
-    ID_HATO : int = 0 #posiblemente quitar, para que no se defina por el usuario
+    #ID_HATO : int = 0 #posiblemente quitar, para que no se defina por el usuario
     ID_CLIENTE : int
     ID_FINCA : int
     Nombre_Hato : Optional[str] = None
@@ -382,9 +382,9 @@ class Ubicacion_VacasT(BaseModel):
     ID_LOTE : Optional [int] = None
     #Nombre_Vaca : str
     #Nombre_Vaca: Optional[str] = None
-    nombre_vaca: VacasT2 = None
-    nombre_hato: HatosT2 = None
-    nombre_lote: LotesT2 = None
+    #nombre_vaca: VacasT2 = None
+    #nombre_hato: HatosT2 = None
+    #nombre_lote: LotesT2 = None
     
     class Config:
         orm_mode = True 

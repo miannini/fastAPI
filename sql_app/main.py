@@ -8,6 +8,7 @@ Created on Tue Dec 15 20:25:17 2020
 from typing import List, Union
 
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -16,6 +17,8 @@ from typing import Optional
 from jose import JWTError
 from . import crud, models, schemas, app_utils, secrets
 from .database import SessionLocal, engine
+import pandas as pd
+import io
 
 
 # security
@@ -332,8 +335,29 @@ def write_meteo(meteo: schemas.MeteorologiaT, db: Session = Depends(get_db)): #,
     return crud.registrar_meteo(db=db, meteo=meteo)
 
 @app.get("/Meteo_get/", response_model=List[schemas.MeteorologiaT])
-async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
     meteo_data = crud.get_meteo(db, date1=date1, date2=date2, finca=finca, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
     return meteo_data
+
+@app.get("/Meteo_csv/", response_model=List[schemas.MeteorologiaT])
+async def meteo_csv(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    meteo_data = crud.get_meteo(db, date1=date1, date2=date2, finca=finca, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)    
+    df = pd.DataFrame.from_records([s.__dict__ for s in meteo_data])
+    df.reset_index(drop=True, inplace=True)
+    cols = ["ID_FINCA", "ID_CLIENTE", "FECHA_HORA", "activacion", "DHT_Humidity_mean", "DHT_Humidity_max", "DHT_Humidity_min", "DHT_Humidity_std", "DHT_Temp_mean",
+            "DHT_Temp_max", "DHT_Temp_min", "Hum_Gnd_mean", "Rain_mm_sum", "Thermo_Couple_mean", "Thermo_Couple_max", "Thermo_Couple_min", "Wind_Dir_Moda", "Wind_Speed_mean", "Wind_Speed_max", 
+            "DS18b20_cap_mean", "DS18b20_cap_max", "DS18b20_cap_min", "Solar_Volt_mean", "Solar_Volt_max", "Solar_Volt_min", "Solar_Volt_std", "Sunlight_mean", "Sunlight_max", "Sunlight_min", "Sunlight_std"]
+    df= df[cols]
+    stream = io.StringIO()
+    df.to_csv(stream, index = False)
+    #response = StreamingResponse(io.StringIO(df.to_csv(index=False)), media_type="text/csv")
+    response = StreamingResponse(iter([stream.getvalue()]),
+                            media_type="text/csv"
+       )
+    response.headers["Content-Disposition"] = "attachment; filename=meteo_data.csv"   
+    return response
+#https://stackoverflow.com/questions/61140398/fastapi-return-a-file-response-with-the-output-of-a-sql-query
+    
+
 
 ##################################################
