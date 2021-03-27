@@ -132,7 +132,7 @@ def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, rol:
     return operarios
 
 
-@app.post("/Operario/", response_model=schemas.OperarioT)
+@app.post("/create_operario/", response_model=schemas.OperarioT)
 def write_operario(operario: schemas.OperarioT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_operario(db=db, operario=operario)
 
@@ -154,7 +154,7 @@ def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = 
     fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     return fincas
 
-@app.post("/Fincas/", status_code=201) #response_model=schemas.Leche_Hatosi)
+@app.post("/create_finca/", status_code=201) #response_model=schemas.Leche_Hatosi)
 def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_finca(db=db, finca=finca, id_cliente= current_user.ID_CLIENTE)
 #solo funciona si tabla lotes tiene finca_id creada ... cambiar SQL, sino se puede, APP debera crear finca y lote al tiempo
@@ -215,7 +215,7 @@ def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_ha
     hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, tipo=tipo, id_cliente = current_user.ID_CLIENTE)
     return hatos
 
-@app.post("/Hatos/", status_code=201) #response_model=schemas.Leche_Hatosi)
+@app.post("/create_hato/", status_code=201) #response_model=schemas.Leche_Hatosi)
 def wr_hato(hato: schemas.HatosP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_hato(db=db, hato=hato, id_cliente= current_user.ID_CLIENTE)
 #funciona, pero duplica ID_hato, sino se puede corregir SQL, entonces hacer get max ID y crear con +1
