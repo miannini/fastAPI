@@ -215,6 +215,7 @@ def get_vacas(db: Session, id_finca:Optional[int]=None, id_vaca:Optional[int]=No
     if activa==1:
         filtros.append(models.VacasT.FechaSalida.is_(None))
     return db.query(models.VacasT).filter(*filtros).all()
+
     
 #-- create vaca
 #-- edit vaca

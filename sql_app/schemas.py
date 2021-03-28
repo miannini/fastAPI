@@ -137,6 +137,15 @@ class FincaP(BaseModel):
     class Config:
         orm_mode = True
 
+class FincaR(BaseModel):
+    ID_FINCA: int
+    ID_cliente: int
+    NOMBRE: Optional[str] = None
+    #DESCRIPCION: Optional[str] = None
+    #lotes_list: List[LotesT] = []
+    class Config:
+        orm_mode = True
+
 class HatosT(BaseModel):
     ID_HATO : int
     ID_CLIENTE : int
@@ -154,6 +163,14 @@ class HatosP(BaseModel):
     Nombre_Hato : Optional[str] = None
     TIPO_Hato : Optional[str] = None
     Descripcion : Optional[str] = None
+    class Config:
+        orm_mode = True
+        
+class HatosR(BaseModel):
+    ID_HATO : int
+    ID_CLIENTE : int
+    ID_FINCA : int
+    Nombre_Hato : Optional[str] = None
     class Config:
         orm_mode = True
         
@@ -207,6 +224,30 @@ class VacasT2(BaseModel):
     Nombre_Vaca : str
     class Config:
         orm_mode = True 
+
+class VacasR(BaseModel):
+    ID_VACA : int
+    ID_CLIENTE : int
+    #ID_FINCA : int
+    #ElectronicID : Optional[str] = None
+    Nombre_Vaca : str
+    Raza : Optional[int] = None
+    Sexo : Optional[int] = None
+    #FECHA_NACIMIENTO : Optional[date] = None
+    #VacaMadre : Optional[int] = None
+    #IDparto : Optional[int] = None
+    #FechaRegistro : Optional[date] = None
+    #IDTipoOrigen : Optional[int] = None
+    #FechaNacimiento : Optional[date] = None
+    #IDTipoSalida : Optional[int] = None
+    #FechaSalida : Optional[date] = None
+    #FECHA_NACIMIENTO = Column(Date, nullable=True)   
+    #Sire : Optional[int] = None    
+    #Estado : Optional[int] = None
+    #Estado_Final : Optional[int] = None 
+    class Config:
+        orm_mode = True  
+
 
 class CriasT(BaseModel):
     ID_CRIA : int

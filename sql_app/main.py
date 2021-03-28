@@ -154,6 +154,12 @@ def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = 
     fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     return fincas
 
+@app.get("/Fincas_small/", response_model=List[schemas.FincaR])
+def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), finca:Optional[int]=None, nombre:Optional[str]=None):
+    fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
+    return fincas
+
+
 @app.post("/create_finca/", status_code=201) #response_model=schemas.Leche_Hatosi)
 def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_finca(db=db, finca=finca, id_cliente= current_user.ID_CLIENTE)
@@ -215,6 +221,11 @@ def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_ha
     hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, tipo=tipo, id_cliente = current_user.ID_CLIENTE)
     return hatos
 
+@app.get("/Hatos_small/", response_model=List[schemas.HatosR])
+def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
+    return hatos
+
 @app.post("/create_hato/", status_code=201) #response_model=schemas.Leche_Hatosi)
 def wr_hato(hato: schemas.HatosP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_hato(db=db, hato=hato, id_cliente= current_user.ID_CLIENTE)
@@ -233,6 +244,11 @@ def wr_leche_hatos(le_ha: schemas.Leche_Hatosi, db: Session = Depends(get_db), c
 
 
 @app.get("/Vacas/", response_model=List[schemas.VacasT])
+async def read_vacas(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    vacas = crud.get_vacas(db, id_finca=id_finca, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE)
+    return vacas
+
+@app.get("/Vacas_small/", response_model=List[schemas.VacasR])
 async def read_vacas(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     vacas = crud.get_vacas(db, id_finca=id_finca, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE)
     return vacas
