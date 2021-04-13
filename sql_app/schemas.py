@@ -112,7 +112,7 @@ class LotesT2(BaseModel):
 class Actividades_LotesT(BaseModel):
     ID_ACT_LOTE : int
     ID_LOTE : int
-    FECHA_ACTIVIDAD  : date
+    FECHA_ACTIVIDAD  : date #datetime
     ID_OPERARIO : int
     Comentario : Optional[str] = None
     class Config:
@@ -182,7 +182,7 @@ class HatosT2(BaseModel):
 class Leche_HatosT(BaseModel):
     #ID_Leche_hato : int
     ID_HATO : int
-    FECHA_ACTIVIDAD : date
+    FECHA_ACTIVIDAD : date #datetime
     ID_OPERARIO : Optional[int] = None
     Comentario : Optional[str] = None
     Numero_Animales : Optional[int] = None
@@ -261,7 +261,7 @@ class Leche_VacaT(BaseModel):
     #ID_Leche_vaca : int   
     ID_VACA : int
     ID_OPERARIO : Optional[int] = None
-    FECHA : date
+    FECHA : date #datetime
     Litros : Optional [float] = None
     Ciclo_Lactancia : Optional[int] = None
     Numero_Partos : Optional[int] = None
@@ -453,5 +453,45 @@ class Traslado_HatosT(Traslado_Hatos_id):
     Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ID_HATO : int
     ID_LOTE : int
+    class Config:
+        orm_mode = True
+        
+class Lotes_variablesT(BaseModel):
+    ID_lote : int
+    fecha : Optional[date] = None
+    Mean_BM : Optional [float] = None
+    Mean_CP : Optional [float] = None
+    Mean_NDF : Optional [float] = None
+    Mean_LAI : Optional [float] = None
+    Mean_NDVI : Optional [float] = None
+    cld_percentage : Optional [float] = None
+    area_factor : Optional [float] = None
+    biomass_corrected : Optional [float] = None
+    class Config:
+        orm_mode = True
+    
+class Lotes_quimicosT(BaseModel):
+    ID_registro : int
+    ID_lote : int
+    Fecha_muestra : Optional[date] = None
+    ID_muestra : Optional [int] = None
+    Fecha_resultado : Optional[date] = None
+    CE : Optional [float] = None
+    PH : Optional [float] = None
+    Nitrogeno : Optional [float] = None
+    Fosforo : Optional [float] = None
+    Potasio : Optional [float] = None
+    Calcio : Optional [float] = None
+    Magnesio : Optional [float] = None
+    Sodio : Optional [float] = None
+    Aluminio : Optional [float] = None
+    Azufre : Optional [float] = None
+    Cloro : Optional [float] = None
+    Hierro : Optional [float] = None
+    Manganeso : Optional [float] = None
+    Cobre : Optional [float] = None
+    Zinc : Optional [float] = None
+    Boro : Optional [float] = None
+    Comentarios : Optional [str] = None
     class Config:
         orm_mode = True

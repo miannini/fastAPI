@@ -11,7 +11,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from datetime import timedelta, date, datetime
 from typing import Optional
 from jose import JWTError
@@ -343,6 +343,16 @@ async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = 
         if db_tras_hato is None: #si el traslado de vaca no se registro, mostrar error
             raise HTTPException(status_code=404, detail="Traslado no registrado")
     return db_tras_hato
+
+
+@app.post("/Wr_lotes_variables/", status_code=201) #, response_model=schemas.Leche_Vacai)
+def wr_lotes_var(lo_va: schemas.Lotes_variablesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_lotes_var(db=db, lo_va=lo_va)
+
+@app.post("/Wr_lotes_quimicos/", status_code=201) #, response_model=schemas.Leche_Vacai)
+def wr_lotes_qui(lo_qu: schemas.Lotes_quimicosT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_lotes_qui(db=db, lo_qu=lo_qu)
+
 
 #################################################
 # API module only for Google Cloud Functions

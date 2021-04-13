@@ -493,3 +493,18 @@ def get_trashato(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=
         filtros.append(models.LotesT.ID_LOTE == id_lote)
         filtros.append(models.Traslado_HatosT.ID_LOTE == id_lote)
     return db.query(models.Traslado_HatosT).join(models.HatosT).join(models.FincaT).join(models.LotesT).filter(*filtros).all()
+
+# Variables de Lotes [Remote Sensing]
+def create_lotes_var(db: Session, lo_va: schemas.Lotes_variablesT):
+    db_lo_va = models.Lotes_variablesT(**lo_va.dict(exclude_unset=True))
+    db.add(db_lo_va)
+    db.commit()
+    #db.refresh(db_le_va)
+    return "post_lotes_variables=Success"
+
+def create_lotes_qui(db: Session, lo_qu: schemas.Lotes_quimicosT):
+    db_lo_qu = models.Lotes_quimicosT(**lo_qu.dict(exclude_unset=True))
+    db.add(db_lo_qu)
+    db.commit()
+    #db.refresh(db_le_va)
+    return "post_lotes_quimicos=Success"
