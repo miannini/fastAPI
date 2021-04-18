@@ -7,7 +7,7 @@ Created on Tue Dec 15 20:17:18 2020
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
-from typing import Optional
+from typing import Optional, List
 from . import models, schemas
 from datetime import date, datetime
 from passlib.context import CryptContext
@@ -422,7 +422,7 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
 
 
 ### Traslado vacas    
-def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0):
+def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0):
     reg_uv = models.Ubicacion_VacasT(**sch_ubi.dict())  
     db.add(reg_uv)
     db.commit()
@@ -430,7 +430,7 @@ def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_client
     return reg_uv
 
 
-def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0): #vaca:Optional[str]=None
+def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0): #vaca:Optional[str]=None
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
@@ -441,7 +441,7 @@ def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cli
         db.commit() 
         return "ok"
  
-def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), id_cliente: str = 0):
+def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), id_cliente: str = 0):
     reg_tv = models.Traslado_VacasT(ID_VACA=sch_ubi.ID_VACA, Fecha_Traslado=Fecha_Traslado, ID_HATO=sch_ubi.ID_HATO)  
     db.add(reg_tv)
     db.commit()
@@ -495,16 +495,31 @@ def get_trashato(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=
     return db.query(models.Traslado_HatosT).join(models.HatosT).join(models.FincaT).join(models.LotesT).filter(*filtros).all()
 
 # Variables de Lotes [Remote Sensing]
-def create_lotes_var(db: Session, lo_va: schemas.Lotes_variablesT):
-    db_lo_va = models.Lotes_variablesT(**lo_va.dict(exclude_unset=True))
-    db.add(db_lo_va)
+def create_lotes_var(db: Session, lo_va: List[schemas.Lotes_variablesT]):
+    db_lo_va = []
+    for dictio in lo_va:
+        db_lo_va.append(models.Lotes_variablesT(**dictio.dict(exclude_unset=True)))
+    #db_lo_va = List[models.Lotes_variablesT(**lo_va.dict(exclude_unset=True))]
+    #db.add(db_lo_va)
+    db.bulk_save_objects(db_lo_va)
     db.commit()
     #db.refresh(db_le_va)
     return "post_lotes_variables=Success"
 
-def create_lotes_qui(db: Session, lo_qu: schemas.Lotes_quimicosT):
-    db_lo_qu = models.Lotes_quimicosT(**lo_qu.dict(exclude_unset=True))
-    db.add(db_lo_qu)
+def create_lotes_qui(db: Session, lo_qu: List[schemas.Lotes_quimicosT]):
+    db_lo_qu = []
+    for dictio in lo_qu:
+        db_lo_qu.append(models.Lotes_quimicosT(**dictio.dict(exclude_unset=True)))
+    #db_lo_qu = models.Lotes_quimicosT(**lo_qu.dict(exclude_unset=True))
+    #db.add(db_lo_qu)
+    db.bulk_save_objects(db_lo_qu)
     db.commit()
     #db.refresh(db_le_va)
     return "post_lotes_quimicos=Success"
+
+def create_moni_des(db: Session, mo_des: schemas.monitoreo_descargas_sentinelT):
+    db_mo_des = models.monitoreo_descargas_sentinelT(**mo_des.dict(exclude_unset=True))
+    db.add(db_mo_des)
+    db.commit()
+    #db.refresh(db_le_va)
+    return "post_monitoreo_descargas=Success"

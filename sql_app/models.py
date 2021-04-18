@@ -7,7 +7,7 @@ Created on Tue Dec 15 19:18:16 2020
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float#, Date
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import Date, DateTime
+from sqlalchemy.types import Date, DateTime, Time
 from .database import Base
 
 '''
@@ -222,9 +222,9 @@ class ActividadesVacasT(Base):
     
 class Ubicacion_VacasT(Base):
     __tablename__ = "Ubicacion_Vacas"
-    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True, index=True)
-    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"), primary_key=True, index=True)
-    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"), primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True)#, index=True)
+    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))#, primary_key=True, index=True)
+    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))#, primary_key=True, index=True)
     #nombre_vaca = relationship("VacasT", backref="Ubicacion_Vacas", lazy='joined') #https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html
     #nombre_hato = relationship("HatosT", backref="Ubicacion_Vacas", lazy='joined')
     #nombre_lote = relationship("LotesT", backref="Ubicacion_Vacas", lazy='joined')
@@ -281,3 +281,19 @@ class Lotes_quimicosT(Base):
     Zinc = Column(Float, nullable=True)
     Boro = Column(Float, nullable=True)
     Comentarios = Column(String(450), nullable=True)
+    
+class monitoreo_descargas_sentinelT(Base):
+    __tablename__ = "monitoreo_descargas_sentinel"
+    ID_cliente= Column(Integer,  ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
+    zona = Column(String(45), nullable=True)
+    file = Column(String(45), nullable=True)
+    municipio = Column(String(45), nullable=True)
+    departamento = Column(String(45), nullable=True)
+    fecha  = Column(Date, nullable=True)
+    mode = Column(String(45), nullable=True)
+    machine_name = Column(String(45), nullable=True)
+    duration = Column(Float, nullable=True)
+    end_time = Column(DateTime, nullable=True)
+    prct_clouds = Column(Float, nullable=True)
+    
+    

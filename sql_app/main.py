@@ -296,7 +296,7 @@ async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[st
     return hist_trasvacas
 
 @app.post("/Traslado_vaca/", status_code=201)
-async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     #actualizar datos de ubicacion
     updated = crud.update_ubica_vaca(db=db, sch_ubi=sch_ubi, id_cliente= current_user.ID_CLIENTE)
     if updated == 'ok':
@@ -346,12 +346,16 @@ async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = 
 
 
 @app.post("/Wr_lotes_variables/", status_code=201) #, response_model=schemas.Leche_Vacai)
-def wr_lotes_var(lo_va: schemas.Lotes_variablesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def wr_lotes_var(lo_va: List[schemas.Lotes_variablesT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_var(db=db, lo_va=lo_va)
 
 @app.post("/Wr_lotes_quimicos/", status_code=201) #, response_model=schemas.Leche_Vacai)
 def wr_lotes_qui(lo_qu: schemas.Lotes_quimicosT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_qui(db=db, lo_qu=lo_qu)
+
+@app.post("/Wr_monitoreo_descargas/", status_code=201) #, response_model=schemas.Leche_Vacai)
+def wr_moni_des(mo_des: schemas.monitoreo_descargas_sentinelT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_moni_des(db=db, mo_des=mo_des)
 
 
 #################################################

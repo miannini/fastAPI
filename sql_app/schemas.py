@@ -431,7 +431,7 @@ class Ubicacion_VacasT(BaseModel):
         orm_mode = True 
 
 class Ubicacion_VacasBasic(BaseModel):
-    ID_VACA : Optional [int] = None
+    #ID_VACA : Optional [int] = None
     ID_HATO : Optional [int] = None
     ID_LOTE : Optional [int] = None    
     class Config:
@@ -493,5 +493,20 @@ class Lotes_quimicosT(BaseModel):
     Zinc : Optional [float] = None
     Boro : Optional [float] = None
     Comentarios : Optional [str] = None
+    class Config:
+        orm_mode = True
+        
+class monitoreo_descargas_sentinelT(BaseModel):
+    ID_cliente : int
+    zona : Optional [str] = None
+    file : Optional [str] = None
+    municipio : Optional [str] = None
+    departamento : Optional [str] = None
+    fecha  : Optional[date] = None
+    mode : Optional [str] = None
+    machine_name : Optional [str] = None
+    duration : Optional [float] = None
+    end_time : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    prct_clouds : Optional [float] = None
     class Config:
         orm_mode = True
