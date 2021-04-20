@@ -97,7 +97,7 @@ class Leche_HatosT(Base):
     __tablename__ = "Leche_Hatos"
     ID_Leche_hato = Column(Integer, primary_key=True, index=True)     #, ForeignKey("Actividades_Vacas.ID_Actividad")
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
-    FECHA_ACTIVIDAD = Column(Date)
+    FECHA_ACTIVIDAD = Column(DateTime)
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
     Comentario = Column(String(45), nullable=True)
     Numero_Animales = Column(Integer, nullable=True)

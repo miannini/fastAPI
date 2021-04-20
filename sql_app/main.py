@@ -350,7 +350,7 @@ def wr_lotes_var(lo_va: List[schemas.Lotes_variablesT], db: Session = Depends(ge
     return crud.create_lotes_var(db=db, lo_va=lo_va)
 
 @app.post("/Wr_lotes_quimicos/", status_code=201) #, response_model=schemas.Leche_Vacai)
-def wr_lotes_qui(lo_qu: schemas.Lotes_quimicosT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def wr_lotes_qui(lo_qu: List[schemas.Lotes_quimicosT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_qui(db=db, lo_qu=lo_qu)
 
 @app.post("/Wr_monitoreo_descargas/", status_code=201) #, response_model=schemas.Leche_Vacai)

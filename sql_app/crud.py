@@ -184,8 +184,8 @@ def get_leche_hatos(db: Session, id_hato:Optional[int]=None, id_operario:Optiona
         filtros.append(models.Leche_HatosT.ID_OPERARIO == id_operario)
     if id_hato:
         filtros.append(models.Leche_HatosT.ID_HATO== id_hato)
-    filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) >= datetime.strptime(date1,'%Y-%m-%d').date())
-    filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) >= datetime.strptime(date1,'%Y-%m-%d').date())#.isoformat(timespec='milliseconds'))
+    filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date())#.isoformat(timespec='milliseconds')) 
     return db.query(models.Leche_HatosT).join(models.HatosT).filter(*filtros).all()
 
 

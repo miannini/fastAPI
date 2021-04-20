@@ -182,7 +182,7 @@ class HatosT2(BaseModel):
 class Leche_HatosT(BaseModel):
     #ID_Leche_hato : int
     ID_HATO : int
-    FECHA_ACTIVIDAD : date #datetime
+    FECHA_ACTIVIDAD : datetime #datetime
     ID_OPERARIO : Optional[int] = None
     Comentario : Optional[str] = None
     Numero_Animales : Optional[int] = None
