@@ -54,18 +54,18 @@ def get_operarios(db: Session, finca:Optional[str]=None, rol:Optional[str]=None,
     if finca:
         filtros.append((models.OperarioT.ID_FINCA == finca))
     if rol:
-        filtros.append((models.OperarioT.Rol == rol))
+        filtros.append((models.OperarioT.Rol.contains(rol)))
     if nombre:
         filtros.append((models.OperarioT.NombreOperario.contains(nombre)))   
     return db.query(models.OperarioT).filter(*filtros).all()
     #return db.query(models.OperarioT).all()
 
-def create_operario(db: Session, operario: schemas.OperarioT):
+def create_operario(db: Session, operario: schemas.OperarioN):
     db_operario = models.OperarioT(**operario.dict(exclude_unset=True))
     db.add(db_operario)
     db.commit()
     db.refresh(db_operario)
-    return db_operario
+    return db_operario.ID_OPERARIO
 
 def delete_operario(db: Session, id_operario: int): #operario: schemas.OperarioDelete,
     db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).delete()
@@ -110,7 +110,7 @@ def get_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=No
 
 ### ************************************************
 #create lote_de_finca
-def create_finca_lote(db: Session, lote: schemas.LotesT, finca_id: int):
+def create_finca_lote(db: Session, lote: schemas.LotesN, finca_id: int):
     db_lote = models.LotesT(**lote.dict(exclude_unset=True))#, ID_FINCA=finca_id)
     db.add(db_lote)
     db.commit()
@@ -121,7 +121,7 @@ def delete_lote(db: Session, id_lote: int): #operario: schemas.OperarioDelete,
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).delete()
     db.commit()
 
-def update_lote(db: Session, lote: schemas.LotesT, id_lote: int):
+def update_lote(db: Session, lote: schemas.LotesN, id_lote: int):
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).update(lote.dict(exclude_unset=True))
     db.commit()    
 ### **************************************************
@@ -148,8 +148,12 @@ def create_acti_lotes(db: Session, ac_lo: schemas.Actividades_LotesT):
     db_ac_lo = models.Actividades_LotesT(**ac_lo.dict(exclude_unset=True))
     db.add(db_ac_lo)
     db.commit()
-    db.refresh(db_ac_lo)
+    #db.refresh(db_ac_lo)
     return "post_acti_lotes=Success"
+
+#update actividades lotes
+#cambiar de programada a ejecutada o fechas
+
 
  
 ### Hatos    
@@ -174,7 +178,7 @@ def create_hato(db: Session, hato: schemas.HatosP, id_cliente: str = 0):
     db.refresh(db_hato)
     return db_hato.ID_HATO
 
-# -- create hato and edit
+# -- edit
 
 ### leche hatos
 def get_leche_hatos(db: Session, id_hato:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0): 
@@ -188,7 +192,6 @@ def get_leche_hatos(db: Session, id_hato:Optional[int]=None, id_operario:Optiona
     filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date())#.isoformat(timespec='milliseconds')) 
     return db.query(models.Leche_HatosT).join(models.HatosT).filter(*filtros).all()
 
-
 def create_leche_hatos(db: Session, le_ha: schemas.Leche_Hatosi):
     db_le_ha = models.Leche_HatosT(**le_ha.dict(exclude_unset=True))
     db.add(db_le_ha)
@@ -196,10 +199,10 @@ def create_leche_hatos(db: Session, le_ha: schemas.Leche_Hatosi):
     #db.refresh(db_le_ha)
     return "post_leche_hatos=Success"
 
-
+#edit leche hatos, solo para admin
 
 ### Vacas    
-def get_vacas(db: Session, id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa: int=1 ,id_cliente: str = 0):
+def get_vacas(db: Session, id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:Optional[int]=None ,id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     if id_finca:
@@ -215,11 +218,20 @@ def get_vacas(db: Session, id_finca:Optional[int]=None, id_vaca:Optional[int]=No
     if activa==1:
         filtros.append(models.VacasT.FechaSalida.is_(None))
     return db.query(models.VacasT).filter(*filtros).all()
-
     
-#-- create vaca
-#-- edit vaca
+def create_vaca(db: Session, wr_va: schemas.VacaN, id_cliente: str = 0): 
+    wr_va.ID_CLIENTE = int(id_cliente)
+    db_vaca = models.VacasT(**wr_va.dict(exclude_unset=True))
+    db.add(db_vaca)
+    db.commit()
+    db.refresh(db_vaca)
+    return db_vaca.ID_VACA
 
+def update_vaca(db: Session, vaca: schemas.VacaN, id_vaca: int):
+    db.query(models.VacasT).filter(models.VacasT.ID_VACA == id_vaca).update(vaca.dict(exclude_unset=True))
+    db.commit() 
+    
+    
 ### leche vaca
 def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]
@@ -240,7 +252,7 @@ def create_leche_vacas(db: Session, le_va: schemas.Leche_Vacai):
     #db.refresh(db_le_va)
     return "post_leche_vacas=Success"
 
-
+#edit solo para admins
 
 ### meteorologia
 def registrar_meteo(db: Session, meteo: schemas.MeteorologiaT):
@@ -303,7 +315,7 @@ def update_user(db: Session, user_t: schemas.User, username: str):
     db.commit() 
     
 ########################################
-#secure users
+### secure users
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -326,6 +338,8 @@ def authenticate_user(db: Session, username: str, password: str):
     if not verify_password(password, user.password): #user.hashed_password
         return False
     return user
+
+#change pswd o change email
 
 ####################################################
 #last ID_Actividad
@@ -423,7 +437,7 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
 
 ### Traslado vacas    
 def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0):
-    reg_uv = models.Ubicacion_VacasT(**sch_ubi.dict())  
+    reg_uv = models.Ubicacion_VacasT(**sch_ubi.dict())#(ID_VACA=sch_ubi.ID_VACA, ID_HATO=sch_ubi.ID_HATO, ID_LOTE=id_lote)   
     db.add(reg_uv)
     db.commit()
     db.refresh(reg_uv)
@@ -437,7 +451,7 @@ def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente
     filtros.append(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA)
     data = db.query(models.Ubicacion_VacasT).join(models.VacasT).join(models.HatosT).filter(*filtros).all()
     if len(data) > 0:
-        db.query(models.Ubicacion_VacasT).filter(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA).update(sch_ubi.dict(exclude_unset=True))
+        db.query(models.Ubicacion_VacasT).filter(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA).update(sch_ubi.dict(exclude_unset=True)) #(ID_VACA=sch_ubi.ID_VACA, ID_HATO=sch_ubi.ID_HATO, ID_LOTE=id_lote) 
         db.commit() 
         return "ok"
  
@@ -461,7 +475,7 @@ def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=
     return db.query(models.Traslado_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all()
 
 
-# traslado hatos
+### traslado hatos
 def update_ubica_hato(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0): #vaca:Optional[str]=None
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
@@ -506,6 +520,8 @@ def create_lotes_var(db: Session, lo_va: List[schemas.Lotes_variablesT]):
     #db.refresh(db_le_va)
     return "post_lotes_variables=Success"
 
+#get
+
 def create_lotes_qui(db: Session, lo_qu: List[schemas.Lotes_quimicosT]):
     db_lo_qu = []
     for dictio in lo_qu:
@@ -517,9 +533,13 @@ def create_lotes_qui(db: Session, lo_qu: List[schemas.Lotes_quimicosT]):
     #db.refresh(db_le_va)
     return "post_lotes_quimicos=Success"
 
+#get
+
 def create_moni_des(db: Session, mo_des: schemas.monitoreo_descargas_sentinelT):
     db_mo_des = models.monitoreo_descargas_sentinelT(**mo_des.dict(exclude_unset=True))
     db.add(db_mo_des)
     db.commit()
     #db.refresh(db_le_va)
     return "post_monitoreo_descargas=Success"
+
+#get

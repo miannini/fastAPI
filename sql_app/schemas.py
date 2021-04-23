@@ -90,6 +90,23 @@ class OperarioT(Operario_id):
     class Config:
         orm_mode = True
 
+class OperarioN(BaseModel): 
+    ID_CLIENTE: Optional[int] = None
+    ID_FINCA: Optional[int] = None
+    NombreOperario: Optional[str] = None
+    FechaDeIngreso: Optional[date] = None
+    Telefono: Optional[int] = None
+    Rol: Optional[str] = None
+    Descripcion: Optional[str] = None
+    Email: Optional[str] = None
+    Direccion: Optional[str] = None
+    class Config:
+        orm_mode = True
+
+class OperarioInfo2(OperarioN):
+    ID_OPERARIO: int
+    class Config:
+        orm_mode = True        
 
 class LotesT(BaseModel): 
     ID_LOTE: int
@@ -100,12 +117,31 @@ class LotesT(BaseModel):
     LONGITUD: Optional[float] = None
     AREA: Optional[float] = None
     DESCRIPCION: Optional[str] = None
+    ID_variedad: Optional[int] = None
     #finca_madre: int
     class Config:
         orm_mode = True
 
 class LotesT2(BaseModel): 
     NOMBRE_LOTE: Optional[str] = None
+    class Config:
+        orm_mode = True
+
+class LotesN(BaseModel): 
+    #ID_LOTE: int
+    ID_FINCA: Optional[int] = None
+    NOMBRE_LOTE: Optional[str] = None
+    LATITUD: Optional[float] = None
+    LONGITUD: Optional[float] = None
+    AREA: Optional[float] = None
+    DESCRIPCION: Optional[str] = None
+    ID_variedad: Optional[int] = None
+    #finca_madre: int
+    class Config:
+        orm_mode = True
+
+class LoteInfo2(LotesN):
+    ID_LOTE: int
     class Config:
         orm_mode = True
         
@@ -199,23 +235,21 @@ class Leche_Hatosi(Leche_HatosT):
 class VacasT(BaseModel):
     ID_VACA : int
     ID_CLIENTE : int
-    ID_FINCA : int
+    #ID_FINCA : int
     ElectronicID : Optional[str] = None
     Nombre_Vaca : str
     Raza : Optional[int] = None
     Sexo : Optional[int] = None
-    #FECHA_NACIMIENTO : Optional[date] = None
     VacaMadre : Optional[int] = None
     IDparto : Optional[int] = None
     FechaRegistro : Optional[date] = None
     IDTipoOrigen : Optional[int] = None
     FechaNacimiento : Optional[date] = None
     IDTipoSalida : Optional[int] = None
-    FechaSalida : Optional[date] = None
-    #FECHA_NACIMIENTO = Column(Date, nullable=True)   
+    FechaSalida : Optional[date] = None 
     Sire : Optional[int] = None    
-    Estado : Optional[int] = None
-    Estado_Final : Optional[int] = None 
+    #Estado : Optional[int] = None
+    #Estado_Final : Optional[int] = None 
     class Config:
         orm_mode = True   
         
@@ -228,26 +262,37 @@ class VacasT2(BaseModel):
 class VacasR(BaseModel):
     ID_VACA : int
     ID_CLIENTE : int
-    #ID_FINCA : int
-    #ElectronicID : Optional[str] = None
     Nombre_Vaca : str
     Raza : Optional[int] = None
     Sexo : Optional[int] = None
-    #FECHA_NACIMIENTO : Optional[date] = None
-    #VacaMadre : Optional[int] = None
-    #IDparto : Optional[int] = None
-    #FechaRegistro : Optional[date] = None
-    #IDTipoOrigen : Optional[int] = None
-    #FechaNacimiento : Optional[date] = None
-    #IDTipoSalida : Optional[int] = None
-    #FechaSalida : Optional[date] = None
-    #FECHA_NACIMIENTO = Column(Date, nullable=True)   
-    #Sire : Optional[int] = None    
-    #Estado : Optional[int] = None
-    #Estado_Final : Optional[int] = None 
     class Config:
         orm_mode = True  
 
+
+#vacas edit and create
+class VacaN(BaseModel):
+    ID_CLIENTE : Optional[int] = None
+    ElectronicID : Optional[str] = None
+    Nombre_Vaca : Optional[str] = None
+    Raza : Optional[int] = None
+    Sexo : Optional[int] = None
+    VacaMadre : Optional[int] = None
+    IDparto : Optional[int] = None
+    FechaRegistro : Optional[date] = None
+    IDTipoOrigen : Optional[int] = None
+    FechaNacimiento : Optional[date] = None
+    IDTipoSalida : Optional[int] = None
+    FechaSalida : Optional[date] = None 
+    Sire : Optional[int] = None
+    class Config:
+        orm_mode = True
+    
+class VacaInfo2(VacaN):
+    ID_VACA: int
+    class Config:
+        orm_mode = True
+
+#
 
 class CriasT(BaseModel):
     ID_CRIA : int
@@ -437,6 +482,12 @@ class Ubicacion_VacasBasic(BaseModel):
     class Config:
         orm_mode = True 
 
+class Ubicacion_VacasBasic2(BaseModel):
+    ID_VACA : Optional [int] = None
+    ID_HATO : Optional [int] = None
+    #ID_LOTE : Optional [int] = None    
+    class Config:
+        orm_mode = True
         
 class Traslado_Vacas_id(BaseModel):
     ID_TRASLADO : int   

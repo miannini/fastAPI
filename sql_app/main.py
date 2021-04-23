@@ -112,7 +112,7 @@ def update_user_status(USERNAME: str, user_t: schemas.User, db: Session = Depend
 def read_users(db: Session = Depends(get_db), full_name: Optional[str]=None, email: Optional[str]=None, active_status: Optional[int]=None,  user_rol: Optional[int]=None, operario: Optional[int]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     usuarios = crud.get_all_users(db, full_name=full_name, email=email, active_status=active_status,  user_rol=user_rol, operario=operario, id_cliente= current_user.ID_CLIENTE)
     return usuarios
-
+#deberia haber una forma de mostrar todos asi no sean del cliente, para asignar
 
 @app.get("/clientes/", response_model=List[schemas.ClientesT])  # sT
 def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None):
@@ -125,6 +125,8 @@ def write_cliente(cliente: schemas.ClientesCreate, db: Session = Depends(get_db)
     #esto seria bueno asociarlo con enviar un email, con formulario y que el ID de cliente se guarde
     #para asignarlo al usuario creado
 
+#falta editar cliente [tambien agregar fecha inicial contrato, fecha_vencimiento, estado]
+
 
 @app.get("/Operario", response_model=List[schemas.OperarioT])  # List[
 def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -132,8 +134,8 @@ def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, rol:
     return operarios
 
 
-@app.post("/create_operario/", response_model=schemas.OperarioT)
-def write_operario(operario: schemas.OperarioT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+@app.post("/create_operario/", status_code=201)
+def write_operario(operario: schemas.OperarioN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_operario(db=db, operario=operario)
 
 
@@ -168,8 +170,8 @@ def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user:
 
 
 @app.post("/Fincas/{finca_id}/Lotes/", response_model=schemas.LotesT)
-def write_lote_for_finca(finca_id: int, lote: schemas.LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    return crud.create_finca_lote(db=db, lote=lote, finca_id=finca_id, id_cliente= current_user.ID_CLIENTE)
+def write_lote_for_finca(finca_id: int, lote: schemas.LotesN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_finca_lote(db=db, lote=lote, finca_id=finca_id) #, id_cliente= current_user.ID_CLIENTE)
 
 
 @app.get("/Lotes/", response_model=List[schemas.LotesT])
@@ -187,7 +189,7 @@ def read_ubva(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato
 @app.delete("/Lotes_del/{ID_LOTE}", )
 def erase_lote(ID_LOTE: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     crud.delete_lote(db, id_lote=ID_LOTE)  # operario = operario,
-    db_lote_id = crud.get_lote_by_id(db, id_lote=ID_LOTE)
+    db_lote_id = crud.get_lotes(db, id_lote=ID_LOTE, id_cliente = current_user.ID_CLIENTE)
     if db_lote_id is not None:
         raise HTTPException(status_code=404, detail="Lote_ID not deleted")
     return {
@@ -196,10 +198,11 @@ def erase_lote(ID_LOTE: int, db: Session = Depends(get_db), current_user: schema
     }
 
 
-@app.patch("/Lotes_upd/{ID_LOTE}", response_model=schemas.LotesT)
-def update_lotes_id(ID_LOTE: int, lote: schemas.LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+@app.patch("/Lotes_upd/{ID_LOTE}", response_model=List[schemas.LotesT])
+def update_lotes_id(ID_LOTE: int, lote: schemas.LotesN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    #primero ver si el lote si pertenece al cliente, luego cambiar
     crud.update_lote(db=db, lote=lote, id_lote=ID_LOTE)
-    db_lote_id = crud.get_lote_by_id(db, id_lote=ID_LOTE)
+    db_lote_id = crud.get_lotes(db, id_lote=ID_LOTE, id_cliente = current_user.ID_CLIENTE)
     if db_lote_id is None:
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_lote_id
@@ -253,6 +256,19 @@ async def read_vacas(db: Session = Depends(get_db), id_finca:Optional[int]=None,
     vacas = crud.get_vacas(db, id_finca=id_finca, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE)
     return vacas
 
+
+@app.post("/Wr_Vaca/", status_code=201)
+def create_vaca(wr_va: schemas.VacaN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_vaca(db=db, wr_va=wr_va, id_cliente = current_user.ID_CLIENTE)
+
+@app.patch("/Vacas_upd/{ID_VACA}", response_model=List[schemas.VacasT])
+def update_vacas_id(ID_VACA: int, vaca: schemas.VacaN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_vaca(db=db, vaca=vaca, id_vaca=ID_VACA)
+    db_vaca_id = crud.get_vacas(db, id_vaca=ID_VACA, id_cliente = current_user.ID_CLIENTE)
+    if db_vaca_id is None:
+        raise HTTPException(status_code=404, detail="Vaca_ID not found")       
+    return db_vaca_id
+
 @app.get("/Leche_Vacas/", response_model=List[schemas.Leche_Vacai])
 def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
     leche_vaca = crud.get_leche_vacas(db, id_vaca=id_vaca, id_operario=id_operario, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
@@ -297,9 +313,18 @@ async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[st
 
 @app.post("/Traslado_vaca/", status_code=201)
 async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    #obtener lote_id del hato al que se mueve la vaca
+    id_lote = crud.get_ubva(db, id_hato=sch_ubi.ID_HATO, id_cliente= current_user.ID_CLIENTE)
+    #transformar JSON a dataframe y extraer unico lote en INT
+    id_lote2 = pd.DataFrame.from_records([s.__dict__ for s in id_lote])
+    id_lote2.reset_index(drop=True, inplace=True)
+    id_lote = id_lote2.ID_LOTE.mode()
+    #actualizar diccionario incluyendo datos del lote
+    sch_ubi.ID_LOTE=int(id_lote)
     #actualizar datos de ubicacion
-    updated = crud.update_ubica_vaca(db=db, sch_ubi=sch_ubi, id_cliente= current_user.ID_CLIENTE)
+    updated = crud.update_ubica_vaca(db=db, sch_ubi=sch_ubi, id_cliente= current_user.ID_CLIENTE)#, id_lote=id_lote)
     if updated == 'ok':
+        print('ok')
         #si la ubicacion ya existia y se actualizo, entonces escribir nuevo traslado id
         db_tras_vaca = crud.write_trasvaca(db=db, sch_ubi=sch_ubi, Fecha_Traslado=Fecha_Traslado, id_cliente = current_user.ID_CLIENTE)
         if db_tras_vaca is None: #si el traslado de vaca no se registro, mostrar error
@@ -307,13 +332,14 @@ async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depe
     
     #si la ubicacion no existia, entonces escribir nueva ubicacion y nuevo traslado
     else: #toca restringir vacas, lotes y hatos desde la APP con seleccion, no texto
+        print('no existe')
         #primero comprobrar que el cliente tenga esa vaca, lote y hato
         #data_histo = crud.get_ubva(db=db, id_vaca=sch_ubi.ID_VACA, id_cliente= current_user.ID_CLIENTE) #id_hato=sch_ubi.ID_HATO, id_lote=sch_ubi.ID_LOTE,
         #if len(data_histo) == 0 :
         #    #si el cliente no tiene alguno de esos, mostrar error para que ingrese nuevos datos
         #    raise HTTPException(status_code=400, detail="Vaca, o Lote, o Hato no son de cliente")
         #elif len(data_histo) == 1:
-        crud.write_ubi_vaca(db=db, sch_ubi=sch_ubi, id_cliente=current_user.ID_CLIENTE)
+        crud.write_ubi_vaca(db=db, sch_ubi=sch_ubi, id_cliente=current_user.ID_CLIENTE, id_lote = id_lote)
         db_tras_vaca = crud.write_trasvaca(db=db, sch_ubi=sch_ubi, Fecha_Traslado=Fecha_Traslado, id_cliente = current_user.ID_CLIENTE)
         if db_tras_vaca is None: #si el traslado de vaca no se registro, mostrar error
             raise HTTPException(status_code=404, detail="Traslado no registrado")

@@ -71,6 +71,7 @@ class LotesT(Base):
     LONGITUD = Column(Float, nullable=True)
     AREA = Column(Float, nullable=True)
     DESCRIPCION = Column(String(45), nullable=True)
+    ID_variedad = Column(Integer, nullable=True)
     finca_madre = relationship("FincaT", back_populates="lotes_list")
     #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
 
@@ -111,7 +112,7 @@ class VacasT(Base):
     __tablename__ = "vacas"
     ID_VACA = Column(Integer, primary_key=True, index=True)
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
-    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
+    #ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     ElectronicID = Column(String(32), nullable=True)
     Nombre_Vaca = Column(String(32))
     Raza = Column(Integer, nullable=True)
@@ -125,8 +126,8 @@ class VacasT(Base):
     FechaSalida = Column(Date, nullable=True)
     #FECHA_NACIMIENTO = Column(Date, nullable=True)
     Sire = Column(Integer, nullable=True)
-    Estado = Column(Integer, nullable=True)
-    Estado_Final = Column(Integer, nullable=True)
+    #Estado = Column(Integer, nullable=True)
+    #Estado_Final = Column(Integer, nullable=True)
     #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
   
 class CriaT(Base):
