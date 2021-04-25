@@ -247,13 +247,13 @@ def wr_leche_hatos(le_ha: schemas.Leche_Hatosi, db: Session = Depends(get_db), c
 
 
 @app.get("/Vacas/", response_model=List[schemas.VacasT])
-async def read_vacas(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1, current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    vacas = crud.get_vacas(db, id_finca=id_finca, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE)
+async def read_vacas(db: Session = Depends(get_db), id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
+    vacas = crud.get_vacas(db, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE) #id_finca=id_finca
     return vacas
 
 @app.get("/Vacas_small/", response_model=List[schemas.VacasR])
-async def read_vacas(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1, current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    vacas = crud.get_vacas(db, id_finca=id_finca, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE)
+async def read_vacas(db: Session = Depends(get_db), id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1, current_user: schemas.UserInfo = Depends(get_current_active_user)):  #id_finca:Optional[int]=None
+    vacas = crud.get_vacas(db,  id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE) #id_finca=id_finca
     return vacas
 
 

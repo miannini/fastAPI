@@ -202,11 +202,11 @@ def create_leche_hatos(db: Session, le_ha: schemas.Leche_Hatosi):
 #edit leche hatos, solo para admin
 
 ### Vacas    
-def get_vacas(db: Session, id_finca:Optional[int]=None, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:Optional[int]=None ,id_cliente: str = 0):
+def get_vacas(db: Session, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:Optional[int]=None ,id_cliente: str = 0): #id_finca:Optional[int]=None
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
-    if id_finca:
-        filtros.append(models.VacasT.ID_FINCA == id_finca)
+    #if id_finca:
+    #    filtros.append(models.VacasT.ID_FINCA == id_finca)
     if id_vaca:
         filtros.append(models.VacasT.ID_VACA == id_vaca)
     if nombre:
