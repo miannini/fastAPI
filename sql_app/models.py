@@ -115,7 +115,7 @@ class VacasT(Base):
     #ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     ElectronicID = Column(String(32), nullable=True)
     Nombre_Vaca = Column(String(32))
-    Raza = Column(Integer, nullable=True)
+    Raza = Column(Integer, ForeignKey("Raza.ID_RAZA"), nullable=True)
     Sexo = Column(Integer, nullable=True)
     VacaMadre = Column(Integer, nullable=True)
     IDparto = Column(Integer, nullable=True)
@@ -297,4 +297,14 @@ class monitoreo_descargas_sentinelT(Base):
     end_time = Column(DateTime, nullable=True)
     prct_clouds = Column(Float, nullable=True)
     
-    
+class razaT(Base):
+    __tablename__ = "Raza"
+    ID_RAZA= Column(Integer,  primary_key=True)
+    Codigo = Column(String(11), nullable=True)
+    Nombre = Column(String(45), nullable=True)
+    Gestacion = Column(Integer, nullable=True)
+    MaxGestacion = Column(Integer, nullable=True)
+    MinGestacion  = Column(Integer, nullable=True)
+    Leche = Column(String(33), nullable=True)
+    Carne = Column(String(33), nullable=True)
+    Pureza = Column(Float, nullable=True)

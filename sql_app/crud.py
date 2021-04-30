@@ -231,7 +231,22 @@ def update_vaca(db: Session, vaca: schemas.VacaN, id_vaca: int):
     db.query(models.VacasT).filter(models.VacasT.ID_VACA == id_vaca).update(vaca.dict(exclude_unset=True))
     db.commit() 
     
-    
+ 
+### raza
+def get_razas(db: Session, id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None):#, id_cliente: str = 0): #id_finca:Optional[int]=None
+    filtros=[]
+    if id_raza:
+        filtros.append(models.razaT.ID_RAZA == id_raza)
+    if nombre:
+        filtros.append(models.razaT.Nombre.contains(nombre)) 
+    if codigo:
+        filtros.append(models.razaT.Codigo.contains(codigo))
+    #return db.query(models.razaT).filter(*filtros).all()  
+    if len(filtros)>0:
+        return db.query(models.razaT).filter(*filtros).all()
+    else:
+        return db.query(models.razaT).all()  
+ 
 ### leche vaca
 def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]

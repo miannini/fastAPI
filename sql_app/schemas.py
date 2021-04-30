@@ -561,3 +561,24 @@ class monitoreo_descargas_sentinelT(BaseModel):
     prct_clouds : Optional [float] = None
     class Config:
         orm_mode = True
+        
+class razaT(BaseModel):
+    ID_RAZA : int
+    Codigo : Optional [str] = None
+    Nombre : Optional [str] = None
+    Gestacion : Optional [int] = None 
+    MaxGestacion : Optional [int] = None
+    MinGestacion  : Optional [int] = None
+    Leche : Optional [str] = None
+    Carne : Optional [str] = None
+    Pureza : Optional [float] = None
+    class Config:
+        orm_mode = True
+        
+class razaR(BaseModel):
+    ID_RAZA : int
+    Codigo : Optional [str] = None
+    Nombre : Optional [str] = None
+    class Config:
+        orm_mode = True
+    

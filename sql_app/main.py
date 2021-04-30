@@ -269,6 +269,19 @@ def update_vacas_id(ID_VACA: int, vaca: schemas.VacaN, db: Session = Depends(get
         raise HTTPException(status_code=404, detail="Vaca_ID not found")       
     return db_vaca_id
 
+
+@app.get("/Raza/", response_model=List[schemas.razaT])
+async def read_raza(db: Session = Depends(get_db), id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
+    raza = crud.get_razas(db, id_raza=id_raza, nombre=nombre, codigo=codigo) #, id_cliente = current_user.ID_CLIENTE
+    return raza
+
+@app.get("/Raza_small/", response_model=List[schemas.razaR])
+async def read_raza(db: Session = Depends(get_db), id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
+    raza = crud.get_razas(db, id_raza=id_raza, nombre=nombre, codigo=codigo) #id_cliente = current_user.ID_CLIENTE
+    return raza
+
+
+
 @app.get("/Leche_Vacas/", response_model=List[schemas.Leche_Vacai])
 def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
     leche_vaca = crud.get_leche_vacas(db, id_vaca=id_vaca, id_operario=id_operario, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
