@@ -271,14 +271,40 @@ def update_vacas_id(ID_VACA: int, vaca: schemas.VacaN, db: Session = Depends(get
 
 
 @app.get("/Raza/", response_model=List[schemas.razaT])
-async def read_raza(db: Session = Depends(get_db), id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
+async def read_raza(db: Session = Depends(get_db), id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     raza = crud.get_razas(db, id_raza=id_raza, nombre=nombre, codigo=codigo) #, id_cliente = current_user.ID_CLIENTE
     return raza
 
 @app.get("/Raza_small/", response_model=List[schemas.razaR])
-async def read_raza(db: Session = Depends(get_db), id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
+async def read_raza(db: Session = Depends(get_db), id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
     raza = crud.get_razas(db, id_raza=id_raza, nombre=nombre, codigo=codigo) #id_cliente = current_user.ID_CLIENTE
     return raza
+
+@app.get("/Sexo/", response_model=List[schemas.sexoT])
+async def read_sexo(db: Session = Depends(get_db), id_sexo:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    sexo = crud.get_sexo(db, id_sexo=id_sexo, nombre=nombre, codigo=codigo) #, id_cliente = current_user.ID_CLIENTE
+    return sexo
+
+@app.get("/Tip_Dest/", response_model=List[schemas.tipo_destinoT])
+async def read_dest(db: Session = Depends(get_db), id_destino:Optional[int]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    tip_dest = crud.get_t_destino(db, id_destino=id_destino, nombre=nombre) #, id_cliente = current_user.ID_CLIENTE
+    return tip_dest
+
+@app.get("/Tip_Oper/", response_model=List[schemas.tipo_operacionesT])
+async def read_tip_oper(db: Session = Depends(get_db), id_tipo:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    tip_oper = crud.get_t_operacion(db, id_tipo=id_tipo, nombre=nombre, codigo=codigo) #, id_cliente = current_user.ID_CLIENTE
+    return tip_oper
+
+
+@app.get("/AV_categ/", response_model=List[schemas.Actividades_vacas_categoriaT])
+async def read_av_categ(db: Session = Depends(get_db), id_cat:Optional[int]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    av_categ = crud.get_av_categoria(db, id_cat=id_cat, nombre=nombre) #, id_cliente = current_user.ID_CLIENTE
+    return av_categ
+
+@app.get("/AV_result/", response_model=List[schemas.Actividades_vacas_resultadoT])
+async def read_av_result(db: Session = Depends(get_db), id_res:Optional[int]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    av_res = crud.get_av_resultado(db, id_res=id_res, nombre=nombre) #, id_cliente = current_user.ID_CLIENTE
+    return av_res
 
 
 

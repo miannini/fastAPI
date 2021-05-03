@@ -582,3 +582,40 @@ class razaR(BaseModel):
     class Config:
         orm_mode = True
     
+class sexoT(BaseModel):
+    idSexo : int
+    Codigo : Optional [str] = None
+    Nombre : Optional [str] = None
+    Genero : Optional [int] = None 
+    VacaRep : Optional [int] = None
+    ToroRep  : Optional [int] = None
+    class Config:
+        orm_mode = True  
+    
+class tipo_destinoT(BaseModel):   
+    IDTipo_Destino : int
+    Nombre : Optional [str] = None
+    Descripcion : Optional [str] = None
+    class Config:
+        orm_mode = True
+        
+class tipo_operacionesT(BaseModel):
+    ID_TipoOperaciones : int
+    Codigo : Optional [str] = None
+    Nombre : Optional [str] = None
+    class Config:
+        orm_mode = True
+        
+class Actividades_vacas_categoriaT(BaseModel):   
+    ID_Categoria : int
+    Nombre : Optional [str] = None
+    Descripcion : Optional [str] = None
+    class Config:
+        orm_mode = True
+        
+class Actividades_vacas_resultadoT(BaseModel):   
+    ID_Resutlado : int
+    Nombre : Optional [str] = None
+    Descripcion : Optional [str] = None
+    class Config:
+        orm_mode = True

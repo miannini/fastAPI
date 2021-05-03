@@ -308,3 +308,36 @@ class razaT(Base):
     Leche = Column(String(33), nullable=True)
     Carne = Column(String(33), nullable=True)
     Pureza = Column(Float, nullable=True)
+    
+class sexoT(Base):
+    __tablename__ = "Sexo"
+    idSexo= Column(Integer,  primary_key=True)
+    Codigo = Column(String(4), nullable=True)
+    Nombre = Column(String(45), nullable=True)
+    Genero = Column(Integer, nullable=True)
+    VacaRep = Column(Integer, nullable=True)
+    ToroRep  = Column(Integer, nullable=True)
+
+class tipo_destinoT(Base):
+    __tablename__ = "Tipo_Destino"
+    IDTipo_Destino= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45), nullable=True)
+    Descripcion = Column(String(45), nullable=True)
+
+class tipo_operacionesT(Base):
+    __tablename__ = "Tipo_operaciones"
+    ID_TipoOperaciones= Column(Integer,  primary_key=True)
+    Codigo = Column(String(45), nullable=True)
+    Nombre = Column(String(45), nullable=True)
+
+class Actividades_vacas_categoriaT(Base):
+    __tablename__ = "Actividades_vacas_categoria"
+    ID_Categoria= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45))
+    Descripcion = Column(String(45), nullable=True)
+    
+class Actividades_vacas_resultadoT(Base):
+    __tablename__ = "Actividades_vacas_resultado"
+    ID_Resutlado= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45))
+    Descripcion = Column(String(45), nullable=True)

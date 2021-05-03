@@ -233,7 +233,7 @@ def update_vaca(db: Session, vaca: schemas.VacaN, id_vaca: int):
     
  
 ### raza
-def get_razas(db: Session, id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None):#, id_cliente: str = 0): #id_finca:Optional[int]=None
+def get_razas(db: Session, id_raza:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None):
     filtros=[]
     if id_raza:
         filtros.append(models.razaT.ID_RAZA == id_raza)
@@ -241,12 +241,79 @@ def get_razas(db: Session, id_raza:Optional[int]=None, nombre:Optional[str]=None
         filtros.append(models.razaT.Nombre.contains(nombre)) 
     if codigo:
         filtros.append(models.razaT.Codigo.contains(codigo))
-    #return db.query(models.razaT).filter(*filtros).all()  
     if len(filtros)>0:
         return db.query(models.razaT).filter(*filtros).all()
     else:
         return db.query(models.razaT).all()  
- 
+
+    
+### sexo
+def get_sexo(db: Session, id_sexo:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None):
+    filtros=[]
+    if id_sexo:
+        filtros.append(models.sexoT.idSexo == id_sexo)
+    if nombre:
+        filtros.append(models.sexoT.Nombre.contains(nombre)) 
+    if codigo:
+        filtros.append(models.sexoT.Codigo.contains(codigo)) 
+    if len(filtros)>0:
+        return db.query(models.sexoT).filter(*filtros).all()
+    else:
+        return db.query(models.sexoT).all() 
+    
+
+### Tipo_Destino
+def get_t_destino(db: Session, id_destino:Optional[int]=None, nombre:Optional[str]=None):
+    filtros=[]
+    if id_destino:
+        filtros.append(models.tipo_destinoT.IDTipo_Destino == id_destino)
+    if nombre:
+        filtros.append(models.tipo_destinoT.Nombre.contains(nombre)) 
+    if len(filtros)>0:
+        return db.query(models.tipo_destinoT).filter(*filtros).all()
+    else:
+        return db.query(models.tipo_destinoT).all() 
+
+### tipo de operaciones    
+def get_t_operacion(db: Session, id_tipo:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None):
+    filtros=[]
+    if id_tipo:
+        filtros.append(models.tipo_operacionesT.ID_TipoOperaciones == id_tipo)
+    if nombre:
+        filtros.append(models.tipo_operacionesT.Nombre.contains(nombre)) 
+    if codigo:
+        filtros.append(models.tipo_operacionesT.Codigo.contains(codigo)) 
+    if len(filtros)>0:
+        return db.query(models.tipo_operacionesT).filter(*filtros).all()
+    else:
+        return db.query(models.tipo_operacionesT).all() 
+
+### Actividades_vacas_categoria
+def get_av_categoria(db: Session, id_cat:Optional[int]=None, nombre:Optional[str]=None):
+    filtros=[]
+    if id_cat:
+        filtros.append(models.Actividades_vacas_categoriaT.ID_Categoria == id_cat)
+    if nombre:
+        filtros.append(models.Actividades_vacas_categoriaT.Nombre.contains(nombre)) 
+    if len(filtros)>0:
+        return db.query(models.Actividades_vacas_categoriaT).filter(*filtros).all()
+    else:
+        return db.query(models.Actividades_vacas_categoriaT).all() 
+    
+### Actividades_vacas_resultado
+def get_av_resultado(db: Session, id_res:Optional[int]=None, nombre:Optional[str]=None):
+    filtros=[]
+    if id_res:
+        filtros.append(models.Actividades_vacas_resultadoT.ID_Resutlado == id_res)
+    if nombre:
+        filtros.append(models.Actividades_vacas_resultadoT.Nombre.contains(nombre)) 
+    if len(filtros)>0:
+        return db.query(models.Actividades_vacas_resultadoT).filter(*filtros).all()
+    else:
+        return db.query(models.Actividades_vacas_resultadoT).all() 
+
+
+    
 ### leche vaca
 def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]
