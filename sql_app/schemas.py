@@ -406,6 +406,19 @@ class UserInfo2(User):
         orm_mode = True
 ################  
 
+class ActInfoBase(BaseModel):
+    ID_Actividad : int
+
+class ActInfo(ActInfoBase):
+    ID_VACA : int
+    ID_TipoOperacion : int = 9
+    ID_Resultado : int = 34
+    ID_OPERARIO : int = 35
+    ID_Categoria : int = 1
+    Fecha  : Optional[date] = None
+    Comentario : Optional[str] = None
+    class Config:
+        orm_mode = True 
 
 class MastitisT(BaseModel):
     ID_ACTIVIDAD : int
@@ -435,20 +448,23 @@ class Mast_Requi(BaseModel):
     Chequeo_revision : Optional[str] = None
     class Config:
         orm_mode = True 
-        
-class ActInfoBase(BaseModel):
-    ID_Actividad : int
 
-class ActInfo(ActInfoBase):
-    ID_VACA : int
-    ID_TipoOperacion : int = 9
-    ID_Resultado : int = 34
-    ID_OPERARIO : int = 35
-    ID_Categoria : int = 1
-    Fecha  : Optional[date] = None
-    Comentario : Optional[str] = None
+#new test mastitis        
+class Mast_2(BaseModel):
+    ID_ACTIVIDAD : int
+    AI : Optional [int] = None
+    AD : Optional [int] = None
+    PI : Optional [int] = None
+    PD : Optional [int] = None
+    Chequeo_revision : Optional[str] = None
+    Ubre_sana : Optional [float] = None
+    Calificacion : Optional [float] = None
+    GAP : Optional [float] = None
+    act_model : ActInfo = None
     class Config:
         orm_mode = True 
+        
+
 '''        
 class Act_Requi(BaseModel):
     ID_VACA : int

@@ -6,7 +6,7 @@ Created on Tue Dec 15 20:17:18 2020
 """
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, inspect
 from typing import Optional, List
 from . import models, schemas
 from datetime import date, datetime
@@ -18,6 +18,18 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 #CRUD = Create, Read, Update and Delete
 
+#to join tables and yield a flat result
+def obj_to_dict(obj):
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+
+def flatten_join(tup_list):
+    return [{**obj_to_dict(a), **obj_to_dict(b)} for a,b in tup_list]
+
+#funcion para unir elementos de tablas, pero quitando variables que no se necesiten de la union
+def flatten_join_av(tup_list, avoid):
+    old_list = [{**obj_to_dict(a), **obj_to_dict(b)} for a,b in tup_list]
+    new_list = [{k: v for k, v in d.items() if k not in avoid} for d in old_list]
+    return new_list
 
 ### Clientes
 def get_clientes(db: Session, ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None): #date1: str = datetime.now().strftime("%Y-%m-%d")
@@ -58,7 +70,7 @@ def get_operarios(db: Session, finca:Optional[str]=None, rol:Optional[str]=None,
     if nombre:
         filtros.append((models.OperarioT.NombreOperario.contains(nombre)))   
     return db.query(models.OperarioT).filter(*filtros).all()
-    #return db.query(models.OperarioT).all()
+    #evaluar si retornar con Usuario API joined
 
 def create_operario(db: Session, operario: schemas.OperarioN):
     db_operario = models.OperarioT(**operario.dict(exclude_unset=True))
@@ -104,8 +116,7 @@ def get_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=No
         filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre)))            
     #if len(filtros)>0:
     return db.query(models.LotesT).join(models.FincaT).filter(*filtros).all()
-    #else:
-    #    return db.query(models.LotesT).all()
+    #evaluar si se queire con Finca Joined
     
 
 ### ************************************************
@@ -142,7 +153,7 @@ def get_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[in
     if nombre_oper:
         filtros.append((models.OperarioT.NombreOperario.contains(nombre_oper)))               
     return db.query(models.Actividades_LotesT).join(models.OperarioT).join(models.LotesT).join(models.FincaT).filter(*filtros).all()  
-
+    #evaluar si se quisiera obtener el join completo
 
 def create_acti_lotes(db: Session, ac_lo: schemas.Actividades_LotesT):
     db_ac_lo = models.Actividades_LotesT(**ac_lo.dict(exclude_unset=True))
@@ -445,7 +456,7 @@ def get_act_vacas(db: Session, date1: str = '2020-01-01', date2: str = datetime.
         filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
     return db.query(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()
     
-    
+'''    
 def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : # 
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
@@ -458,9 +469,31 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
     if operario:
         filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
     return db.query(models.MastitisT).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()  
+'''
+
+#solution to join tables
+#https://stackoverflow.com/questions/27280862/sqlalchemy-getting-a-single-object-from-joining-multiple-tables/60883545#60883545?newreg=418bba09a46f4fe5b0b02ab0e8514acc
+def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : # 
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.ActividadesVacasT.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date())    
+    if vaca:
+        filtros.append((models.ActividadesVacasT.ID_VACA == vaca))
+    if operacion:
+        filtros.append((models.ActividadesVacasT.ID_TipoOperacion == operacion))
+    if operario:
+        filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
+    res = db.query(models.MastitisT, models.ActividadesVacasT).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()  
+    #remover ID_TipoOperacion, ID_Resultado, ID_Categoria, ID_Actividad
+    avoid = ['ID_TipoOperacion', 'ID_Resultado', 'ID_Categoria', 'ID_Actividad']
+    res_b = flatten_join_av(res, avoid) #res_b = flatten_join(res)
+    
+    return res_b
 
 
-
+    
+    
 ### Registrar Mastitis
 def reg_acti_2(db: Session, data: schemas.Mast_Requi):
     reg_av = models.ActividadesVacasT(ID_VACA=data.ID_VACA, ID_TipoOperacion=data.ID_TipoOperacion, ID_Resultado=data.ID_Resultado,
