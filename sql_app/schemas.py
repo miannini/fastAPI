@@ -405,6 +405,16 @@ class UserInfo2(User):
     class Config:
         orm_mode = True
 ################  
+#privileges
+
+class API_Users_PrivT(BaseModel):
+    id_user_rol : int
+    name : Optional[str] = None
+    description : Optional[str] = None
+    class Config:
+        orm_mode = True
+    
+#################
 
 class ActInfoBase(BaseModel):
     ID_Actividad : int

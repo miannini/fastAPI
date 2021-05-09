@@ -434,6 +434,18 @@ def authenticate_user(db: Session, username: str, password: str):
 
 #change pswd o change email
 
+#get_all_privs
+def get_all_privs(db: Session, name:Optional[int]=None, description:Optional[str]=None):
+    filtros=[]
+    if name:
+        filtros.append(models.API_Users_PrivT.name.contains(name))
+    if description:
+        filtros.append(models.API_Users_PrivT.description.contains(description)) 
+    if len(filtros)>0:
+        return db.query(models.API_Users_PrivT).filter(*filtros).all()
+    else:
+        return db.query(models.API_Users_PrivT).all() 
+
 ####################################################
 #last ID_Actividad
 '''

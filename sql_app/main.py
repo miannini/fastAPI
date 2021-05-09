@@ -114,6 +114,13 @@ def read_users(db: Session = Depends(get_db), full_name: Optional[str]=None, ema
     return usuarios
 #deberia haber una forma de mostrar todos asi no sean del cliente, para asignar
 
+
+@app.get("/User_priv/", response_model=List[schemas.API_Users_PrivT])  # sT
+def read_users_priv(db: Session = Depends(get_db), name: Optional[str]=None, description: Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    privilegios = crud.get_all_privs(db, name=name, description=description)
+    return privilegios
+
+
 @app.get("/clientes/", response_model=List[schemas.ClientesT])  # sT
 def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None):
     clientes = crud.get_clientes(db, ciudad=ciudad, departamento=departamento, nombre=nombre, date1= date1, id_cliente=id_cliente)

@@ -191,11 +191,18 @@ class API_UsersT(Base):
     email = Column(String(45))
     password = Column(String(99))
     active_status = Column(Integer, nullable=True)
-    id_user_rol = Column(Integer, nullable=True)
+    id_user_rol = Column(Integer, ForeignKey("API_Users_Privileges.id_user_rol"), nullable=True)
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), nullable=True)
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
 
 
+class API_Users_PrivT(Base):
+    __tablename__ = "API_Users_Privileges"
+    id_user_rol = Column(Integer, primary_key=True, index=True)
+    name = Column(String(45), nullable=True)
+    description= Column(String(45), nullable=True)
+    
+    
 class MastitisT(Base):
     __tablename__ = "Mastitis"
     ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), primary_key=True, index=True)#, ForeignKey("Actividades_Vacas.ID_FINCA"))
