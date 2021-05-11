@@ -345,6 +345,15 @@ def create_leche_vacas(db: Session, le_va: schemas.Leche_Vacai):
     #db.refresh(db_le_va)
     return "post_leche_vacas=Success"
 
+def create_leche_vaca_list(db: Session, le_va: List[schemas.Leche_VacaT]):
+    db_le_va = []
+    for dictio in le_va:
+        db_le_va.append(models.Leche_VacaT(**dictio.dict(exclude_unset=True)))
+    db.bulk_save_objects(db_le_va)
+    db.commit()
+    #db.refresh(db_le_va)
+    return "post_leche_vacas_list=Success"
+
 #edit solo para admins
 
 ### meteorologia

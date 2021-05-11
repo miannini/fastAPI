@@ -324,6 +324,12 @@ def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, i
 def wr_leche_vacas(le_va: schemas.Leche_Vacai, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_vacas(db=db, le_va=le_va)
 
+
+@app.post("/Wr_Leche_vaca_list/", status_code=201) #, response_model=schemas.Leche_Vacai)
+def wr_leche_vaca_l(le_va: List[schemas.Leche_VacaT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_leche_vaca_list(db=db, le_va=le_va)
+
+
 '''
 @app.post("/Mastitis/", response_model=Union[schemas.MastitisT, schemas.ActInfo])
 async def write_mastitis(mastitis: schemas.MastitisT, av:schemas.ActInfo, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
