@@ -515,8 +515,8 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
 
     
     
-### Registrar Mastitis
-def reg_acti_2(db: Session, data: schemas.Mast_Requi):
+### Registrar Actividad - cualquiera
+def reg_acti_2(db: Session, data: schemas.ActInfo): #Mast_Requi
     reg_av = models.ActividadesVacasT(ID_VACA=data.ID_VACA, ID_TipoOperacion=data.ID_TipoOperacion, ID_Resultado=data.ID_Resultado,
                                       ID_OPERARIO=data.ID_OPERARIO, ID_Categoria=data.ID_Categoria, Fecha=data.Fecha, Comentario=data.Comentario)  
     db.add(reg_av)
@@ -524,6 +524,7 @@ def reg_acti_2(db: Session, data: schemas.Mast_Requi):
     db.refresh(reg_av)
     return reg_av
 
+### calificacion de pezones
 def pez_cor(pez, valids): #correccion de valor de pezones, para calculo de ubre sana y calificacion
         if pez==5: #5 = pezon muerto
             res = None
@@ -536,6 +537,7 @@ def pez_cor(pez, valids): #correccion de valor de pezones, para calculo de ubre 
             cor =0
         return [res,cor]
 
+### registrar mastitis
 def registrar_masti_2(db: Session, data: schemas.Mast_Requi, id_to_use):
     #calculo de calificacion y ubre sana
     valids = 4 - sum(float(num) == 5 for num in [data.AI,data.AD,data.PI,data.PD]) #calculo de pezones validos
@@ -556,6 +558,57 @@ def registrar_masti_2(db: Session, data: schemas.Mast_Requi, id_to_use):
     return "post_Registrar_mastitis_2"
 
 
+### partos
+def get_act_partos(db: Session, date1: str = '2000-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None, id_cliente: str = 0) : # 
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.ActividadesVacasT.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date())    
+    if vaca:
+        filtros.append((models.ActividadesVacasT.ID_VACA == vaca))
+    if categoria:
+        filtros.append((models.ActividadesVacasT.ID_Categoria == categoria))
+    if operario:
+        filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
+    if comentario:
+        filtros.append((models.ActividadesVacasT.Comentario.contains(comentario)))
+    res = db.query(models.PartosT, models.ActividadesVacasT).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()  
+    #remover ID_TipoOperacion, ID_Resultado, ID_Categoria, ID_Actividad
+    avoid = ['ID_TipoOperacion', 'ID_Resultado', 'ID_Actividad']
+    res_b = flatten_join_av(res, avoid) #res_b = flatten_join(res)
+    return res_b
+
+def get_solo_partos(db: Session, date1: str = '2000-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, idparto:Optional[int]=None, idactividad:Optional[int]=None, id_cliente: str = 0) : # 
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.ActividadesVacasT.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date())   
+    if vaca:
+        filtros.append((models.PartosT.ID_VACA == vaca))
+    if idparto:
+        filtros.append((models.PartosT.IDparto == idparto))
+    if idactividad:
+        filtros.append((models.PartosT.ID_actividad == idactividad))
+    res = db.query(models.PartosT).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()  
+    return res
+
+def get_max_partos(db: Session, vaca:Optional[str]=None, id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    if vaca:
+        filtros.append((models.PartosT.ID_VACA == vaca))
+    res = db.query(models.PartosT.ID_VACA.label('ID_VACA'), func.max(models.PartosT.Numero_Parto).label('max_partos')).group_by(models.PartosT.ID_VACA).join(models.VacasT).filter(*filtros).all()
+    res_b =  [r._asdict() for r in res] 
+    return  res_b 
+
+### Registrar Partos
+def registrar_parto(db: Session, data: schemas.Parto_Requi, id_to_use, numero):
+    #subida de datos a la API
+    reg_parto = models.PartosT(ID_VACA=data.ID_VACA, Numero_Parto=numero, Sire=data.Sire, ID_ACTIVIDAD=id_to_use) #IDparto=0, 
+    db.add(reg_parto)
+    db.commit()
+    db.refresh(reg_parto)
+    return reg_parto
 
 ### Ubicacion vacas  
 def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, id_cliente: str = 0):

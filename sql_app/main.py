@@ -364,6 +364,37 @@ async def read_mastitis(date1: str='2020-01-01', date2: str = datetime.now().str
     act_mast = crud.get_act_mastitis(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario, id_cliente = current_user.ID_CLIENTE)
     return act_mast
 
+
+@app.get("/Partos_act_get/", status_code=201)#, response_model=List[schemas.Mast_2])
+async def read_partos(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None,  db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+    act_partos = crud.get_act_partos(db, date1=date1, date2=date2, vaca=vaca, categoria=categoria, operario=operario, comentario=comentario, id_cliente = current_user.ID_CLIENTE)
+    return act_partos
+
+@app.get("/solo_partos_get/", response_model=List[schemas.PartosT])#, response_model=List[schemas.Mast_2])
+async def read_parto(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, idparto:Optional[int]=None, idactividad:Optional[int]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+    partos = crud.get_solo_partos(db, vaca=vaca, idparto=idparto, idactividad=idactividad, id_cliente = current_user.ID_CLIENTE)
+    return partos
+
+@app.get("/Max_partos_get/", status_code=201)#, response_model=List[schemas.Mast_2])
+async def read_max_parto(vaca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+    max_partos = crud.get_max_partos(db, vaca=vaca, id_cliente = current_user.ID_CLIENTE)
+    return max_partos
+
+@app.post("/Parto_crear/", status_code=201)
+async def write_parto(data: schemas.Parto_Requi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    id_to_use = crud.reg_acti_2(db=db, data=data) #reg_acti_P
+    id_to_use
+    id_to_use = id_to_use.ID_Actividad 
+    numero_parto = crud.get_max_partos(db, vaca=data.ID_VACA, id_cliente = current_user.ID_CLIENTE)
+    try:
+        numero = int(numero_parto[0]['max_partos'])+1
+    except:
+        numero = 1
+    id_parto = crud.registrar_parto(db=db, data=data, id_to_use=id_to_use, numero=numero)
+    id_parto_new = id_parto.IDparto
+    return id_parto_new
+
+
 @app.get("/TrasVacas/", response_model=List[schemas.Traslado_VacasT])
 async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[str]=None, id_vaca:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     hist_trasvacas = crud.get_trasvaca(db, id_hato=id_hato, id_vaca=id_vaca, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)

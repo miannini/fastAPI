@@ -425,7 +425,18 @@ class ActInfo(ActInfoBase):
     ID_Resultado : int = 34
     ID_OPERARIO : int = 35
     ID_Categoria : int = 1
-    Fecha  : Optional[date] = None
+    Fecha  : Optional[datetime] = None
+    Comentario : Optional[str] = None
+    class Config:
+        orm_mode = True 
+        
+class Actividades(BaseModel):
+    ID_VACA : int
+    ID_TipoOperacion : int
+    ID_Resultado : int
+    ID_OPERARIO : int
+    ID_Categoria : int
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
     Comentario : Optional[str] = None
     class Config:
         orm_mode = True 
@@ -449,7 +460,7 @@ class Mast_Requi(BaseModel):
     ID_Resultado : int = 34
     ID_OPERARIO : int = 35
     ID_Categoria : int = 1
-    Fecha  : Optional[date] = datetime.now().strftime("%Y-%m-%d") #None
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
     Comentario : Optional[str] = None
     AI : Optional [int] = None
     AD : Optional [int] = None
@@ -474,19 +485,27 @@ class Mast_2(BaseModel):
     class Config:
         orm_mode = True 
         
-
-'''        
-class Act_Requi(BaseModel):
+class PartosT(BaseModel):
+    IDparto : int
     ID_VACA : int
-    ID_TipoOperacion : int = 9
-    ID_Resultado : int = 34
-    ID_OPERARIO : int = 35
-    ID_Categoria : int = 1
-    Fecha  : Optional[date] = None
-    Comentario : Optional[str] = None
+    Numero_Parto : Optional [int] = None
+    Sire : Optional [int] = None
+    ID_ACTIVIDAD : Optional [int] = None
     class Config:
         orm_mode = True 
-'''
+    
+class Parto_Requi(BaseModel):
+    ID_VACA : int
+    ID_TipoOperacion : int = 1
+    ID_Resultado : int = 1
+    ID_OPERARIO : int = 35
+    ID_Categoria : int = 1
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    Comentario : Optional[str] = None
+    Fecha_programada : Optional[datetime] = None
+    Sire : Optional [int] = None
+    class Config:
+        orm_mode = True 
  
 class Ubicacion_VacasT(BaseModel):
     ID_VACA : Optional [int] = None

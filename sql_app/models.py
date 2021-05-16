@@ -214,7 +214,14 @@ class MastitisT(Base):
     Ubre_sana = Column(Float, nullable=True)
     Calificacion = Column(Float, nullable=True)
     GAP = Column(Float, nullable=True)
-  
+    
+class PartosT(Base):
+    __tablename__ = "Partos"
+    IDparto = Column(Integer, primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    Numero_Parto = Column(Integer, nullable=True)
+    Sire = Column(Integer, nullable=True)
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), nullable=True)
 
 class ActividadesVacasT(Base):
     __tablename__ = "Actividades_Vacas"
