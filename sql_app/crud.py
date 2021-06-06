@@ -135,6 +135,17 @@ def delete_lote(db: Session, id_lote: int): #operario: schemas.OperarioDelete,
 def update_lote(db: Session, lote: schemas.LotesN, id_lote: int):
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).update(lote.dict(exclude_unset=True))
     db.commit()    
+    
+def update_lote2(db: Session, lote: List[schemas.LotesN], id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    db_up_lot = []
+    for dictio in lote:
+        db_up_lot.append(models.LotesT).join(models.FincaT).filter(*filtros).update(dictio.dict(exclude_unset=True))
+    db.bulk_save_objects(db_up_lot)
+    db.commit()
+    return "patch_update_lotes = success" 
+    
 ### **************************************************
 
 ### Acti Lotes

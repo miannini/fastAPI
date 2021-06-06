@@ -148,9 +148,13 @@ class LoteInfo2(LotesN):
 class Actividades_LotesT(BaseModel):
     ID_ACT_LOTE : int
     ID_LOTE : int
-    FECHA_ACTIVIDAD  : date #datetime
+    FECHA_ACTIVIDAD  : datetime #datetime
+    ID_Tipo_Actividad : int
+    Producto : Optional[str] = None
     ID_OPERARIO : int
     Comentario : Optional[str] = None
+    Fecha_programada : Optional[datetime] = None
+    Estado : Optional[int] = None
     class Config:
         orm_mode = True
 

@@ -214,6 +214,14 @@ def update_lotes_id(ID_LOTE: int, lote: schemas.LotesN, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_lote_id
 
+@app.patch("/Lotes_upd_lista/", status_code=201) # response_model=List[schemas.LotesT])
+def update_lotes_id2(lote: List[schemas.LotesN], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    #primero ver si el lote si pertenece al cliente, luego cambiar
+    return crud.update_lote2(db=db, lote=lote, id_cliente = current_user.ID_CLIENTE)
+    #db_lote_id = crud.get_lotes(db, id_cliente = current_user.ID_CLIENTE)
+    #if db_lote_id is None:
+    #    raise HTTPException(status_code=404, detail="Lote_ID not found")
+    #return 
 
 @app.get("/Acti_Lotes/", response_model=List[schemas.Actividades_LotesT])
 def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, nombre_oper:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d")):
@@ -360,18 +368,18 @@ async def read_mastitis(date1: str='2020-01-01', date2: str = datetime.now().str
 '''
 
 @app.get("/Mastit_get/", status_code=201)#, response_model=List[schemas.Mast_2])
-async def read_mastitis(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+async def read_mastitis(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     act_mast = crud.get_act_mastitis(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario, id_cliente = current_user.ID_CLIENTE)
     return act_mast
 
 
 @app.get("/Partos_act_get/", status_code=201)#, response_model=List[schemas.Mast_2])
-async def read_partos(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None,  db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+async def read_partos(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None,  db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     act_partos = crud.get_act_partos(db, date1=date1, date2=date2, vaca=vaca, categoria=categoria, operario=operario, comentario=comentario, id_cliente = current_user.ID_CLIENTE)
     return act_partos
 
 @app.get("/solo_partos_get/", response_model=List[schemas.PartosT])#, response_model=List[schemas.Mast_2])
-async def read_parto(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, idparto:Optional[int]=None, idactividad:Optional[int]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+async def read_parto(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, idparto:Optional[int]=None, idactividad:Optional[int]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     partos = crud.get_solo_partos(db, vaca=vaca, idparto=idparto, idactividad=idactividad, id_cliente = current_user.ID_CLIENTE)
     return partos
 

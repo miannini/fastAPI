@@ -79,9 +79,13 @@ class Actividades_LotesT(Base):
     __tablename__ = "Actividades_Lotes"
     ID_ACT_LOTE = Column(Integer, primary_key=True, index=True)
     ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
-    FECHA_ACTIVIDAD = Column(Date)
+    FECHA_ACTIVIDAD = Column(DateTime)
+    ID_Tipo_Actividad = Column(Integer)
+    Producto = Column(String(45), nullable=True)
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"))
     Comentario = Column(String(45), nullable=True)
+    Fecha_programada = Column(DateTime, nullable=True)
+    Estado = Column(Integer, nullable=True)
     #productos = relationship("FincaT", back_populates="lotes_list")
     
 class HatosT(Base):
