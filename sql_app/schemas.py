@@ -140,6 +140,12 @@ class LotesN(BaseModel):
     class Config:
         orm_mode = True
 
+class LotesPasto(BaseModel): 
+    ID_LOTE: int
+    ID_variedad: Optional[int] = None
+    class Config:
+        orm_mode = True
+        
 class LoteInfo2(LotesN):
     ID_LOTE: int
     class Config:
@@ -157,7 +163,15 @@ class Actividades_LotesT(BaseModel):
     Estado : Optional[int] = None
     class Config:
         orm_mode = True
+        
 
+class Tipo_Actividades_LotesT(BaseModel):
+    IDTipo_Actividades_Lotes : int
+    Code : str
+    Nombre  : str
+    ID_Categoria_Act : int
+    class Config:
+        orm_mode = True
         
 class FincaT(BaseModel):
     ID_FINCA: int

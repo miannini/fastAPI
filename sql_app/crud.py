@@ -135,17 +135,17 @@ def delete_lote(db: Session, id_lote: int): #operario: schemas.OperarioDelete,
 def update_lote(db: Session, lote: schemas.LotesN, id_lote: int):
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).update(lote.dict(exclude_unset=True))
     db.commit()    
-    
-def update_lote2(db: Session, lote: List[schemas.LotesN], id_cliente: str = 0):
-    filtros=[]
-    filtros.append(models.FincaT.ID_cliente == id_cliente)
-    db_up_lot = []
+'''    
+def update_lote2(db: Session, lote: List[schemas.LotesPasto], id_cliente: str = 0):
+    #filtros=[]
+    #filtros.append(models.FincaT.ID_cliente == id_cliente)
+    #db_up_lot = []
     for dictio in lote:
-        db_up_lot.append(models.LotesT).join(models.FincaT).filter(*filtros).update(dictio.dict(exclude_unset=True))
-    db.bulk_save_objects(db_up_lot)
+        #db_up_lot.append(models.LotesT(**dictio.dict(exclude_unset=True))) #.join(models.FincaT).filter(*filtros)
+        db.bulk_update_mappings(models.LotesT,**dictio.dict(exclude_unset=True))
     db.commit()
     return "patch_update_lotes = success" 
-    
+'''    
 ### **************************************************
 
 ### Acti Lotes
@@ -309,6 +309,11 @@ def get_t_operacion(db: Session, id_tipo:Optional[int]=None, nombre:Optional[str
         return db.query(models.tipo_operacionesT).filter(*filtros).all()
     else:
         return db.query(models.tipo_operacionesT).all() 
+
+
+### tipo de operaciones  lotes   
+def get_tipo_acti_lotes(db: Session):
+        return db.query(models.Tipo_Actividades_LotesT).all() 
 
 ### Actividades_vacas_categoria
 def get_av_categoria(db: Session, id_cat:Optional[int]=None, nombre:Optional[str]=None):

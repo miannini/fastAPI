@@ -214,14 +214,16 @@ def update_lotes_id(ID_LOTE: int, lote: schemas.LotesN, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_lote_id
 
-@app.patch("/Lotes_upd_lista/", status_code=201) # response_model=List[schemas.LotesT])
-def update_lotes_id2(lote: List[schemas.LotesN], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+'''
+@app.patch("/Lotes_upd_lista/", status_code=201) 
+def update_lotes_id2(lote: List[schemas.LotesPasto], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     #primero ver si el lote si pertenece al cliente, luego cambiar
     return crud.update_lote2(db=db, lote=lote, id_cliente = current_user.ID_CLIENTE)
     #db_lote_id = crud.get_lotes(db, id_cliente = current_user.ID_CLIENTE)
     #if db_lote_id is None:
     #    raise HTTPException(status_code=404, detail="Lote_ID not found")
     #return 
+'''
 
 @app.get("/Acti_Lotes/", response_model=List[schemas.Actividades_LotesT])
 def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, nombre_oper:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d")):
@@ -231,8 +233,11 @@ def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInf
 @app.post("/Wr_Acti_Lotes/", status_code=201) #response_model=schemas.Leche_Hatosi)
 def wr_acti_lotes(ac_lo: schemas.Actividades_LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_acti_lotes(db=db, ac_lo=ac_lo)
-#funciona, pero duplica ID_acti_lote, sino se puede corregir SQL, entonces hacer get max ID y crear con +1
 
+@app.get("/Tipo_Acti_Lotes/", response_model=List[schemas.Tipo_Actividades_LotesT])
+def read_tip_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    tipo_acti_lotes = crud.get_tipo_acti_lotes(db)
+    return tipo_acti_lotes
 
 @app.get("/Hatos/", response_model=List[schemas.HatosT])
 def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -479,6 +484,7 @@ def wr_lotes_qui(lo_qu: List[schemas.Lotes_quimicosT], db: Session = Depends(get
 @app.post("/Wr_monitoreo_descargas/", status_code=201) #, response_model=schemas.Leche_Vacai)
 def wr_moni_des(mo_des: schemas.monitoreo_descargas_sentinelT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_moni_des(db=db, mo_des=mo_des)
+
 
 
 #################################################
