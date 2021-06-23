@@ -367,3 +367,8 @@ class Actividades_vacas_resultadoT(Base):
     ID_Resutlado= Column(Integer,  primary_key=True)
     Nombre = Column(String(45))
     Descripcion = Column(String(45), nullable=True)
+    
+class AforoT(Base):
+    __tablename__ = "Aforo"
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Lotes.ID_ACT_LOTE"), primary_key=True)
+    Aforo = Column(Float)

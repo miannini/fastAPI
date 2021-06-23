@@ -163,7 +163,35 @@ class Actividades_LotesT(BaseModel):
     Estado : Optional[int] = None
     class Config:
         orm_mode = True
+
+class Actividades_LotesT2(BaseModel):
+    ID_LOTE : int
+    FECHA_ACTIVIDAD  : datetime #datetime
+    ID_Tipo_Actividad : int
+    ID_OPERARIO : int
+    class Config:
+        orm_mode = True
         
+class AforoT(BaseModel):
+    ID_ACTIVIDAD : int
+    Aforo : float
+    class Config:
+        orm_mode = True
+        
+
+class Aforo_Requi(BaseModel):
+    ID_LOTE : int
+    FECHA_ACTIVIDAD  : datetime #datetime
+    ID_Tipo_Actividad : int = 15
+    #Producto : Optional[str] = None
+    ID_OPERARIO : int
+    #Comentario : Optional[str] = None
+    #Fecha_programada : Optional[datetime] = None
+    #Estado : Optional[int] = None
+    Aforo: float
+    class Config:
+        orm_mode = True
+
 
 class Tipo_Actividades_LotesT(BaseModel):
     IDTipo_Actividades_Lotes : int
@@ -682,3 +710,4 @@ class Actividades_vacas_resultadoT(BaseModel):
     Descripcion : Optional [str] = None
     class Config:
         orm_mode = True
+        

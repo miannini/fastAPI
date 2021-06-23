@@ -234,6 +234,13 @@ def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInf
 def wr_acti_lotes(ac_lo: schemas.Actividades_LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_acti_lotes(db=db, ac_lo=ac_lo)
 
+@app.post("/Wr_Acti_Aforo/", status_code=201) #response_model=schemas.Leche_Hatosi)
+def wr_acti_aforo(ac_fo: schemas.Aforo_Requi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    id_to_use = crud.create_acti_lotes2(db=db, ac_fo=ac_fo)
+    id_to_use
+    id_to_use = id_to_use.ID_ACT_LOTE
+    return crud.create_acti_aforo(db=db, ac_fo=ac_fo, id_to_use=id_to_use)
+
 @app.get("/Tipo_Acti_Lotes/", response_model=List[schemas.Tipo_Actividades_LotesT])
 def read_tip_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     tipo_acti_lotes = crud.get_tipo_acti_lotes(db)

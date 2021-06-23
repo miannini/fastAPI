@@ -173,6 +173,34 @@ def create_acti_lotes(db: Session, ac_lo: schemas.Actividades_LotesT):
     #db.refresh(db_ac_lo)
     return "post_acti_lotes=Success"
 
+
+### Aforo
+#crear actividad
+def create_acti_lotes2(db: Session, ac_fo: schemas.Actividades_LotesT2):
+    '''ac_fo_cop = ac_fo.copy()
+    try:
+        del ac_fo_cop.Aforo
+    except:
+        print('Key Aforo is not in the dictionary')
+    #ac_fo_cop.pop('Aforo')
+    db_ac_lo = models.Actividades_LotesT(**ac_fo_cop.dict(exclude_unset=True))
+    '''
+    db_ac_lo = models.Actividades_LotesT(ID_LOTE = ac_fo.ID_LOTE, FECHA_ACTIVIDAD = ac_fo.FECHA_ACTIVIDAD, 
+                                         ID_Tipo_Actividad = ac_fo.ID_Tipo_Actividad, ID_OPERARIO=ac_fo.ID_OPERARIO)
+    db.add(db_ac_lo)
+    db.commit()
+    db.refresh(db_ac_lo)
+    return db_ac_lo
+
+#registrar aforo
+def create_acti_aforo(db: Session, ac_fo: schemas.Aforo_Requi, id_to_use):
+    #subida de datos a la API
+    reg_aforo = models.AforoT(ID_ACTIVIDAD=id_to_use, Aforo=ac_fo.Aforo)
+    db.add(reg_aforo)
+    db.commit()
+    db.refresh(reg_aforo)
+    return "post_Registrar_aforo"
+
 #update actividades lotes
 #cambiar de programada a ejecutada o fechas
 
@@ -529,7 +557,6 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
     return res_b
 
 
-    
     
 ### Registrar Actividad - cualquiera
 def reg_acti_2(db: Session, data: schemas.ActInfo): #Mast_Requi
