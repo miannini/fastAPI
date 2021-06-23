@@ -394,6 +394,7 @@ class MeteorologiaT(BaseModel):
     Sunlight_max : Optional [float] = None
     Sunlight_min : Optional [float] = None
     Sunlight_std : Optional [float] = None
+    Count_Report : Optional [int] = None
     class Config:
         orm_mode = True  
 

@@ -193,6 +193,7 @@ class MeteorologiaT(Base):
     Sunlight_max = Column(Float, nullable=True)
     Sunlight_min = Column(Float, nullable=True)
     Sunlight_std = Column(Float, nullable=True)
+    Count_Report = Column(Integer, nullable=True)
 
 
 class API_UsersT(Base):
