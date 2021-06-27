@@ -666,13 +666,25 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
         filtros.append(models.Ubicacion_VacasT.ID_LOTE == id_lote)
     return db.query(models.Ubicacion_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
 
+### Ubicacion vacas  
+def get_ubha(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=None, id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    if id_hato:
+        filtros.append(models.Ubicacion_VacasT.ID_HATO == id_hato)
+    if id_lote:
+        filtros.append(models.Ubicacion_VacasT.ID_LOTE == id_lote)
+    return db.query(models.Ubicacion_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
+
+
 
 ### Traslado vacas    
 def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0):
     reg_uv = models.Ubicacion_VacasT(**sch_ubi.dict())#(ID_VACA=sch_ubi.ID_VACA, ID_HATO=sch_ubi.ID_HATO, ID_LOTE=id_lote)   
     db.add(reg_uv)
     db.commit()
-    db.refresh(reg_uv)
+    db.refresh(reg_uv) #descommented
     return reg_uv
 
 
@@ -682,6 +694,7 @@ def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     filtros.append(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA)
     data = db.query(models.Ubicacion_VacasT).join(models.VacasT).join(models.HatosT).filter(*filtros).all()
+    print (data)
     if len(data) > 0:
         db.query(models.Ubicacion_VacasT).filter(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA).update(sch_ubi.dict(exclude_unset=True)) #(ID_VACA=sch_ubi.ID_VACA, ID_HATO=sch_ubi.ID_HATO, ID_LOTE=id_lote) 
         db.commit() 
@@ -691,8 +704,8 @@ def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, Fecha_Traslad
     reg_tv = models.Traslado_VacasT(ID_VACA=sch_ubi.ID_VACA, Fecha_Traslado=Fecha_Traslado, ID_HATO=sch_ubi.ID_HATO)  
     db.add(reg_tv)
     db.commit()
-    db.refresh(reg_tv)
-    return reg_tv
+    db.refresh(reg_tv) #descommented
+    return  reg_tv #"ok"
 
 def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]

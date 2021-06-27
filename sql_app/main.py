@@ -423,8 +423,10 @@ async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[st
 @app.post("/Traslado_vaca/", status_code=201)
 async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depends(get_db), Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     #obtener lote_id del hato al que se mueve la vaca
-    id_lote = crud.get_ubva(db, id_hato=sch_ubi.ID_HATO, id_cliente= current_user.ID_CLIENTE)
+    id_lote = crud.get_ubha(db, id_hato=sch_ubi.ID_HATO, id_cliente= current_user.ID_CLIENTE)
+    #print(id_lote)
     #transformar JSON a dataframe y extraer unico lote en INT
+    #if id_lote is not None:
     id_lote2 = pd.DataFrame.from_records([s.__dict__ for s in id_lote])
     id_lote2.reset_index(drop=True, inplace=True)
     id_lote = id_lote2.ID_LOTE.mode()
@@ -438,20 +440,23 @@ async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depe
         db_tras_vaca = crud.write_trasvaca(db=db, sch_ubi=sch_ubi, Fecha_Traslado=Fecha_Traslado, id_cliente = current_user.ID_CLIENTE)
         if db_tras_vaca is None: #si el traslado de vaca no se registro, mostrar error
             raise HTTPException(status_code=404, detail="Traslado no registrado")
+        
     
     #si la ubicacion no existia, entonces escribir nueva ubicacion y nuevo traslado
-    else: #toca restringir vacas, lotes y hatos desde la APP con seleccion, no texto
-        print('no existe')
+    else:
+    #else: #toca restringir vacas, lotes y hatos desde la APP con seleccion, no texto
+        print('Vaca es nueva')
         #primero comprobrar que el cliente tenga esa vaca, lote y hato
         #data_histo = crud.get_ubva(db=db, id_vaca=sch_ubi.ID_VACA, id_cliente= current_user.ID_CLIENTE) #id_hato=sch_ubi.ID_HATO, id_lote=sch_ubi.ID_LOTE,
         #if len(data_histo) == 0 :
         #    #si el cliente no tiene alguno de esos, mostrar error para que ingrese nuevos datos
         #    raise HTTPException(status_code=400, detail="Vaca, o Lote, o Hato no son de cliente")
         #elif len(data_histo) == 1:
-        crud.write_ubi_vaca(db=db, sch_ubi=sch_ubi, id_cliente=current_user.ID_CLIENTE, id_lote = id_lote)
+        crud.write_ubi_vaca(db=db, sch_ubi=sch_ubi, id_cliente=current_user.ID_CLIENTE)#, id_lote = id_lote)
         db_tras_vaca = crud.write_trasvaca(db=db, sch_ubi=sch_ubi, Fecha_Traslado=Fecha_Traslado, id_cliente = current_user.ID_CLIENTE)
         if db_tras_vaca is None: #si el traslado de vaca no se registro, mostrar error
             raise HTTPException(status_code=404, detail="Traslado no registrado")
+        
     return db_tras_vaca
 
 @app.get("/TrasHatos/", response_model=List[schemas.Traslado_HatosT])
