@@ -8,9 +8,11 @@ Created on Tue Dec 15 20:17:18 2020
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_, inspect
 from typing import Optional, List
-from . import models, schemas
+from . import models, schemas, secrets
 from datetime import date, datetime
 from passlib.context import CryptContext
+import os
+import pandas as pd
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -30,6 +32,39 @@ def flatten_join_av(tup_list, avoid):
     old_list = [{**obj_to_dict(a), **obj_to_dict(b)} for a,b in tup_list]
     new_list = [{k: v for k, v in d.items() if k not in avoid} for d in old_list]
     return new_list
+
+
+
+#Funcion para enviar emails
+def email_func(alpha, fecha):
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail, Email
+    from python_http_client.exceptions import HTTPError
+
+    sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
+    html_content1 = "<p>ALERT - New registered Client!</p>" + "<p>This email is to Alert for new Client for My Kau App. New ID = " + str(alpha.ID_CLIENTE) + "</p> <p>"
+    html_content2 = " , Name is = " + str(alpha.NOMBRE) + " , eMail is = " + str(alpha.EMAIL) +  " , Company is = " + str(alpha.RAZON_SOCIAL) + " , Phone is = " + str(alpha.TELEFONO)
+    html_content3 = "</p>" + "<p>Registered on = " + str(fecha) + "</p>"
+    html_content = html_content1 + html_content2 + html_content3
+                    
+    message = Mail(
+      to_emails=["jgarboleda@gmail.com", "juancacamacho89@gmail.com", "luchofelipe8023@gmail.com", "marceloiannini@hotmail.com", "nickair90@gmail.com"],
+      #bcc_emails="mianninig@gmail.com",
+      from_email=Email('mianninig@gmail.com', "MyKau Monitor_Report"),
+      subject="New Client [AUTO ALERT] - MyKau",
+      html_content=html_content
+      )
+    #message.add_bcc("mianninig@gmail.com","minds4analytics@gmail.com","salsandres22@gmail.com")
+
+    try:
+      response = sg.send(message)
+      return f"email.status_code={response.status_code}"
+      #expected 202 Accepted
+    except HTTPError as e:
+      return e.message 
+
+
+###############################################################################################
 
 ### Clientes
 def get_clientes(db: Session, ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None): #date1: str = datetime.now().strftime("%Y-%m-%d")
@@ -56,7 +91,15 @@ def create_cliente(db: Session, cliente: schemas.ClientesCreate):
     db.add(db_cliente)
     db.commit()
     db.refresh(db_cliente)
-    return db_cliente
+    
+    #id_cliente2 = pd.DataFrame.from_records([s.__dict__ for s in db_cliente])
+    #id_cliente2.reset_index(drop=True, inplace=True)
+    #id_cliente = id_cliente2.ID_CLIENTE.mode()
+    #actualizar diccionario incluyendo datos del lote
+    #id_cliente=int(id_cliente)
+    
+    email_func(db_cliente, datetime.now().strftime("%Y-%m-%d"))
+    return db_cliente.ID_CLIENTE
 #edit clientes
 
 ### Operarios

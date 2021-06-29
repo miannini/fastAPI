@@ -35,7 +35,7 @@ class ClientesT(BaseModel):
 class Clientes_id(BaseModel):
     ID_CLIENTE: int
     
-class ClientesCreate(Clientes_id):
+class ClientesCreate(BaseModel): #(Clientes_id):
     NOMBRE: Optional[str] = None
     NIT_CC: Optional[int] = None
     RAZON_SOCIAL: Optional[str] = None

@@ -127,7 +127,7 @@ def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo 
     return clientes
 
 @app.post("/Cliente/", status_code=201)
-def write_cliente(cliente: schemas.ClientesCreate, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+async def write_cliente(cliente: schemas.ClientesCreate, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_cliente(db=db, cliente=cliente)
     #esto seria bueno asociarlo con enviar un email, con formulario y que el ID de cliente se guarde
     #para asignarlo al usuario creado
