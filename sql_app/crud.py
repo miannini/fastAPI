@@ -36,14 +36,14 @@ def flatten_join_av(tup_list, avoid):
 
 
 #Funcion para enviar emails
-def email_func(alpha, fecha):
+def email_cliente(alpha, fecha):
     from sendgrid import SendGridAPIClient
     from sendgrid.helpers.mail import Mail, Email
     from python_http_client.exceptions import HTTPError
 
     sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
-    html_content1 = "<p>ALERT - New registered Client!</p>" + "<p>This email is to Alert for new Client for My Kau App. New ID = " + str(alpha.ID_CLIENTE) + "</p> <p>"
-    html_content2 = " , Name is = " + str(alpha.NOMBRE) + " , eMail is = " + str(alpha.EMAIL) +  " , Company is = " + str(alpha.RAZON_SOCIAL) + " , Phone is = " + str(alpha.TELEFONO)
+    html_content1 = "<p>ALERT - New registered Client!</p>" + "<p>This email is to Alert for new Client for My Kau App. New ID = " + str(alpha.ID_CLIENTE) + ".</p> <p>"
+    html_content2 = "Name is = " + str(alpha.NOMBRE) + " , eMail is = " + str(alpha.EMAIL) +  " , Company is = " + str(alpha.RAZON_SOCIAL) + " , Phone is = " + str(alpha.TELEFONO)
     html_content3 = "</p>" + "<p>Registered on = " + str(fecha) + "</p>"
     html_content = html_content1 + html_content2 + html_content3
                     
@@ -98,7 +98,7 @@ def create_cliente(db: Session, cliente: schemas.ClientesCreate):
     #actualizar diccionario incluyendo datos del lote
     #id_cliente=int(id_cliente)
     
-    email_func(db_cliente, datetime.now().strftime("%Y-%m-%d"))
+    email_cliente(db_cliente, datetime.now().strftime("%Y-%m-%d"))
     return db_cliente.ID_CLIENTE
 #edit clientes
 
