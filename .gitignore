@@ -34,5 +34,7 @@ MANIFEST
 
 #own files
 sql_app/secrets.py
+GCP_secrets/
+*.json
 
 

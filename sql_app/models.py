@@ -18,7 +18,30 @@ When you access my_user.items, SQLAlchemy will actually go and fetch the items f
 And when accessing the attribute owner in an Item, it will contain a User SQLAlchemy model from the users table. It will use the owner_id attribute/column with its foreign key to know which record to get from the users table.
 
 '''
+#######################     USERS   ###################################################
+class API_UsersT(Base):
+    __tablename__ = "API_Users"
+    id = Column(Integer, primary_key=True, index=True)
+    user = Column(String(45))
+    full_name = Column(String(45)) #, ForeignKey("Operario.NombreOperario"))
+    email = Column(String(45))
+    password = Column(String(99))
+    active_status = Column(Integer, nullable=True)
+    id_user_rol = Column(Integer, ForeignKey("API_Users_Privileges.id_user_rol"), nullable=True)
+    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), nullable=True)
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
 
+
+class API_Users_PrivT(Base):
+    __tablename__ = "API_Users_Privileges"
+    id_user_rol = Column(Integer, primary_key=True, index=True)
+    name = Column(String(45), nullable=True)
+    description= Column(String(45), nullable=True)
+
+###################################################################################################
+
+
+############################       CLIENTS      ###############################################
 class ClientesT(Base):
     __tablename__ = "clientes" #nombre de la tabla de la DB
     ID_CLIENTE = Column(Integer, primary_key=True, index=True) #
@@ -34,9 +57,12 @@ class ClientesT(Base):
     FECHA_CONTRATO = Column(Date, nullable=True)
     #Vencimiento_contrato, activo, categoria(oro,plata,etc)
     #is_active = Column(Boolean, default=True)
-
     #operarios = relationship("OperarioT", back_populates="owner_CLIENTE") #the magic
 
+####################################################################################################
+
+
+##################################      OPERARIOS    #################################################
 class OperarioT(Base):
     __tablename__ = "Operario"
     ID_OPERARIO = Column(Integer, primary_key=True, index=True)
@@ -51,7 +77,10 @@ class OperarioT(Base):
     Direccion = Column(String(32), nullable=True)
     #owner_CLIENTE = relationship("ClientesT", back_populates="operarios")
 
+##########################################################################################################
 
+
+#################################     FINCAS     #########################################################
 class FincaT(Base):
     __tablename__ = "Finca"
     ID_FINCA = Column(Integer, primary_key=True, index=True)
@@ -60,7 +89,10 @@ class FincaT(Base):
     DESCRIPCION = Column(String(134), nullable=True)
     lotes_list = relationship("LotesT", back_populates="finca_madre")
     
+###########################################################################################################
 
+
+###########################################    LOTES    ###################################################
 class LotesT(Base):
     __tablename__ = "lotes"
     ID_LOTE = Column(Integer, primary_key=True, index=True)
@@ -75,6 +107,10 @@ class LotesT(Base):
     finca_madre = relationship("FincaT", back_populates="lotes_list")
     #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
 
+###########################################################################################################
+
+
+#########################################  ACTIVIDADES LOTES  ############################################
 class Actividades_LotesT(Base):
     __tablename__ = "Actividades_Lotes"
     ID_ACT_LOTE = Column(Integer, primary_key=True, index=True)
@@ -87,7 +123,6 @@ class Actividades_LotesT(Base):
     Fecha_programada = Column(DateTime, nullable=True)
     Estado = Column(Integer, nullable=True)
 
-
 class Tipo_Actividades_LotesT(Base):
     __tablename__ = "Tipo_Actividades_Lotes"
     IDTipo_Actividades_Lotes = Column(Integer, primary_key=True, index=True)
@@ -95,7 +130,14 @@ class Tipo_Actividades_LotesT(Base):
     Nombre = Column(String(45))
     ID_Categoria_Act = Column(Integer)
 
-    
+class AforoT(Base):
+    __tablename__ = "Aforo"
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Lotes.ID_ACT_LOTE"), primary_key=True)
+    Aforo = Column(Float)
+###########################################################################################################
+
+
+########################################    HATOS     ####################################################    
 class HatosT(Base):
     __tablename__ = "Hatos"
     ID_HATO = Column(Integer, primary_key=True, index=True)
@@ -105,21 +147,18 @@ class HatosT(Base):
     TIPO_Hato = Column(String(32), nullable=True)
     Descripcion = Column(String(32), nullable=True)
     #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_hato")
-    
-class Leche_HatosT(Base):
-    __tablename__ = "Leche_Hatos"
-    ID_Leche_hato = Column(Integer, primary_key=True, index=True)     #, ForeignKey("Actividades_Vacas.ID_Actividad")
-    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
-    FECHA_ACTIVIDAD = Column(DateTime)
-    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
-    Comentario = Column(String(45), nullable=True)
-    Numero_Animales = Column(Integer, nullable=True)
-    Leche_Total = Column(Float, nullable=True)
-    Hora = Column(String(2), nullable=True)
-    Antibiotico = Column(String(45), nullable=True)
-    Terneras = Column(String(45), nullable=True)
 
-    
+class Traslado_HatosT(Base):
+    __tablename__ = "Traslado_Hatos"
+    ID_TRASLADO_HATO = Column(Integer, primary_key=True, index=True)
+    Fecha_Traslado = Column(DateTime)
+    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
+
+###########################################################################################################
+
+
+#############################################   VACAS    #################################################    
 class VacasT(Base):
     __tablename__ = "vacas"
     ID_VACA = Column(Integer, primary_key=True, index=True)
@@ -141,81 +180,47 @@ class VacasT(Base):
     #Estado = Column(Integer, nullable=True)
     #Estado_Final = Column(Integer, nullable=True)
     #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
-  
-class CriaT(Base):
-    __tablename__ = "Cria"
-    ID_CRIA = Column(Integer, primary_key=True, index=True)
-    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
-    ID_INSEMINACION = Column(Integer, nullable=True)
-    FECHA_NACIMIENTO = Column(Date)
+
+class razaT(Base):
+    __tablename__ = "Raza"
+    ID_RAZA= Column(Integer,  primary_key=True)
+    Codigo = Column(String(11), nullable=True)
+    Nombre = Column(String(45), nullable=True)
+    Gestacion = Column(Integer, nullable=True)
+    MaxGestacion = Column(Integer, nullable=True)
+    MinGestacion  = Column(Integer, nullable=True)
+    Leche = Column(String(33), nullable=True)
+    Carne = Column(String(33), nullable=True)
+    Pureza = Column(Float, nullable=True)
+    
+class sexoT(Base):
+    __tablename__ = "Sexo"
+    idSexo= Column(Integer,  primary_key=True)
+    Codigo = Column(String(4), nullable=True)
+    Nombre = Column(String(45), nullable=True)
+    Genero = Column(Integer, nullable=True)
+    VacaRep = Column(Integer, nullable=True)
+    ToroRep  = Column(Integer, nullable=True)
+
+class tipo_destinoT(Base):
+    __tablename__ = "Tipo_Destino"
+    IDTipo_Destino= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45), nullable=True)
+    Descripcion = Column(String(45), nullable=True)
+
+
 
     
-class Leche_VacaT(Base):
-    __tablename__ = "Leche_Vaca"
-    ID_Leche_vaca = Column(Integer, primary_key=True, index=True)    #, ForeignKey("Actividades_Vacas.ID_Actividad")
-    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
-    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
-    FECHA = Column(Date)
-    Litros = Column(Float, nullable=True)
-    Ciclo_Lactancia = Column(Integer, nullable=True)    ## deberia ir en vaca
-    Numero_Partos = Column(Integer, nullable=True)      ##deberia ir en vaca
-    
-
-class MeteorologiaT(Base):
-    __tablename__ = "Meteorologia"
-    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"), primary_key=True)
-    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
-    FECHA_HORA = Column(Date, primary_key=True, index=True)
-    activacion = Column(Integer, nullable=True)
-    DHT_Humidity_mean = Column(Float, nullable=True)
-    DHT_Humidity_max = Column(Float, nullable=True)
-    DHT_Humidity_min = Column(Float, nullable=True)
-    DHT_Humidity_std = Column(Float, nullable=True)
-    DHT_Temp_mean = Column(Float, nullable=True)
-    DHT_Temp_max = Column(Float, nullable=True)
-    DHT_Temp_min = Column(Float, nullable=True)
-    Hum_Gnd_mean = Column(Float, nullable=True)
-    Rain_mm_sum = Column(Float, nullable=True)
-    Thermo_Couple_mean = Column(Float, nullable=True)
-    Thermo_Couple_max = Column(Float, nullable=True)
-    Thermo_Couple_min = Column(Float, nullable=True)
-    Wind_Dir_Moda = Column(String(12), nullable=True)
-    Wind_Speed_mean = Column(Float, nullable=True)
-    Wind_Speed_max = Column(Float, nullable=True)
-    DS18b20_cap_mean = Column(Float, nullable=True)
-    DS18b20_cap_max = Column(Float, nullable=True)
-    DS18b20_cap_min = Column(Float, nullable=True)
-    Solar_Volt_mean = Column(Float, nullable=True)
-    Solar_Volt_max = Column(Float, nullable=True)
-    Solar_Volt_min = Column(Float, nullable=True)
-    Solar_Volt_std = Column(Float, nullable=True)
-    Sunlight_mean = Column(Float, nullable=True)
-    Sunlight_max = Column(Float, nullable=True)
-    Sunlight_min = Column(Float, nullable=True)
-    Sunlight_std = Column(Float, nullable=True)
-    Count_Report = Column(Integer, nullable=True)
+#########################################################################################################
 
 
-class API_UsersT(Base):
-    __tablename__ = "API_Users"
-    id = Column(Integer, primary_key=True, index=True)
-    user = Column(String(45))
-    full_name = Column(String(45)) #, ForeignKey("Operario.NombreOperario"))
-    email = Column(String(45))
-    password = Column(String(99))
-    active_status = Column(Integer, nullable=True)
-    id_user_rol = Column(Integer, ForeignKey("API_Users_Privileges.id_user_rol"), nullable=True)
-    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), nullable=True)
-    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
+###########################################   ACTIVIDADES VACAS   #########################################
+class tipo_operacionesT(Base):
+    __tablename__ = "Tipo_operaciones"
+    ID_TipoOperaciones= Column(Integer,  primary_key=True)
+    Codigo = Column(String(45), nullable=True)
+    Nombre = Column(String(45), nullable=True)
 
-
-class API_Users_PrivT(Base):
-    __tablename__ = "API_Users_Privileges"
-    id_user_rol = Column(Integer, primary_key=True, index=True)
-    name = Column(String(45), nullable=True)
-    description= Column(String(45), nullable=True)
-    
-    
 class MastitisT(Base):
     __tablename__ = "Mastitis"
     ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), primary_key=True, index=True)#, ForeignKey("Actividades_Vacas.ID_FINCA"))
@@ -246,7 +251,25 @@ class ActividadesVacasT(Base):
     ID_Categoria = Column(Integer) #, ForeignKey
     Fecha = Column(Date, nullable=True)
     Comentario = Column(String(450), nullable=True)
+
+class CriaT(Base):
+    __tablename__ = "Cria"
+    ID_CRIA = Column(Integer, primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    ID_INSEMINACION = Column(Integer, nullable=True)
+    FECHA_NACIMIENTO = Column(Date)
+
+class Actividades_vacas_categoriaT(Base):
+    __tablename__ = "Actividades_vacas_categoria"
+    ID_Categoria= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45))
+    Descripcion = Column(String(45), nullable=True)
     
+class Actividades_vacas_resultadoT(Base):
+    __tablename__ = "Actividades_vacas_resultado"
+    ID_Resutlado= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45))
+    Descripcion = Column(String(45), nullable=True)
     
 class Ubicacion_VacasT(Base):
     __tablename__ = "Ubicacion_Vacas"
@@ -257,21 +280,42 @@ class Ubicacion_VacasT(Base):
     #nombre_hato = relationship("HatosT", backref="Ubicacion_Vacas", lazy='joined')
     #nombre_lote = relationship("LotesT", backref="Ubicacion_Vacas", lazy='joined')
     
-    
 class Traslado_VacasT(Base):
     __tablename__ = "Traslado_Vacas"
     ID_TRASLADO = Column(Integer, primary_key=True, index=True)
     Fecha_Traslado = Column(DateTime)
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+##########################################################################################################
 
-class Traslado_HatosT(Base):
-    __tablename__ = "Traslado_Hatos"
-    ID_TRASLADO_HATO = Column(Integer, primary_key=True, index=True)
-    Fecha_Traslado = Column(DateTime)
+
+#########################################    LECHE    #####################################################    
+class Leche_HatosT(Base):
+    __tablename__ = "Leche_Hatos"
+    ID_Leche_hato = Column(Integer, primary_key=True, index=True)     #, ForeignKey("Actividades_Vacas.ID_Actividad")
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
-    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
-    
+    FECHA_ACTIVIDAD = Column(DateTime)
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
+    Comentario = Column(String(45), nullable=True)
+    Numero_Animales = Column(Integer, nullable=True)
+    Leche_Total = Column(Float, nullable=True)
+    Hora = Column(String(2), nullable=True)
+    Antibiotico = Column(String(45), nullable=True)
+    Terneras = Column(String(45), nullable=True)
+
+class Leche_VacaT(Base):
+    __tablename__ = "Leche_Vaca"
+    ID_Leche_vaca = Column(Integer, primary_key=True, index=True)    #, ForeignKey("Actividades_Vacas.ID_Actividad")
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
+    FECHA = Column(Date)
+    Litros = Column(Float, nullable=True)
+    Ciclo_Lactancia = Column(Integer, nullable=True)    ## deberia ir en vaca
+    Numero_Partos = Column(Integer, nullable=True)      ##deberia ir en vaca
+
+##########################################################################################################
+
+######################################### OTRAS FUENTES LOTES   #########################################
 class Lotes_variablesT(Base):
     __tablename__ = "Lotes_variables"
     ID_lote= Column(Integer,  ForeignKey("lotes.ID_LOTE"), primary_key=True)
@@ -309,7 +353,10 @@ class Lotes_quimicosT(Base):
     Zinc = Column(Float, nullable=True)
     Boro = Column(Float, nullable=True)
     Comentarios = Column(String(450), nullable=True)
-    
+
+###########################################################################################################
+
+##########################################  Monitoreo procesamiento imagenes satel   ######################
 class monitoreo_descargas_sentinelT(Base):
     __tablename__ = "monitoreo_descargas_sentinel"
     ID_cliente= Column(Integer,  ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
@@ -323,53 +370,42 @@ class monitoreo_descargas_sentinelT(Base):
     duration = Column(Float, nullable=True)
     end_time = Column(DateTime, nullable=True)
     prct_clouds = Column(Float, nullable=True)
-    
-class razaT(Base):
-    __tablename__ = "Raza"
-    ID_RAZA= Column(Integer,  primary_key=True)
-    Codigo = Column(String(11), nullable=True)
-    Nombre = Column(String(45), nullable=True)
-    Gestacion = Column(Integer, nullable=True)
-    MaxGestacion = Column(Integer, nullable=True)
-    MinGestacion  = Column(Integer, nullable=True)
-    Leche = Column(String(33), nullable=True)
-    Carne = Column(String(33), nullable=True)
-    Pureza = Column(Float, nullable=True)
-    
-class sexoT(Base):
-    __tablename__ = "Sexo"
-    idSexo= Column(Integer,  primary_key=True)
-    Codigo = Column(String(4), nullable=True)
-    Nombre = Column(String(45), nullable=True)
-    Genero = Column(Integer, nullable=True)
-    VacaRep = Column(Integer, nullable=True)
-    ToroRep  = Column(Integer, nullable=True)
 
-class tipo_destinoT(Base):
-    __tablename__ = "Tipo_Destino"
-    IDTipo_Destino= Column(Integer,  primary_key=True)
-    Nombre = Column(String(45), nullable=True)
-    Descripcion = Column(String(45), nullable=True)
+###########################################################################################################
 
-class tipo_operacionesT(Base):
-    __tablename__ = "Tipo_operaciones"
-    ID_TipoOperaciones= Column(Integer,  primary_key=True)
-    Codigo = Column(String(45), nullable=True)
-    Nombre = Column(String(45), nullable=True)
+########################################   ESTACION METEOROLOGICA   #######################################
+class MeteorologiaT(Base):
+    __tablename__ = "Meteorologia"
+    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"), primary_key=True)
+    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
+    FECHA_HORA = Column(Date, primary_key=True, index=True)
+    activacion = Column(Integer, nullable=True)
+    DHT_Humidity_mean = Column(Float, nullable=True)
+    DHT_Humidity_max = Column(Float, nullable=True)
+    DHT_Humidity_min = Column(Float, nullable=True)
+    DHT_Humidity_std = Column(Float, nullable=True)
+    DHT_Temp_mean = Column(Float, nullable=True)
+    DHT_Temp_max = Column(Float, nullable=True)
+    DHT_Temp_min = Column(Float, nullable=True)
+    Hum_Gnd_mean = Column(Float, nullable=True)
+    Rain_mm_sum = Column(Float, nullable=True)
+    Thermo_Couple_mean = Column(Float, nullable=True)
+    Thermo_Couple_max = Column(Float, nullable=True)
+    Thermo_Couple_min = Column(Float, nullable=True)
+    Wind_Dir_Moda = Column(String(12), nullable=True)
+    Wind_Speed_mean = Column(Float, nullable=True)
+    Wind_Speed_max = Column(Float, nullable=True)
+    DS18b20_cap_mean = Column(Float, nullable=True)
+    DS18b20_cap_max = Column(Float, nullable=True)
+    DS18b20_cap_min = Column(Float, nullable=True)
+    Solar_Volt_mean = Column(Float, nullable=True)
+    Solar_Volt_max = Column(Float, nullable=True)
+    Solar_Volt_min = Column(Float, nullable=True)
+    Solar_Volt_std = Column(Float, nullable=True)
+    Sunlight_mean = Column(Float, nullable=True)
+    Sunlight_max = Column(Float, nullable=True)
+    Sunlight_min = Column(Float, nullable=True)
+    Sunlight_std = Column(Float, nullable=True)
+    Count_Report = Column(Integer, nullable=True)
 
-class Actividades_vacas_categoriaT(Base):
-    __tablename__ = "Actividades_vacas_categoria"
-    ID_Categoria= Column(Integer,  primary_key=True)
-    Nombre = Column(String(45))
-    Descripcion = Column(String(45), nullable=True)
-    
-class Actividades_vacas_resultadoT(Base):
-    __tablename__ = "Actividades_vacas_resultado"
-    ID_Resutlado= Column(Integer,  primary_key=True)
-    Nombre = Column(String(45))
-    Descripcion = Column(String(45), nullable=True)
-    
-class AforoT(Base):
-    __tablename__ = "Aforo"
-    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Lotes.ID_ACT_LOTE"), primary_key=True)
-    Aforo = Column(Float)
+###########################################################################################################

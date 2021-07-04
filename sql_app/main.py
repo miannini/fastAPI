@@ -15,14 +15,24 @@ from sqlalchemy.orm import Session, joinedload
 from datetime import timedelta, date, datetime
 from typing import Optional
 from jose import JWTError
-from . import crud, models, schemas, app_utils, secrets
+from . import crud, models, schemas, app_utils, secrets, GCP_functions
+#from . import GCP_functions
 from .database import SessionLocal, engine
 import pandas as pd
 import io
+import os
+import json
+from google.oauth2 import service_account
+from google.cloud import storage
 
 
 ##################################  security ############################################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+with open('GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source:
+    info = json.load(source)
+    project_id = 'data-science-proj-280908'
+storage_credentials = service_account.Credentials.from_service_account_info(info)
+storage_client = storage.Client(project=project_id, credentials=storage_credentials)
 
 #########################################################################################
 
@@ -30,14 +40,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 ################################# SQL engine ############################################
 models.Base.metadata.create_all(bind=engine)
 
-###########################################################################################
-# APP
-app = FastAPI(
-    title="My Kau API project",
-    description= "This is the API for connecting MySQL DB to the APP, Dashboard and other front ends",
-    version="0.0.1",
-    )
-
+####################################  DOCS TAGS and DESCRIPTION #######################################################
 tags_metadata = [
     {
          "name": "Users",
@@ -91,7 +94,20 @@ tags_metadata = [
          "name": "Estacion Meteorologica",
          "description":"Operations with Meteo-station / IoT.",
      },
+    {
+         "name": "Stream Images",
+         "description":"Streaming de imagenes satelitales / Remote Sensing.",
+     },
+    
     ]
+
+# APP
+app = FastAPI(
+    title="My Kau API project",
+    description= "This is the API for connecting MySQL DB to the APP, Dashboard and other front ends",
+    version="0.0.1",
+    openapi_tags=tags_metadata
+    )
 ################################  CORS   ######################################################
 app.add_middleware(
     CORSMiddleware,
@@ -212,7 +228,6 @@ async def write_cliente(cliente: schemas.ClientesCreate, db: Session = Depends(g
 ####################################################################################################
 
 
-
 ##################################      OPERARIOS    #################################################
 @app.get("/Operario", response_model=List[schemas.OperarioT], tags=["Operarios"])  # List[
 def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -286,6 +301,9 @@ def update_lotes_id(ID_LOTE: int, lote: schemas.LotesN, db: Session = Depends(ge
     if db_lote_id is None:
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_lote_id
+
+###########################################################################################################
+
 
 #########################################  ACTIVIDADES LOTES  ############################################
 @app.get("/Acti_Lotes/", response_model=List[schemas.Actividades_LotesT], tags=["Actividades-Lotes"])
@@ -604,3 +622,25 @@ async def meteo_csv(date1: str='2020-01-01', date2: str = datetime.now().strftim
 #https://stackoverflow.com/questions/61140398/fastapi-return-a-file-response-with-the-output-of-a-sql-query
 
 ###########################################################################################################
+
+####################################      STREAMING IMAGES   ################################################
+@app.get("/Image_lote/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
+async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), lote:Optional[str]=None, prop:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    images_route = 'Data/PNG_Images/ID_CLIENTE-'
+    id_cliente = current_user.ID_CLIENTE
+    buck= 'satellite_storage'
+    datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop)
+    
+    #pensar en separar list, ya que se toma buen tiempo ... y el download por aparte de lo que se seleccione
+    #se guarda el archivo fuera de la carpeta de API para no hacer reload de API ... pensar otro lugar temp 
+    GCP_functions.download_blob(storage_client,buck, datos[0], "../"+os.path.basename(datos[0].split('/')[-1])) #'test.png')
+    #archivo dejarlo en open
+    file_like = open("../"+os.path.basename(datos[0].split('/')[-1]), mode="rb")
+    return StreamingResponse(file_like, media_type="image/png")
+
+
+
+
+#id_cliente = str(1) #id_cliente
+#prop = 'ndvi'
+#lote = str(100)
