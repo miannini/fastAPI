@@ -62,3 +62,5 @@ passlib==1.7.4
 bcrypt==3.2.0
 pandas==1.2.3
 numpy==1.20.1
+requests==2.25.1
+google-cloud-storage==1.38.0

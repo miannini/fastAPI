@@ -633,10 +633,11 @@ async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strft
     
     #pensar en separar list, ya que se toma buen tiempo ... y el download por aparte de lo que se seleccione
     #se guarda el archivo fuera de la carpeta de API para no hacer reload de API ... pensar otro lugar temp 
-    GCP_functions.download_blob(storage_client,buck, datos[0], "../"+os.path.basename(datos[0].split('/')[-1])) #'test.png')
+    open_file = GCP_functions.download_blob(storage_client,buck, datos[0], "../"+os.path.basename(datos[0].split('/')[-1]))
+    return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
     #archivo dejarlo en open
-    file_like = open("../"+os.path.basename(datos[0].split('/')[-1]), mode="rb")
-    return StreamingResponse(file_like, media_type="image/png")
+    #file_like = open("../"+os.path.basename(datos[0].split('/')[-1]), mode="rb")
+    #return StreamingResponse(file_like, media_type="image/png")
 
 
 

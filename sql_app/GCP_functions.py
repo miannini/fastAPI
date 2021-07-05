@@ -4,11 +4,11 @@ Created on Sat Mar 13 21:38:29 2021
 
 @author: Marcelo
 """
-import os
+#import os
 import re
-from google.cloud import storage
-from google.resumable_media.requests import Download, ChunkedDownload
-from pathlib import Path
+#from google.cloud import storage
+#from google.resumable_media.requests import Download, ChunkedDownload
+#from pathlib import Path
 
 
 
@@ -167,14 +167,10 @@ def download_blob(storage_client, bucket_name, source_blob_name, destination_fil
     # any content from Google Cloud Storage. As we don't need additional data,
     # using `Bucket.blob` is preferred here.
     blob = bucket.blob(source_blob_name)
-    blob.download_to_filename(destination_file_name)
-    #print(blob.exists())
-    #blob.download_as_string(timeout=100)#, file_obj)
-    print(
-        "Blob {} downloaded to {}.".format(
-            source_blob_name, destination_file_name
-        )
-    )
+    #blob.download_to_filename(destination_file_name)
+    with blob.open('rb') as f:
+        return f.read()
+
 
 
 #def stream_blob(storage_client, url, bucket_name, source_blob_name):
