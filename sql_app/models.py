@@ -77,6 +77,13 @@ class OperarioT(Base):
     Direccion = Column(String(32), nullable=True)
     #owner_CLIENTE = relationship("ClientesT", back_populates="operarios")
 
+class Operario_Sin_UserT(Base):
+    __tablename__ = "Operario_sin_user"
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), primary_key=True, index=True)
+    NombreOperario = Column(String(32))
+    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
+
+
 ##########################################################################################################
 
 
@@ -209,7 +216,16 @@ class tipo_destinoT(Base):
     Descripcion = Column(String(45), nullable=True)
 
 
-
+class siresT(Base):
+    __tablename__ = "Sires"
+    IDsire= Column(Integer,  primary_key=True)
+    Active = Column(Integer, nullable=True)
+    IDOfficial = Column(String(45),  nullable=True)
+    AINumber = Column(String(45),  nullable=True)
+    Nombre_Largo = Column(String(45), nullable=True)
+    Registro = Column(String(45), nullable=True)
+    Raza = Column(Integer, nullable=True)
+    Fecha_descontinuado = Column(DateTime, nullable=True)
     
 #########################################################################################################
 

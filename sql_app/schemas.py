@@ -146,6 +146,13 @@ class OperarioInfo2(OperarioN):
     ID_OPERARIO: int
     class Config:
         orm_mode = True 
+        
+class Operario_Sin_UserT(BaseModel):
+    ID_OPERARIO : int
+    NombreOperario : str
+    ID_CLIENTE : int
+    class Config:
+        orm_mode = True
 
 ##########################################################################################################
 
@@ -423,6 +430,18 @@ class tipo_destinoT(BaseModel):
     class Config:
         orm_mode = True
 
+class siresT(BaseModel):
+    IDsire : int
+    Active : Optional [int] = None
+    IDOfficial : Optional [str] = None
+    AINumber : Optional [str] = None
+    Nombre_Largo : Optional [str] = None
+    Registro : Optional [str] = None
+    Raza : Optional [int] = None
+    Fecha_descontinuado : Optional[datetime] = None
+    class Config:
+        orm_mode = True
+    
 #########################################################################################################
 
 

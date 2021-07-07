@@ -249,6 +249,11 @@ def erase_operario(ID_OPERARIO: int, db: Session = Depends(get_db), current_user
         "message": "User deleted"
     }
 
+@app.get("/Operario_sin_user", response_model=List[schemas.Operario_Sin_UserT], tags=["Operarios"])  # List[
+def read_oper_sin_user(db: Session = Depends(get_db), nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    operarios = crud.get_oper_sin_user(db, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
+    return operarios
+
 ##########################################################################################################
 
 
@@ -417,6 +422,10 @@ async def read_dest(db: Session = Depends(get_db), id_destino:Optional[int]=None
     tip_dest = crud.get_t_destino(db, id_destino=id_destino, nombre=nombre) #, id_cliente = current_user.ID_CLIENTE
     return tip_dest
 
+@app.get("/Sires/", response_model=List[schemas.siresT], tags=["Vacas"])
+async def read_sires(db: Session = Depends(get_db), id_sire:Optional[int]=None, id_oficial:Optional[str]=None, nombre_largo:Optional[str]=None, registro:Optional[str]=None, raza:Optional[int]=None, activa:Optional[int]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
+    sires = crud.get_sires(db, id_sire=id_sire, id_oficial=id_oficial, nombre_largo=nombre_largo, registro=registro, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE) #id_finca=id_finca
+    return sires
 #########################################################################################################
 
 

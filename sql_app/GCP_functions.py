@@ -132,14 +132,14 @@ def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lot
     for blob in blobs:
         if lote is not None: #si ha restriccion de lote
             if prop is not None: #tambien hay restriccion de propiedad
-                if re.search(re.escape(lote)+r'_'+re.escape(prop),blob.name):
+                if re.search(r'_'+re.escape(lote)+r'_'+re.escape(prop),blob.name):
                     lista.append(blob.name)
             else:               #no hay restriccion de propiedad
-                if re.search(re.escape(lote),blob.name):
+                if re.search(r'_'+re.escape(lote)+r'_',blob.name):
                     lista.append(blob.name)
         else:                   #no hay restriccion de lote
             if prop is not None:    #si hay restriccion de propiedad
-                if re.search(re.escape(prop),blob.name):
+                if re.search(r'_'+re.escape(prop),blob.name):
                     lista.append(blob.name)
             else:               #no hay restriccion de lote ni de propiedad
                 lista.append(blob.name)   

@@ -234,6 +234,14 @@ def delete_operario(db: Session, id_operario: int): #operario: schemas.OperarioD
  
 # -- edit operario
 
+### Operarios sin user App
+def get_oper_sin_user(db: Session, nombre:Optional[str]=None,  id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.OperarioT.ID_CLIENTE == id_cliente)
+    if nombre:
+        filtros.append((models.Operario_Sin_UserT.NombreOperario.contains(nombre)))   
+    return db.query(models.Operario_Sin_UserT).join(models.OperarioT).filter(*filtros).all()
+
 ##########################################################################################################
 
 
@@ -508,6 +516,27 @@ def get_t_destino(db: Session, id_destino:Optional[int]=None, nombre:Optional[st
     else:
         return db.query(models.tipo_destinoT).all() 
 
+### Sires
+def get_sires(db: Session, id_sire:Optional[int]=None, id_oficial:Optional[str]=None, nombre_largo:Optional[str]=None, registro:Optional[str]=None, raza:Optional[int]=None, activa:Optional[int]=None ,id_cliente: str = 0): #id_finca:Optional[int]=None
+    filtros=[]
+    #la tabla no tiene ID_cliente, despues toca ver la forma de filtrar por activas para cada cliente
+    #filtros.append(models.siresT.ID_CLIENTE == id_cliente) 
+    if id_sire:
+        filtros.append(models.siresT.IDsire == id_sire)
+    if id_oficial:
+        filtros.append(models.siresT.IDOfficial.contains(id_oficial))
+    if nombre_largo:
+        filtros.append(models.siresT.Nombre_Largo.contains(nombre_largo)) 
+    if registro:
+        filtros.append(models.siresT.Registro.contains(registro))
+    if raza:
+        filtros.append(models.siresT.Raza == raza)
+    if activa==1:
+        filtros.append(models.siresT.Active == activa)
+    if len(filtros)>0:
+        return db.query(models.siresT).filter(*filtros).all()
+    else:
+        return db.query(models.siresT).all()
 #########################################################################################################
 
 
