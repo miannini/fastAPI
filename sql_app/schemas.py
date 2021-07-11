@@ -621,7 +621,7 @@ class Leche_VacaT(BaseModel):
     #ID_Leche_vaca : int   
     ID_VACA : int
     ID_OPERARIO : Optional[int] = None
-    FECHA : date #datetime
+    FECHA : datetime #datetime
     Litros : Optional [float] = None
     Ciclo_Lactancia : Optional[int] = None
     Numero_Partos : Optional[int] = None
