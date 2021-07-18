@@ -94,6 +94,7 @@ class FincaT(Base):
     ID_cliente = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
     NOMBRE = Column(String(32), nullable=True)
     DESCRIPCION = Column(String(134), nullable=True)
+    sentinel_zone =  Column(String(32),ForeignKey("monitoreo_descargas_sentinel.zona"), nullable=True)
     lotes_list = relationship("LotesT", back_populates="finca_madre")
     
 ###########################################################################################################
@@ -375,17 +376,10 @@ class Lotes_quimicosT(Base):
 ##########################################  Monitoreo procesamiento imagenes satel   ######################
 class monitoreo_descargas_sentinelT(Base):
     __tablename__ = "monitoreo_descargas_sentinel"
-    ID_cliente= Column(Integer,  ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
-    zona = Column(String(45), nullable=True)
-    file = Column(String(45), nullable=True)
-    municipio = Column(String(45), nullable=True)
-    departamento = Column(String(45), nullable=True)
-    fecha  = Column(Date, nullable=True)
-    mode = Column(String(45), nullable=True)
-    machine_name = Column(String(45), nullable=True)
-    duration = Column(Float, nullable=True)
-    end_time = Column(DateTime, nullable=True)
-    prct_clouds = Column(Float, nullable=True)
+    zona= Column(String(45), primary_key=True)
+    file = Column(String(45))
+    fecha  = Column(Date)
+    process_date = Column(DateTime)
 
 ###########################################################################################################
 

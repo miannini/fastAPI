@@ -263,6 +263,7 @@ class FincaT(BaseModel):
     NOMBRE: Optional[str] = None
     DESCRIPCION: Optional[str] = None
     lotes_list: List[LotesT] = []
+    sentinel_zona: Optional[str] = None
     class Config:
         orm_mode = True
   
@@ -679,17 +680,10 @@ class Lotes_quimicosT(BaseModel):
 
 ##########################################  Monitoreo procesamiento imagenes satel   ######################
 class monitoreo_descargas_sentinelT(BaseModel):
-    ID_cliente : int
-    zona : Optional [str] = None
-    file : Optional [str] = None
-    municipio : Optional [str] = None
-    departamento : Optional [str] = None
-    fecha  : Optional[date] = None
-    mode : Optional [str] = None
-    machine_name : Optional [str] = None
-    duration : Optional [float] = None
-    end_time : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    prct_clouds : Optional [float] = None
+    zona : str
+    file : str
+    fecha  : date
+    process_date :datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     class Config:
         orm_mode = True
 

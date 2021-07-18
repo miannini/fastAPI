@@ -877,8 +877,21 @@ def create_moni_des(db: Session, mo_des: schemas.monitoreo_descargas_sentinelT):
     #db.refresh(db_le_va)
     return "post_monitoreo_descargas=Success"
 
-#get
-
+def get_moni_des(db: Session, date1: str='2020-01-01', date2: str=datetime.now().strftime("%Y-%m-%d"),  zona: Optional[str] = None, finca:Optional[str]=None, id_cliente: Optional[str]=None) : 
+    filtros=[]
+    filtros.append(func.DATE(models.monitoreo_descargas_sentinelT.fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.monitoreo_descargas_sentinelT.fecha) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    if zona:
+        filtros.append((models.monitoreo_descargas_sentinelT.zona == finca))
+    if id_cliente:
+        filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if finca:
+        filtros.append((models.FincaT.ID_FINCA == finca))
+    #return db.query(models.monitoreo_descargas_sentinelT).join(models.FincaT).filter(*filtros).all()
+    if finca or id_cliente:
+        return db.query(models.monitoreo_descargas_sentinelT).join(models.FincaT).filter(*filtros).all()
+    else:
+        return db.query(models.monitoreo_descargas_sentinelT).filter(*filtros).all()
 ###########################################################################################################
 
 ########################################   ESTACION METEOROLOGICA   #######################################

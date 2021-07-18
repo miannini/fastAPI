@@ -598,6 +598,11 @@ def wr_lotes_qui(lo_qu: List[schemas.Lotes_quimicosT], db: Session = Depends(get
 def wr_moni_des(mo_des: schemas.monitoreo_descargas_sentinelT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_moni_des(db=db, mo_des=mo_des)
 
+@app.get("/Rd_monitoreo_descargas/", response_model=List[schemas.monitoreo_descargas_sentinelT], tags=["Monitoreo Descargas satelitales"])
+async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, zona:Optional[str]=None, id_cliente:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    descarga_data = crud.get_moni_des(db, date1=date1, date2=date2, finca=finca, zona=zona, id_cliente = id_cliente) #current_user.ID_CLIENTE)# skip=skip, limit=limit)
+    return descarga_data
+
 ###########################################################################################################
 
 ########################################   ESTACION METEOROLOGICA   #######################################
