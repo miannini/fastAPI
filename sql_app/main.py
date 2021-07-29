@@ -7,7 +7,7 @@ Created on Tue Dec 15 20:25:17 2020
 
 from typing import List, Union
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,7 +24,9 @@ import os
 import json
 from google.oauth2 import service_account
 from google.cloud import storage
-
+import asyncio
+#import zipfile
+#import StringIO
 
 ##################################  security ############################################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -278,7 +280,7 @@ def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user:
 
 
 ###########################################    LOTES    ###################################################
-@app.post("/Fincas/{finca_id}/Lotes/", response_model=schemas.LotesT, tags=["Lotes"])
+@app.post("/Fincas/{finca_id}/Lotes/", status_code=201, tags=["Lotes"])
 def write_lote_for_finca(finca_id: int, lote: schemas.LotesN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_finca_lote(db=db, lote=lote, finca_id=finca_id) #, id_cliente= current_user.ID_CLIENTE)
 
@@ -317,7 +319,7 @@ def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInf
     return acti_lotes
 
 @app.post("/Wr_Acti_Lotes/", status_code=201, tags=["Actividades-Lotes"]) #response_model=schemas.Leche_Hatosi)
-def wr_acti_lotes(ac_lo: schemas.Actividades_LotesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def wr_acti_lotes(ac_lo: schemas.Acti_lotes_post, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_acti_lotes(db=db, ac_lo=ac_lo)
 
 @app.post("/Wr_Acti_Aforo/", status_code=201, tags=["Actividades-Lotes"]) #response_model=schemas.Leche_Hatosi)
@@ -564,7 +566,7 @@ def read_leche_hatos(db: Session = Depends(get_db), id_hato:Optional[int]=None, 
     return leche_hatos
 
 @app.post("/Wr_Leche_Hatos/", status_code=201, tags=["Leche"]) #response_model=schemas.Leche_Hatosi)
-def wr_leche_hatos(le_ha: schemas.Leche_Hatosi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def wr_leche_hatos(le_ha: schemas.Leche_HatosT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_hatos(db=db, le_ha=le_ha)
 
 @app.get("/Leche_Vacas/", response_model=List[schemas.Leche_Vacai], tags=["Leche"])
@@ -573,7 +575,7 @@ def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, i
     return leche_vaca
 
 @app.post("/Wr_Leche_vacas/", status_code=201, tags=["Leche"]) #, response_model=schemas.Leche_Vacai)
-def wr_leche_vacas(le_va: schemas.Leche_Vacai, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def wr_leche_vacas(le_va: schemas.Leche_VacaT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_vacas(db=db, le_va=le_va)
 
 @app.post("/Wr_Leche_vaca_list/", status_code=201, tags=["Leche"]) #, response_model=schemas.Leche_Vacai)
@@ -643,16 +645,66 @@ async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strft
     images_route = 'Data/PNG_Images/ID_CLIENTE-'
     id_cliente = current_user.ID_CLIENTE
     buck= 'satellite_storage'
-    datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop)
-    
-    #pensar en separar list, ya que se toma buen tiempo ... y el download por aparte de lo que se seleccione
-    #se guarda el archivo fuera de la carpeta de API para no hacer reload de API ... pensar otro lugar temp 
-    open_file = GCP_functions.download_blob(storage_client,buck, datos[0], "../"+os.path.basename(datos[0].split('/')[-1]))
+    mindate = int(''.join(date1.split('-')))
+    maxdate = int(''.join(date2.split('-')))
+    print(mindate,maxdate)
+    datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
+    open_file = GCP_functions.open_blob(storage_client,buck, datos[0]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
     return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
-    #archivo dejarlo en open
-    #file_like = open("../"+os.path.basename(datos[0].split('/')[-1]), mode="rb")
-    #return StreamingResponse(file_like, media_type="image/png")
 
+
+# https://stackoverflow.com/questions/61163024/return-multiple-files-from-fastapi
+@app.get("/Multi_Image_lote/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
+async def imagen_lotes(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), lote:Optional[str]=None, prop:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    images_route = 'Data/PNG_Images/ID_CLIENTE-'
+    id_cliente = current_user.ID_CLIENTE
+    buck= 'satellite_storage'
+    mindate = int(''.join(date1.split('-')))
+    maxdate = int(''.join(date2.split('-')))
+    print(mindate,maxdate)
+    datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
+    results ={}
+    for dato in datos:
+        open_file = GCP_functions.open_blob(storage_client,buck, dato)
+        #results[str(dato.split('/')[-1])]: (StreamingResponse(io.BytesIO(open_file), media_type="image/png"))
+        results[str(dato.split('/')[-1])]: io.BytesIO(open_file)
+    return results
+        
+    
+    #return StreamingResponse(io.BytesIO(GCP_functions.open_multi_blob(storage_client,buck, datos)), media_type="image/png")
+    '''async def stream_imagenes(datos):
+        yield [io.BytesIO(GCP_functions.open_blob(storage_client,buck, dato)) for dato in datos]
+        yield b""
+    return stream_imagenes(datos)
+    '''
+    '''
+    def get_bytes_value(image):
+        img_byte_arr = io.BytesIO(GCP_functions.open_blob(storage_client,buck, image))
+        image.save(img_byte_arr, format='PNG') #img.save
+        return img_byte_arr.getvalue()   
+    return [get_bytes_value(image) for image in datos] if datos else None
+    '''
+             
+'''
+    for dato in datos:
+        open_file = GCP_functions.download_blob(storage_client,buck, dato, "../"+os.path.basename(dato.split('/')[-1]))
+        StreamingResponse(io.BytesIO(open_file))
+  
+    def zipfile(datos):
+        zip_io = io.BytesIO()
+        with zipfile.ZipFile(zip_io, mode='w', compression=zipfile.ZIP_DEFLATED) as temp_zip:
+            for fpath in datos:
+                # Calculate path for file in zip
+                fdir, fname = os.path.split(fpath)
+                zip_path = os.path.join(fdir, fname)
+                # Add file, at correct path
+                temp_zip.write((fpath, zip_path))
+        return StreamingResponse(
+            iter([zip_io.getvalue()]), 
+            media_type="application/x-zip-compressed", 
+            headers = { "Content-Disposition": f"attachment; filename=images.zip"}
+            )
+'''
 
 
 

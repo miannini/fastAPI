@@ -226,6 +226,14 @@ class Actividades_LotesT2(BaseModel):
     class Config:
         orm_mode = True
         
+class Acti_lotes_post(Actividades_LotesT2):
+    Producto : Optional[str] = None
+    Comentario : Optional[str] = None
+    Fecha_programada : Optional[datetime] = None
+    Estado : Optional[int] = None
+    class Config:
+        orm_mode = True
+        
 class AforoT(BaseModel):
     ID_ACTIVIDAD : int
     Aforo : float
@@ -651,7 +659,7 @@ class Lotes_variablesT(BaseModel):
         orm_mode = True
     
 class Lotes_quimicosT(BaseModel):
-    ID_registro : int
+    #ID_registro : int
     ID_lote : int
     Fecha_muestra : Optional[date] = None
     ID_muestra : Optional [int] = None
@@ -675,6 +683,9 @@ class Lotes_quimicosT(BaseModel):
     Comentarios : Optional [str] = None
     class Config:
         orm_mode = True
+        
+class Lotes_quimicosi(Lotes_quimicosT):
+    ID_registro : int
 
 ###########################################################################################################
 

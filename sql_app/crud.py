@@ -259,8 +259,8 @@ def create_finca(db: Session, finca: schemas.FincaP, id_cliente: str = 0):
     db_finca = models.FincaT(**finca.dict(exclude_unset=True))
     db.add(db_finca)
     db.commit()
-    #db.refresh(db_finca)
-    return "post_finca=Success"
+    db.refresh(db_finca)
+    return db_finca.ID_FINCA
 
 #-- edit
 
@@ -288,7 +288,7 @@ def create_finca_lote(db: Session, lote: schemas.LotesN, finca_id: int):
     db.add(db_lote)
     db.commit()
     db.refresh(db_lote)
-    return db_lote
+    return db_lote.ID_LOTE
 
 def delete_lote(db: Session, id_lote: int): #operario: schemas.OperarioDelete,
     db.query(models.LotesT).filter(models.LotesT.ID_LOTE == id_lote).delete()
@@ -331,7 +331,7 @@ def get_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[in
     return db.query(models.Actividades_LotesT).join(models.OperarioT).join(models.LotesT).join(models.FincaT).filter(*filtros).all()  
     #evaluar si se quisiera obtener el join completo
 
-def create_acti_lotes(db: Session, ac_lo: schemas.Actividades_LotesT):
+def create_acti_lotes(db: Session, ac_lo: schemas.Acti_lotes_post):
     db_ac_lo = models.Actividades_LotesT(**ac_lo.dict(exclude_unset=True))
     db.add(db_ac_lo)
     db.commit()
@@ -421,13 +421,16 @@ def write_trashato(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, Fecha_Tra
 
 def get_trashato(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]
+    #filtros.append()
+    filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
     filtros.append(func.DATE(models.Traslado_HatosT.Fecha_Traslado) >= datetime.strptime(date1,'%Y-%m-%d').date())
     filtros.append(func.DATE(models.Traslado_HatosT.Fecha_Traslado) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
     if id_hato:
-        filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+        #filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
         filtros.append(models.Traslado_HatosT.ID_HATO == id_hato)
     if id_lote:
-        filtros.append(models.FincaT.ID_cliente == id_cliente)
+        #filtros.append(models.FincaT.ID_cliente == id_cliente)
         filtros.append(models.LotesT.ID_LOTE == id_lote)
         filtros.append(models.Traslado_HatosT.ID_LOTE == id_lote)
     return db.query(models.Traslado_HatosT).join(models.HatosT).join(models.FincaT).join(models.LotesT).filter(*filtros).all()
@@ -773,13 +776,15 @@ def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, Fecha_Traslad
 
 def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]
+    filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.Traslado_VacasT.Fecha_Traslado) >= datetime.strptime(date1,'%Y-%m-%d').date())
     filtros.append(func.DATE(models.Traslado_VacasT.Fecha_Traslado) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
     if id_hato:
-        filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+        #filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
         filtros.append(models.Traslado_VacasT.ID_HATO == id_hato)
     if id_vaca:
-        filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+        #filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
         filtros.append(models.Traslado_VacasT.ID_VACA == id_vaca)
     return db.query(models.Traslado_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all()
 ##########################################################################################################
@@ -798,7 +803,7 @@ def get_leche_hatos(db: Session, id_hato:Optional[int]=None, id_operario:Optiona
     filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date())#.isoformat(timespec='milliseconds')) 
     return db.query(models.Leche_HatosT).join(models.HatosT).filter(*filtros).all()
 
-def create_leche_hatos(db: Session, le_ha: schemas.Leche_Hatosi):
+def create_leche_hatos(db: Session, le_ha: schemas.Leche_HatosT):
     db_le_ha = models.Leche_HatosT(**le_ha.dict(exclude_unset=True))
     db.add(db_le_ha)
     db.commit()
@@ -819,7 +824,7 @@ def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optiona
     filtros.append(func.DATE(models.Leche_VacaT.FECHA) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
     return db.query(models.Leche_VacaT).join(models.VacasT).filter(*filtros).all()
     
-def create_leche_vacas(db: Session, le_va: schemas.Leche_Vacai):
+def create_leche_vacas(db: Session, le_va: schemas.Leche_VacaT):
     db_le_va = models.Leche_VacaT(**le_va.dict(exclude_unset=True))
     db.add(db_le_va)
     db.commit()

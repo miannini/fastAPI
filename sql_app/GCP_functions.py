@@ -6,6 +6,7 @@ Created on Sat Mar 13 21:38:29 2021
 """
 #import os
 import re
+import numpy as np
 #from google.cloud import storage
 #from google.resumable_media.requests import Download, ChunkedDownload
 #from pathlib import Path
@@ -121,7 +122,7 @@ def list_gcs_directories(bucket, prefix):
 
 '''
 ### listar objetos de un bucket
-def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lote=None, prop=None, ym=None): #prefix is initial route, delimiter is '/', lote, prop
+def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lote=None, prop=None, mindate=0, maxdate=np.inf): #prefix is initial route, delimiter is '/', lote, prop
     #cred
     """Lists all the blobs in the bucket."""
     # bucket_name = "your-bucket-name"
@@ -130,19 +131,20 @@ def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lot
     # Note: Client.list_blobs requires at least package version 1.17.0.
     blobs = storage_client.list_blobs(bucket_name, prefix=prefix,delimiter=delimiter)
     for blob in blobs:
-        if lote is not None: #si ha restriccion de lote
-            if prop is not None: #tambien hay restriccion de propiedad
-                if re.search(r'_'+re.escape(lote)+r'_'+re.escape(prop),blob.name):
-                    lista.append(blob.name)
-            else:               #no hay restriccion de propiedad
-                if re.search(r'_'+re.escape(lote)+r'_',blob.name):
-                    lista.append(blob.name)
-        else:                   #no hay restriccion de lote
-            if prop is not None:    #si hay restriccion de propiedad
-                if re.search(r'_'+re.escape(prop),blob.name):
-                    lista.append(blob.name)
-            else:               #no hay restriccion de lote ni de propiedad
-                lista.append(blob.name)   
+        if int(blob.name.split('/')[-1][0:8]) >= mindate and int(blob.name.split('/')[-1][0:8]) <= maxdate:
+            if lote is not None: #si ha restriccion de lote
+                if prop is not None: #tambien hay restriccion de propiedad
+                    if re.search(r'_'+re.escape(lote)+r'_'+re.escape(prop),blob.name):
+                        lista.append(blob.name)
+                else:               #no hay restriccion de propiedad
+                    if re.search(r'_'+re.escape(lote)+r'_',blob.name):
+                        lista.append(blob.name)
+            else:                   #no hay restriccion de lote
+                if prop is not None:    #si hay restriccion de propiedad
+                    if re.search(r'_'+re.escape(prop),blob.name):
+                        lista.append(blob.name)
+                else:               #no hay restriccion de lote ni de propiedad
+                    lista.append(blob.name)   
     return lista
 
 #usar la funcion
@@ -153,24 +155,28 @@ def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lot
 
 
 
-### descargar objetos:
-def download_blob(storage_client, bucket_name, source_blob_name, destination_file_name):
-    """Downloads a blob from the bucket."""
+### abrir objeto:
+def open_blob(storage_client, bucket_name, source_blob_name): #destination_file_name
+    """open a blob from the bucket."""
     # bucket_name = "your-bucket-name"
     # source_blob_name = "storage-object-name"
-    # destination_file_name = "local/path/to/file"
-
     #storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-    # Construct a client side representation of a blob.
-    # Note `Bucket.blob` differs from `Bucket.get_blob` as it doesn't retrieve
-    # any content from Google Cloud Storage. As we don't need additional data,
-    # using `Bucket.blob` is preferred here.
     blob = bucket.blob(source_blob_name)
-    #blob.download_to_filename(destination_file_name)
     with blob.open('rb') as f:
         return f.read()
 
+### abrir objetos:
+def open_multi_blob(storage_client, bucket_name, source_blob_folder): #destination_file_name
+    """open a blob from the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_blob_name = "storage-object-name"
+    #storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    for source_blob_name in source_blob_folder:
+        blob = bucket.blob(source_blob_name)
+        with blob.open('rb') as f:
+            return f.read()
 
 
 #def stream_blob(storage_client, url, bucket_name, source_blob_name):
