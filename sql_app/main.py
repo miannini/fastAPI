@@ -641,7 +641,7 @@ async def meteo_csv(date1: str='2020-01-01', date2: str = datetime.now().strftim
 
 ####################################      STREAMING IMAGES   ################################################
 @app.get("/Image_lote/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
-async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), lote:Optional[str]=None, prop:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), lote:Optional[str]=None, prop:Optional[str]=None, numero:Optional[int] = 0, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
     images_route = 'Data/PNG_Images/ID_CLIENTE-'
     id_cliente = current_user.ID_CLIENTE
     buck= 'satellite_storage'
@@ -649,7 +649,7 @@ async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strft
     maxdate = int(''.join(date2.split('-')))
     print(mindate,maxdate)
     datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
-    open_file = GCP_functions.open_blob(storage_client,buck, datos[0]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
+    open_file = GCP_functions.open_blob(storage_client,buck, datos[numero]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
     return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
 
 
