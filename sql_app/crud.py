@@ -76,7 +76,7 @@ def email_user(alpha, tomail, fecha):
       to_emails= [str(tomail)],#["jgarboleda@gmail.com", "juancacamacho89@gmail.com", "luchofelipe8023@gmail.com", "marceloiannini@hotmail.com", "nickair90@gmail.com"],
       #cc_emails=Cc("marceloiannini@hotmail.com"),
       from_email=Email('mianninig@gmail.com', "MyKau User_Report"),
-      subject="New Client [AUTO ALERT] - MyKau",
+      subject="New User [AUTO ALERT] - MyKau",
       html_content=html_content
       )
 
@@ -86,7 +86,34 @@ def email_user(alpha, tomail, fecha):
       #expected 202 Accepted
     except HTTPError as e:
       return e.message
-  
+
+#Funcion para enviar emails a clientes, por creacion de usuarios
+def email_user_initial(alpha, fecha):
+    from sendgrid import SendGridAPIClient#, Personalization
+    from sendgrid.helpers.mail import Mail, Email#, Cc
+    from python_http_client.exceptions import HTTPError
+    sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
+    html_content1 = "<p>ALERTA - Nuevo usuario registrado a su Cuenta de Cliente!</p>" + "<p>Un nuevo usuario se ha registrado con su Numero de Cliente, en MyKau App. Nuevo User_ID = " + str(alpha.user) + ".</p> <p>"
+    html_content2 = "Nombre = " + str(alpha.full_name) + " , e-mail = " + str(alpha.email)
+    html_content3 = "</p>" + "<p>Fecha de Registro = " + str(fecha) + "</p>"
+    html_content4 = "</p> si conoce este usuario, ingrese a MyKauApp, active la cuenta del usuario y asocie con el Operario correspondiente en caso de ser necesario</p>"
+    html_content = html_content1 + html_content2 + html_content3 + html_content4
+                    
+    message = Mail(
+      to_emails= ["jgarboleda@gmail.com", "juancacamacho89@gmail.com", "luchofelipe8023@gmail.com", "marceloiannini@hotmail.com", "nickair90@gmail.com"],#["jgarboleda@gmail.com", "juancacamacho89@gmail.com", "luchofelipe8023@gmail.com", "marceloiannini@hotmail.com", "nickair90@gmail.com"],
+      #cc_emails=Cc("marceloiannini@hotmail.com"),
+      from_email=Email('mianninig@gmail.com', "MyKau User_Report"),
+      subject="New Initial User for New Client [AUTO ALERT] - MyKau",
+      html_content=html_content
+      )
+
+    try:
+      response = sg.send(message)
+      return f"email.status_code={response.status_code}"
+      #expected 202 Accepted
+    except HTTPError as e:
+      return e.message    
+
 #######################     USERS   ###################################################
 #v2 auth
 def get_user_by_username(db: Session, user: str):
@@ -119,8 +146,14 @@ def create_user(db: Session, user_t: schemas.UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        #send a notification
-        email_user(db_user, cliente_mail, datetime.now().strftime("%Y-%m-%d"))
+        #if initial user, send to mykau, else to client
+        list_users = get_all_users(id_cliente=user_t.ID_CLIENTE)
+        if len(list_users)>0:
+            #send a notification
+            email_user(db_user, cliente_mail, datetime.now().strftime("%Y-%m-%d"))
+        else:
+            #send a notification
+            email_user_initial(db_user, datetime.now().strftime("%Y-%m-%d"))
         return db_user
     else:
         raise HTTPException(status_code=404, detail="Cliente not found")
@@ -787,6 +820,15 @@ def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=
         #filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
         filtros.append(models.Traslado_VacasT.ID_VACA == id_vaca)
     return db.query(models.Traslado_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all()
+
+def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
+    #reg_celo = models.celoT(**sch_celo.dict())  
+    reg_celo = models.celoT(ID_vaca=1234, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S") , celotron=987654321)  
+    db.add(reg_celo)
+    db.commit()
+    db.refresh(reg_celo) #descommented
+    return  reg_celo.id_celo #"ok"
+
 ##########################################################################################################
 
 

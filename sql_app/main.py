@@ -556,6 +556,19 @@ async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depe
             raise HTTPException(status_code=404, detail="Traslado no registrado")   
     return db_tras_vaca
 
+
+from twilio.twiml.messaging_response import MessagingResponse
+@app.post("/Heat_Detection/", tags=["Deteccion Celo"]) #response_model=List[schemas.MeteorologiaT]
+async def celo_detect(db: Session = Depends(get_db)): # sch_celo: schemas.celoT,, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    #write to DB
+    #id_celo = crud.write_celo(db=db, sch_celo=sch_celo)
+    id_celo = crud.write_celo(db)
+    # Start our TwiML response
+    resp = MessagingResponse()
+        
+    return id_celo
+
+
 ##########################################################################################################
 
 

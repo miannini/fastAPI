@@ -303,6 +303,13 @@ class Traslado_VacasT(Base):
     Fecha_Traslado = Column(DateTime)
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+    
+class celoT(Base):
+    __tablename__ = "celo"
+    id_celo = Column(Integer, primary_key=True, index=True)
+    ID_vaca = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    date = Column(DateTime, nullable=True)
+    celotron = Column(Integer, nullable=True)
 ##########################################################################################################
 
 
