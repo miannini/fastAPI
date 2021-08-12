@@ -13,6 +13,13 @@ from datetime import date, datetime
 from passlib.context import CryptContext
 import os
 import pandas as pd
+#SMS
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+#Emails
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Email
+from python_http_client.exceptions import HTTPError
 
 #CRUD = Create, Read, Update and Delete
 
@@ -35,9 +42,6 @@ def flatten_join_av(tup_list, avoid):
 
 #Funcion para enviar emails a My Kau por creacion de cliente
 def email_cliente(alpha, fecha):
-    from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail, Email
-    from python_http_client.exceptions import HTTPError
     sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
     html_content1 = "<p>ALERT - New registered Client!</p>" + "<p>This email is to Alert for new Client for My Kau App. New ID = " + str(alpha.ID_CLIENTE) + ".</p> <p>"
     html_content2 = "Name is = " + str(alpha.NOMBRE) + " , eMail is = " + str(alpha.EMAIL) +  " , Company is = " + str(alpha.RAZON_SOCIAL) + " , Phone is = " + str(alpha.TELEFONO)
@@ -62,9 +66,6 @@ def email_cliente(alpha, fecha):
 
 #Funcion para enviar emails a clientes, por creacion de usuarios
 def email_user(alpha, tomail, fecha):
-    from sendgrid import SendGridAPIClient#, Personalization
-    from sendgrid.helpers.mail import Mail, Email#, Cc
-    from python_http_client.exceptions import HTTPError
     sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
     html_content1 = "<p>ALERTA - Nuevo usuario registrado a su Cuenta de Cliente!</p>" + "<p>Un nuevo usuario se ha registrado con su Numero de Cliente, en MyKau App. Nuevo User_ID = " + str(alpha.user) + ".</p> <p>"
     html_content2 = "Nombre = " + str(alpha.full_name) + " , e-mail = " + str(alpha.email)
@@ -89,9 +90,6 @@ def email_user(alpha, tomail, fecha):
 
 #Funcion para enviar emails a clientes, por creacion de usuarios
 def email_user_initial(alpha, fecha):
-    from sendgrid import SendGridAPIClient#, Personalization
-    from sendgrid.helpers.mail import Mail, Email#, Cc
-    from python_http_client.exceptions import HTTPError
     sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
     html_content1 = "<p>ALERTA - Nuevo usuario registrado a su Cuenta de Cliente!</p>" + "<p>Un nuevo usuario se ha registrado con su Numero de Cliente, en MyKau App. Nuevo User_ID = " + str(alpha.user) + ".</p> <p>"
     html_content2 = "Nombre = " + str(alpha.full_name) + " , e-mail = " + str(alpha.email)
@@ -114,6 +112,54 @@ def email_user_initial(alpha, fecha):
     except HTTPError as e:
       return e.message    
 
+
+def email_celo(alpha, tomail, fecha):
+    sg = SendGridAPIClient(secrets.EMAIL_API_KEY) #.environ['EMAIL_API_KEY'])
+    html_content1 = "<p>ALERTA - Celo Detectado!</p>" + "<p>Un nuevo usuario se ha registrado con su Numero de Cliente, en MyKau App. Nuevo User_ID = " + str(alpha.user) + ".</p> <p>"
+    html_content2 = "Vaca = " + str(alpha.ID_Vaca) + " , celotron = " + str(alpha.id_celotron)
+    html_content3 = "</p>" + "<p>Fecha de Registro = " + str(fecha) + "</p>"
+    html_content4 = "</p> mensaje personalizado para intervenir en deteccion de celo</p>"
+    html_content = html_content1 + html_content2 + html_content3 + html_content4
+                    
+    message = Mail(
+      to_emails= [str(tomail)], # to_emails= ["jgarboleda@gmail.com", "juancacamacho89@gmail.com", "luchofelipe8023@gmail.com", "marceloiannini@hotmail.com", "nickair90@gmail.com"],#["jgarboleda@gmail.com", "juancacamacho89@gmail.com", "luchofelipe8023@gmail.com", "marceloiannini@hotmail.com", "nickair90@gmail.com"],
+      #cc_emails=Cc("marceloiannini@hotmail.com"),
+      from_email=Email('mianninig@gmail.com', "MyKau User_Report"),
+      subject="Deteccion de Celo [AUTO ALERT] - MyKau",
+      html_content=html_content
+      )
+
+    try:
+      response = sg.send(message)
+      return f"email.status_code={response.status_code}"
+      #expected 202 Accepted
+    except HTTPError as e:
+      return e.message
+
+def sms_celo():
+    hoy = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    client = Client(secrets.account_sid, secrets.auth_token)
+    ID_VACA = 1234
+    texto = "Alerta! Deteccion de Celo en vaca: " + str(ID_VACA) + ', fecha: ' + hoy + ', Celotron:' + str(987654321)
+    NUMBERS = {
+        'Marcelo':'+974 55033811',
+        'Marcelo2':'+57 3124165084',
+        #'Felipe':'+57 3108672598',
+        'Andres':'+57 3173941374',
+        #'Nico':'+57 3102961475',
+        #'Fernando':'+57 3103128204'
+        }
+    for name, number in NUMBERS.items():
+        try:
+            message = client.messages.create(
+                to=number, 
+                from_=secrets.twilioNumber, 
+                body=texto)
+            print('exito')
+            print (message.sid)
+        except TwilioRestException as e:
+            print(e)
+    
 #######################     USERS   ###################################################
 #v2 auth
 def get_user_by_username(db: Session, user: str):
