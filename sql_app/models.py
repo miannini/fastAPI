@@ -249,6 +249,18 @@ class MastitisT(Base):
     Ubre_sana = Column(Float, nullable=True)
     Calificacion = Column(Float, nullable=True)
     GAP = Column(Float, nullable=True)
+
+class Result_MastitisT(Base):
+    __tablename__ = "Result_Mastitis"
+    ID_Actividad = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), primary_key=True, index=True)#, ForeignKey("Actividades_Vacas.ID_FINCA"))
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    Fecha = Column(Date, nullable=True)
+    AI = Column(Integer, nullable=True)
+    AD = Column(Integer, nullable=True)
+    PI = Column(Integer, nullable=True)
+    PD = Column(Integer, nullable=True)
+    Chequeo_revision = Column(String(45), nullable=True)
+
     
 class PartosT(Base):
     __tablename__ = "Partos"
@@ -296,6 +308,17 @@ class Ubicacion_VacasT(Base):
     #nombre_vaca = relationship("VacasT", backref="Ubicacion_Vacas", lazy='joined') #https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html
     #nombre_hato = relationship("HatosT", backref="Ubicacion_Vacas", lazy='joined')
     #nombre_lote = relationship("LotesT", backref="Ubicacion_Vacas", lazy='joined')
+
+#DB View
+class Ubicacion_Vacas_FullT(Base):
+    __tablename__ = "ubica_vacas_full"
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True)
+    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
+    ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+    Nombre_vaca = Column(String(45), nullable=True)
+    NOMBRE_LOTE = Column(String(45), nullable=True)
+    Nombre_Hato = Column(String(45), nullable=True)
+    
     
 class Traslado_VacasT(Base):
     __tablename__ = "Traslado_Vacas"

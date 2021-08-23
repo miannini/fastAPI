@@ -544,6 +544,19 @@ class Mast_2(BaseModel):
     act_model : ActInfo = None
     class Config:
         orm_mode = True 
+ 
+#DB View results    
+class Result_MastitisT(BaseModel):
+    ID_Actividad : int
+    ID_VACA : int
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    AI : Optional [int] = None
+    AD : Optional [int] = None
+    PI : Optional [int] = None
+    PD : Optional [int] = None
+    Chequeo_revision : Optional[str] = None
+    class Config:
+        orm_mode = True 
         
 class PartosT(BaseModel):
     IDparto : int
@@ -587,6 +600,17 @@ class Ubicacion_VacasBasic2(BaseModel):
     #ID_LOTE : Optional [int] = None    
     class Config:
         orm_mode = True
+
+class Ubicacion_Vacas_FullT(BaseModel):
+    ID_VACA : Optional [int] = None
+    ID_HATO : Optional [int] = None
+    ID_LOTE : Optional [int] = None
+    Nombre_vaca : Optional[str] = None
+    NOMBRE_LOTE : Optional[str] = None
+    Nombre_Hato : Optional[str] = None
+    class Config:
+        orm_mode = True 
+
         
 class Traslado_Vacas_id(BaseModel):
     ID_TRASLADO : int   

@@ -7,7 +7,7 @@ Created on Tue Dec 15 20:25:17 2020
 
 from typing import List, Union
 
-from fastapi import Depends, FastAPI, HTTPException, status, Response
+from fastapi import Depends, FastAPI, HTTPException, status, Response, File, UploadFile
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -481,6 +481,12 @@ async def read_mastitis(date1: Optional[str]='2020-01-01', date2: Optional[str] 
     act_mast = crud.get_act_mastitis(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario, id_cliente = current_user.ID_CLIENTE)
     return act_mast
 
+#DB View
+@app.get("/Last_Mastit/", status_code=201, tags=["Actividades-Vacas"])#, response_model=List[schemas.Mast_2])
+async def read_masti_las(vaca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100, operario:Optional[int]=None
+    act_mast2 = crud.get_last_mastitis(db, vaca=vaca, id_cliente = current_user.ID_CLIENTE) #operario=operario, 
+    return act_mast2
+
 @app.get("/Partos_act_get/", status_code=201, tags=["Actividades-Vacas"])#, response_model=List[schemas.Mast_2])
 async def read_partos(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None,  db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     act_partos = crud.get_act_partos(db, date1=date1, date2=date2, vaca=vaca, categoria=categoria, operario=operario, comentario=comentario, id_cliente = current_user.ID_CLIENTE)
@@ -514,6 +520,12 @@ async def write_parto(data: schemas.Parto_Requi, db: Session = Depends(get_db), 
 def read_ubva(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     ub_va = crud.get_ubva(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_cliente= current_user.ID_CLIENTE)
     return ub_va
+
+# DB View
+@app.get("/UbicacionVacas_view/", response_model=List[schemas.Ubicacion_Vacas_FullT], tags=["Actividades-Vacas"])
+def read_ubvaf(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    ub_vaf = crud.get_ubvaf(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_cliente= current_user.ID_CLIENTE)
+    return ub_vaf
 
 @app.get("/TrasVacas/", response_model=List[schemas.Traslado_VacasT], tags=["Actividades-Vacas"])
 async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[str]=None, id_vaca:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
@@ -573,6 +585,7 @@ async def celo_detect(db: Session = Depends(get_db)): # sch_celo: schemas.celoT,
     crud.sms_celo()
     return str(resp)
 
+#invalid content type application-json
 
 ##########################################################################################################
 
@@ -724,6 +737,15 @@ async def imagen_lotes(date1: str='2020-01-01', date2: str = datetime.now().strf
             )
 '''
 
+@app.post("/Image_load/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
+async def imagen_load(image: UploadFile = File(...) ): #, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    images_route = 'Data/Upload_Images/'#'ID_CLIENTE-'
+    #id_cliente = current_user.ID_CLIENTE
+    buck= 'satellite_storage'
+    #datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
+    #open_file = GCP_functions.open_blob(storage_client,buck, datos[numero]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
+    
+    return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
 
 
 #id_cliente = str(1) #id_cliente

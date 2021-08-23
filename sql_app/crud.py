@@ -717,6 +717,21 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
     
     return res_b
 
+#DB View
+def get_last_mastitis(db: Session, vaca:Optional[str]=None, id_cliente: str = 0) : # operario:Optional[int]=None, 
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)   
+    if vaca:
+        filtros.append((models.Result_MastitisT.ID_VACA == vaca))
+    #if operario:
+    #    filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
+    res = db.query(models.Result_MastitisT).join(models.VacasT).filter(*filtros).all()  
+    #remover ID_TipoOperacion, ID_Resultado, ID_Categoria, ID_Actividad
+    #avoid = ['ID_TipoOperacion', 'ID_Resultado', 'ID_Categoria', 'ID_Actividad']
+    #res_b = flatten_join_av(res, avoid) #res_b = flatten_join(res)
+    
+    return res#_b
+
 ### Registrar Actividad - cualquiera
 def reg_acti_2(db: Session, data: schemas.ActInfo): #Mast_Requi
     reg_av = models.ActividadesVacasT(ID_VACA=data.ID_VACA, ID_TipoOperacion=data.ID_TipoOperacion, ID_Resultado=data.ID_Resultado,
@@ -824,6 +839,19 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
     if id_lote:
         filtros.append(models.Ubicacion_VacasT.ID_LOTE == id_lote)
     return db.query(models.Ubicacion_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
+
+#DB View - Ubicacion Full
+def get_ubvaf(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    if id_hato:
+        filtros.append(models.Ubicacion_Vacas_FullT.ID_HATO == id_hato)
+    if id_vaca:
+        filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_vaca)
+    if id_lote:
+        filtros.append(models.Ubicacion_Vacas_FullT.ID_LOTE == id_lote)
+    return db.query(models.Ubicacion_Vacas_FullT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
 
 ### Traslado vacas    
 def write_ubi_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente: str = 0):
