@@ -25,6 +25,7 @@ import json
 from google.oauth2 import service_account
 from google.cloud import storage
 import asyncio
+from twilio.twiml.messaging_response import MessagingResponse
 #import zipfile
 #import StringIO
 
@@ -209,12 +210,26 @@ def read_users_priv(db: Session = Depends(get_db), name: Optional[str]=None, des
     privilegios = crud.get_all_privs(db, name=name, description=description)
     return privilegios
 
+### Permisions
+@app.get("/Permisos/", response_model=List[schemas.PermisosT], tags=["Users"])
+def read_permisos(db: Session = Depends(get_db), name: Optional[str]=None, user: Optional[int]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    permisos = crud.get_permisos(db, name=name, user=user, id_cliente = current_user.ID_CLIENTE)
+    return permisos
+
+@app.patch("/Permisos/{User_ID}", response_model=List[schemas.PermisosT], tags=["Users"])
+def update_permisos(User_ID: int, permiso: schemas.PermisosU, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_permiso(db=db, permiso=permiso, user_id=User_ID)
+    db_permiso_id = crud.get_permisos(db, user=User_ID, id_cliente = current_user.ID_CLIENTE)
+    if db_permiso_id is None:
+        raise HTTPException(status_code=404, detail="User_ID not found")
+    return db_permiso_id
+
 ###################################################################################################
 
 
 ############################       CLIENTS      ###############################################
 @app.get("/clientes/", response_model=List[schemas.ClientesT], tags=["Clients"])  
-def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente:Optional[str]=None):
+def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), ciudad:Optional[str]=None, departamento:Optional[str]=None, nombre:Optional[str]=None, date1: Optional[str]=None, id_cliente: Optional[str]=None):
     clientes = crud.get_clientes(db, ciudad=ciudad, departamento=departamento, nombre=nombre, date1= date1, id_cliente=id_cliente)
     return clientes
 
@@ -224,22 +239,29 @@ async def write_cliente(cliente: schemas.ClientesCreate, db: Session = Depends(g
     #esto seria bueno asociarlo con enviar un email, con formulario y que el ID de cliente se guarde
     #para asignarlo al usuario creado
 
-#falta editar cliente [tambien agregar fecha inicial contrato, fecha_vencimiento, estado]
+#editar cliente
+@app.patch("/Cliente/{ID_CLIENTE}", response_model=List[schemas.ClientesT], tags=["Clients"])
+def update_cliente(Cliente_ID: int, cliente: schemas.ClientesU, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_cliente(db=db, cliente=cliente, cliente_id=Cliente_ID)
+    db_cliente_id = crud.get_clientes(db, id_cliente = Cliente_ID)
+    if db_cliente_id is None:
+        raise HTTPException(status_code=404, detail="ID_CLIENTE not found")
+    return db_cliente_id
 #falta otra tabla sobre estado clientes, pagos y vencimientos, separada de tabla cliente
-
+#[tambien agregar fecha inicial contrato, fecha_vencimiento, estado
 ####################################################################################################
 
 
 ##################################      OPERARIOS    #################################################
 @app.get("/Operario", response_model=List[schemas.OperarioT], tags=["Operarios"])  # List[
-def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    operarios = crud.get_operarios(db, finca=finca, rol=rol, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
+def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, id_operario:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    operarios = crud.get_operarios(db, finca=finca, id_operario=id_operario, rol=rol, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
     return operarios
 
 @app.post("/create_operario/", status_code=201, tags=["Operarios"])
 def write_operario(operario: schemas.OperarioN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_operario(db=db, operario=operario)
-
+'''
 @app.delete("/Operario_del/{ID_OPERARIO}", tags=["Operarios"])
 def erase_operario(ID_OPERARIO: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     crud.delete_operario(db, id_operario=ID_OPERARIO)  # operario = operario,
@@ -250,11 +272,20 @@ def erase_operario(ID_OPERARIO: int, db: Session = Depends(get_db), current_user
         "status": True,
         "message": "User deleted"
     }
-
+'''
 @app.get("/Operario_sin_user", response_model=List[schemas.Operario_Sin_UserT], tags=["Operarios"])  # List[
 def read_oper_sin_user(db: Session = Depends(get_db), nombre:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     operarios = crud.get_oper_sin_user(db, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
     return operarios
+
+#patch operario
+@app.patch("/Operario/{ID_OPERARIO}", response_model=List[schemas.OperarioT], tags=["Operarios"])
+def update_operario(Operario_ID: int, operario: schemas.OperarioN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_operario(db=db, operario=operario, id_operario=Operario_ID)
+    db_operario_id = crud.get_operarios(db, id_operario=Operario_ID, id_cliente = current_user.ID_CLIENTE)
+    if db_operario_id is None:
+        raise HTTPException(status_code=404, detail="ID_OPERARIO not found")
+    return db_operario_id
 
 ##########################################################################################################
 
@@ -276,6 +307,14 @@ def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user:
 #solo funciona si tabla lotes tiene finca_id creada ... cambiar SQL, sino se puede, APP debera crear finca y lote al tiempo
 #obteniendo max finca_id, asignando en tabla lotes y despues en tabla fincas
 
+#patch finca
+@app.patch("/Fincas/{ID_FINCA}", response_model=List[schemas.FincaT], tags=["Fincas"])
+def update_finca(Finca_ID: int, finca: schemas.FincaU, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_finca(db=db, finca=finca, id_finca=Finca_ID)
+    db_finca_id = crud.get_fincas(db, finca=Finca_ID, id_cliente = current_user.ID_CLIENTE)
+    if db_finca_id is None:
+        raise HTTPException(status_code=404, detail="ID_FINCA not found")
+    return db_finca_id
 ###########################################################################################################
 
 
@@ -288,7 +327,7 @@ def write_lote_for_finca(finca_id: int, lote: schemas.LotesN, db: Session = Depe
 def read_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre:Optional[str]=None):
     lotes = crud.get_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
     return lotes
-
+'''
 @app.delete("/Lotes_del/{ID_LOTE}", tags=["Lotes"])
 def erase_lote(ID_LOTE: int, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     crud.delete_lote(db, id_lote=ID_LOTE)  # operario = operario,
@@ -299,7 +338,7 @@ def erase_lote(ID_LOTE: int, db: Session = Depends(get_db), current_user: schema
         "status": True,
         "message": "Lote deleted"
     }
-
+'''
 @app.patch("/Lotes_upd/{ID_LOTE}", response_model=List[schemas.LotesT], tags=["Lotes"])
 def update_lotes_id(ID_LOTE: int, lote: schemas.LotesN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     #primero ver si el lote si pertenece al cliente, luego cambiar
@@ -353,6 +392,16 @@ def wr_hato(hato: schemas.HatosP, db: Session = Depends(get_db), current_user: s
     return crud.create_hato(db=db, hato=hato, id_cliente= current_user.ID_CLIENTE)
 #funciona, pero duplica ID_hato, sino se puede corregir SQL, entonces hacer get max ID y crear con +1
 
+#Patch Hato
+@app.patch("/Hatos/{ID_HATO}", response_model=List[schemas.HatosT], tags=["Hatos"])
+def update_hato(Hato_ID: int, hato: schemas.HatosP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_hato(db=db, hato=hato, id_hato=Hato_ID)
+    db_hato_id = crud.get_hatos(db, id_hato=Hato_ID, id_cliente = current_user.ID_CLIENTE)
+    if db_hato_id is None:
+        raise HTTPException(status_code=404, detail="ID_HATO not found")
+    return db_hato_id
+
+
 @app.get("/TrasHatos/", response_model=List[schemas.Traslado_HatosT], tags=["Hatos"])
 async def read_hist_trashatos(db: Session = Depends(get_db), id_hato:Optional[str]=None, id_lote:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     hist_trashatos = crud.get_trashato(db, id_hato=id_hato, id_lote=id_lote, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
@@ -377,6 +426,8 @@ async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = 
         if db_tras_hato is None: #si el traslado de vaca no se registro, mostrar error
             raise HTTPException(status_code=404, detail="Traslado no registrado")
     return db_tras_hato
+
+#patch traslado hatos
 
 ###########################################################################################################
 
@@ -428,6 +479,11 @@ async def read_dest(db: Session = Depends(get_db), id_destino:Optional[int]=None
 async def read_sires(db: Session = Depends(get_db), id_sire:Optional[int]=None, id_oficial:Optional[str]=None, nombre_largo:Optional[str]=None, registro:Optional[str]=None, raza:Optional[int]=None, activa:Optional[int]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #id_finca:Optional[int]=None
     sires = crud.get_sires(db, id_sire=id_sire, id_oficial=id_oficial, nombre_largo=nombre_largo, registro=registro, raza=raza, activa=activa, id_cliente = current_user.ID_CLIENTE) #id_finca=id_finca
     return sires
+
+#post sire
+
+#patch sire
+
 #########################################################################################################
 
 
@@ -477,8 +533,8 @@ async def read_mastitis(date1: str='2020-01-01', date2: str = datetime.now().str
 '''
 
 @app.get("/Mastit_get/", status_code=201, tags=["Actividades-Vacas"])#, response_model=List[schemas.Mast_2])
-async def read_mastitis(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
-    act_mast = crud.get_act_mastitis(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario, id_cliente = current_user.ID_CLIENTE)
+async def read_mastitis(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_mastitis:Optional[int]=None,   db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+    act_mast = crud.get_act_mastitis(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario, id_mastitis=id_mastitis, id_cliente = current_user.ID_CLIENTE)
     return act_mast
 
 #DB View
@@ -486,6 +542,16 @@ async def read_mastitis(date1: Optional[str]='2020-01-01', date2: Optional[str] 
 async def read_masti_las(vaca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100, operario:Optional[int]=None
     act_mast2 = crud.get_last_mastitis(db, vaca=vaca, id_cliente = current_user.ID_CLIENTE) #operario=operario, 
     return act_mast2
+
+#patch mastitis
+@app.patch("/Mastitis/{ID_mastitis}", status_code=201, tags=["Actividades-Vacas"])
+def update_mastitis(ID_mastitis: int, mastitis: schemas.MastitisU, acts:schemas.ActividadesU, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_mastitis(db=db, mastitis=mastitis, acts=acts, id_mastitis=ID_mastitis)
+    db_mastitis = crud.get_act_mastitis(db, id_mastitis=ID_mastitis, id_cliente = current_user.ID_CLIENTE)
+    if db_mastitis is None:
+        raise HTTPException(status_code=404, detail="Mastitis_ID not found")
+    return db_mastitis
+
 
 @app.get("/Partos_act_get/", status_code=201, tags=["Actividades-Vacas"])#, response_model=List[schemas.Mast_2])
 async def read_partos(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None,  db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
@@ -516,6 +582,8 @@ async def write_parto(data: schemas.Parto_Requi, db: Session = Depends(get_db), 
     id_parto_new = id_parto.IDparto
     return id_parto_new
 
+#patch partos
+
 @app.get("/UbicacionVacas/", response_model=List[schemas.Ubicacion_VacasT], tags=["Actividades-Vacas"])
 def read_ubva(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     ub_va = crud.get_ubva(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_cliente= current_user.ID_CLIENTE)
@@ -526,6 +594,8 @@ def read_ubva(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato
 def read_ubvaf(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     ub_vaf = crud.get_ubvaf(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_cliente= current_user.ID_CLIENTE)
     return ub_vaf
+
+#patch ubicacion vacas
 
 @app.get("/TrasVacas/", response_model=List[schemas.Traslado_VacasT], tags=["Actividades-Vacas"])
 async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[str]=None, id_vaca:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
@@ -568,41 +638,35 @@ async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depe
             raise HTTPException(status_code=404, detail="Traslado no registrado")   
     return db_tras_vaca
 
+#patch traslado vacas
 
-from twilio.twiml.messaging_response import MessagingResponse
-
-
-@app.post("/Heat_Detection/", status_code=200, tags=["Deteccion Celo"]) #response_model=List[schemas.MeteorologiaT]
-async def celo_detect(db: Session = Depends(get_db)): # sch_celo: schemas.celoT,, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
-    #write to DB
-    #id_celo = crud.write_celo(db=db, sch_celo=sch_celo)
-    id_celo = crud.write_celo(db)
-    # Start our TwiML response
-    resp = MessagingResponse()
-    resp.message("Mensaje de Celo recibido!, consecutivo: " + str(id_celo))
-    
-    ### reenviar SMS
-    crud.sms_celo()
-    return str(resp)
-
-#invalid content type application-json
 
 ##########################################################################################################
 
 
 #########################################    LECHE    #####################################################
 @app.get("/Leche_Hatos/", response_model=List[schemas.Leche_Hatosi], tags=["Leche"]) 
-def read_leche_hatos(db: Session = Depends(get_db), id_hato:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d") ,current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: str='2020-01-01'
-    leche_hatos = crud.get_leche_hatos(db, id_hato=id_hato, id_operario=id_operario, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date1
+def read_leche_hatos(db: Session = Depends(get_db), id_hato:Optional[int]=None, id_operario:Optional[int]=None, id_leche_ha:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d") ,current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: str='2020-01-01'
+    leche_hatos = crud.get_leche_hatos(db, id_hato=id_hato, id_operario=id_operario, id_leche_ha=id_leche_ha, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date1
     return leche_hatos
 
 @app.post("/Wr_Leche_Hatos/", status_code=201, tags=["Leche"]) #response_model=schemas.Leche_Hatosi)
 def wr_leche_hatos(le_ha: schemas.Leche_HatosT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_hatos(db=db, le_ha=le_ha)
 
+#patch leche hatos
+@app.patch("/Leche_Hatos/{ID_Leche}", response_model=List[schemas.Leche_Hatosi], tags=["Leche"])
+def update_leche_ha(ID_leche: int, leche: schemas.Leche_HatosU, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_leche_ha(db=db, leche=leche, id_leche=ID_leche)
+    db_leche_ha = crud.get_leche_hatos(db, id_leche_ha=ID_leche, id_cliente = current_user.ID_CLIENTE)
+    if db_leche_ha is None:
+        raise HTTPException(status_code=404, detail="Lote_ID not found")
+    return db_leche_ha
+
+### Leche Vacas
 @app.get("/Leche_Vacas/", response_model=List[schemas.Leche_Vacai], tags=["Leche"])
-def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
-    leche_vaca = crud.get_leche_vacas(db, id_vaca=id_vaca, id_operario=id_operario, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
+def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, id_operario:Optional[int]=None, id_leche_va:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    leche_vaca = crud.get_leche_vacas(db, id_vaca=id_vaca, id_operario=id_operario, id_leche_va=id_leche_va, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
     return leche_vaca
 
 @app.post("/Wr_Leche_vacas/", status_code=201, tags=["Leche"]) #, response_model=schemas.Leche_Vacai)
@@ -613,6 +677,14 @@ def wr_leche_vacas(le_va: schemas.Leche_VacaT, db: Session = Depends(get_db), cu
 def wr_leche_vaca_l(le_va: List[schemas.Leche_VacaT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_leche_vaca_list(db=db, le_va=le_va)
 
+#patch leche vacas
+@app.patch("/Leche_Vacas/{ID_Leche}", response_model=List[schemas.Leche_Vacai], tags=["Leche"])
+def update_leche_va(ID_leche: int, leche: schemas.Leche_VacaU, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_leche_va(db=db, leche=leche, id_leche=ID_leche)
+    db_leche_va = crud.get_leche_vacas(db, id_leche_va=ID_leche, id_cliente = current_user.ID_CLIENTE)
+    if db_leche_va is None:
+        raise HTTPException(status_code=404, detail="Lote_ID not found")
+    return db_leche_va
 ##########################################################################################################
 
 ######################################### OTRAS FUENTES LOTES   #########################################
@@ -620,9 +692,18 @@ def wr_leche_vaca_l(le_va: List[schemas.Leche_VacaT], db: Session = Depends(get_
 def wr_lotes_var(lo_va: List[schemas.Lotes_variablesT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_var(db=db, lo_va=lo_va)
 
+#get
+
+#patch
+
 @app.post("/Wr_lotes_quimicos/", status_code=201, tags=["Otras Fuentes Lotes"]) #, response_model=schemas.Leche_Vacai)
 def wr_lotes_qui(lo_qu: List[schemas.Lotes_quimicosT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_qui(db=db, lo_qu=lo_qu)
+
+
+#get
+
+#patch
 
 ###########################################################################################################
 
@@ -645,8 +726,8 @@ def write_meteo(meteo: schemas.MeteorologiaT, db: Session = Depends(get_db)): #,
     return crud.registrar_meteo(db=db, meteo=meteo)
 
 @app.get("/Meteo_get/", response_model=List[schemas.MeteorologiaT], tags=["Estacion Meteorologica"])
-async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
-    meteo_data = crud.get_meteo(db, date1=date1, date2=date2, finca=finca, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
+async def read_meteo_sta(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), estacion:Optional[str]=None, finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    meteo_data = crud.get_meteo(db, date1=date1, date2=date2, estacion=estacion, finca=finca, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
     return meteo_data
 
 @app.get("/Meteo_csv/", response_model=List[schemas.MeteorologiaT], tags=["Estacion Meteorologica"])
@@ -751,3 +832,21 @@ async def imagen_load(image: UploadFile = File(...) ): #, current_user: schemas.
 #id_cliente = str(1) #id_cliente
 #prop = 'ndvi'
 #lote = str(100)
+
+#########################################################################################################################
+
+################################################## CELOTRON   ###########################################################
+@app.post("/Heat_Detection/", status_code=200, tags=["Deteccion Celo"]) #response_model=List[schemas.MeteorologiaT]
+async def celo_detect(db: Session = Depends(get_db)): # sch_celo: schemas.celoT,, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    #write to DB
+    #id_celo = crud.write_celo(db=db, sch_celo=sch_celo)
+    id_celo = crud.write_celo(db)
+    # Start our TwiML response
+    resp = MessagingResponse()
+    resp.message("Mensaje de Celo recibido!, consecutivo: " + str(id_celo))
+    
+    ### reenviar SMS
+    crud.sms_celo()
+    return str(resp)
+
+#invalid content type application-json

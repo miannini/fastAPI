@@ -37,6 +37,25 @@ class API_Users_PrivT(Base):
     id_user_rol = Column(Integer, primary_key=True, index=True)
     name = Column(String(45), nullable=True)
     description= Column(String(45), nullable=True)
+    
+class PermisosT(Base):
+    __tablename__ = "Permisos"
+    ID_permisos = Column(Integer, primary_key=True, index=True)
+    User_ID = Column(Integer, ForeignKey("API_Users.id"))
+    Crear = Column(Integer)
+    Activar_User = Column(Integer)
+    Imagenes_Sat = Column(Integer)
+    Leche = Column(Integer)
+    Hatos_Traslado = Column(Integer)
+    Hatos_Suplementa = Column(Integer)
+    Hatos_Servicios = Column(Integer)
+    Animales_Traslados = Column(Integer)
+    Animales_Mastitis = Column(Integer)
+    Animales_CrearEditar = Column(Integer)
+    Animales_Examenes = Column(Integer)
+    Animales_Salud = Column(Integer)
+    Lotes = Column(Integer)
+
 
 ###################################################################################################
 
@@ -416,8 +435,8 @@ class monitoreo_descargas_sentinelT(Base):
 ########################################   ESTACION METEOROLOGICA   #######################################
 class MeteorologiaT(Base):
     __tablename__ = "Meteorologia"
-    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"), primary_key=True)
-    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
+    ID_Estacion = Column(Integer, ForeignKey("Estaciones_Meteo.ID_Estacion"), primary_key=True) #
+    #ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), primary_key=True)
     FECHA_HORA = Column(Date, primary_key=True, index=True)
     activacion = Column(Integer, nullable=True)
     DHT_Humidity_mean = Column(Float, nullable=True)
@@ -448,4 +467,9 @@ class MeteorologiaT(Base):
     Sunlight_std = Column(Float, nullable=True)
     Count_Report = Column(Integer, nullable=True)
 
+class EstacionesT(Base):
+    __tablename__ = "Estaciones_Meteo"
+    ID_Estacion = Column(Integer, primary_key=True) #ForeignKey("Finca.ID_FINCA"),
+    ID_Finca = Column(Integer, ForeignKey("Finca.ID_FINCA"))
+    comentarios = Column(String(45))
 ###########################################################################################################

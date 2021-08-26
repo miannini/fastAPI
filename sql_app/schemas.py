@@ -72,13 +72,52 @@ class API_Users_PrivT(BaseModel):
     description : Optional[str] = None
     class Config:
         orm_mode = True
+        
+#permisos
+class PermisosT(BaseModel):
+    ID_permisos : int
+    User_ID : int
+    Crear : Optional[int] = None
+    Activar_User : Optional[int] = None
+    Imagenes_Sat : Optional[int] = None
+    Leche : Optional[int] = None
+    Hatos_Traslado : Optional[int] = None
+    Hatos_Suplementa : Optional[int] = None
+    Hatos_Servicios : Optional[int] = None
+    Animales_Traslados : Optional[int] = None
+    Animales_Mastitis : Optional[int] = None
+    Animales_CrearEditar : Optional[int] = None
+    Animales_Examenes : Optional[int] = None
+    Animales_Salud : Optional[int] = None
+    Lotes : Optional[int] = None
+    class Config:
+        orm_mode = True
+
+class PermisosU(BaseModel):
+    #ID_permisos : int
+    User_ID : int
+    Crear : Optional[int] = None
+    Activar_User : Optional[int] = None
+    Imagenes_Sat : Optional[int] = None
+    Leche : Optional[int] = None
+    Hatos_Traslado : Optional[int] = None
+    Hatos_Suplementa : Optional[int] = None
+    Hatos_Servicios : Optional[int] = None
+    Animales_Traslados : Optional[int] = None
+    Animales_Mastitis : Optional[int] = None
+    Animales_CrearEditar : Optional[int] = None
+    Animales_Examenes : Optional[int] = None
+    Animales_Salud : Optional[int] = None
+    Lotes : Optional[int] = None
+    class Config:
+        orm_mode = True
     
 ###################################################################################################
 
 
 ############################       CLIENTS      ###############################################
-class ClientesT(BaseModel):
-    ID_CLIENTE: int
+class ClientesU(BaseModel):
+    #ID_CLIENTE: int
     NOMBRE: Optional[str] = None
     NIT_CC: Optional[int] = None
     RAZON_SOCIAL: Optional[str] = None
@@ -89,6 +128,21 @@ class ClientesT(BaseModel):
     CIUDAD: Optional[str] = None
     DEPARTAMENTO: Optional[str] = None
     FECHA_CONTRATO: Optional[date] = None
+    class Config:
+        orm_mode = True
+
+class ClientesT(ClientesU):
+    ID_CLIENTE: int
+    #NOMBRE: Optional[str] = None
+    #NIT_CC: Optional[int] = None
+    #RAZON_SOCIAL: Optional[str] = None
+    #TELEFONO: Optional[int] = None
+    #EMAIL: Optional[str] = None
+    #DIRECCION: Optional[str] = None
+    #DESCRIPCION: Optional[str] = None
+    #CIUDAD: Optional[str] = None
+    #DEPARTAMENTO: Optional[str] = None
+    #FECHA_CONTRATO: Optional[date] = None
     class Config:
         orm_mode = True
 
@@ -265,13 +319,23 @@ class Tipo_Actividades_LotesT(BaseModel):
 
 
 #################################     FINCAS  (down here to make word lotes_list)   ######################################
-class FincaT(BaseModel):
-    ID_FINCA: int
-    ID_cliente: int
+class FincaU(BaseModel):
+    #ID_FINCA: int
+    #ID_cliente: int
     NOMBRE: Optional[str] = None
     DESCRIPCION: Optional[str] = None
+    #lotes_list: List[LotesT] = []
+    sentinel_zone: Optional[str] = None
+    class Config:
+        orm_mode = True
+
+class FincaT(FincaU):
+    ID_FINCA: int
+    ID_cliente: int
+    #NOMBRE: Optional[str] = None
+    #DESCRIPCION: Optional[str] = None
     lotes_list: List[LotesT] = []
-    sentinel_zona: Optional[str] = None
+    #sentinel_zona: Optional[str] = None
     class Config:
         orm_mode = True
   
@@ -308,8 +372,8 @@ class HatosT(BaseModel):
         
 class HatosP(BaseModel):
     #ID_HATO : int = 0 #posiblemente quitar, para que no se defina por el usuario
-    ID_CLIENTE : int
-    ID_FINCA : int
+    ID_CLIENTE : Optional[int] = None
+    ID_FINCA : Optional[int] = None
     Nombre_Hato : Optional[str] = None
     TIPO_Hato : Optional[str] = None
     Descripcion : Optional[str] = None
@@ -479,6 +543,14 @@ class Actividades(BaseModel):
     Comentario : Optional[str] = None
     class Config:
         orm_mode = True 
+        
+class ActividadesU(BaseModel):
+    ID_VACA : Optional [int] = None
+    ID_OPERARIO : Optional [int] = None
+    Fecha  : Optional[datetime] = None 
+    Comentario : Optional[str] = None
+    class Config:
+        orm_mode = True 
 
 class tipo_operacionesT(BaseModel):
     ID_TipoOperaciones : int
@@ -503,6 +575,19 @@ class Actividades_vacas_resultadoT(BaseModel):
 
 class MastitisT(BaseModel):
     ID_ACTIVIDAD : int
+    AI : Optional [int] = None
+    AD : Optional [int] = None
+    PI : Optional [int] = None
+    PD : Optional [int] = None
+    Chequeo_revision : Optional[str] = None
+    Ubre_sana : Optional [float] = None
+    Calificacion : Optional [float] = None
+    GAP : Optional [float] = None
+    class Config:
+        orm_mode = True 
+
+class MastitisU(BaseModel):
+    #ID_ACTIVIDAD : Optional [int] = None
     AI : Optional [int] = None
     AD : Optional [int] = None
     PI : Optional [int] = None
@@ -664,6 +749,20 @@ class Leche_HatosT(BaseModel):
 class Leche_Hatosi(Leche_HatosT):
     ID_Leche_hato : int
 
+class Leche_HatosU(BaseModel):
+    #ID_Leche_hato : int
+    ID_HATO : Optional[int] = None
+    FECHA_ACTIVIDAD : Optional[datetime] = None  #datetime
+    ID_OPERARIO : Optional[int] = None
+    Comentario : Optional[str] = None
+    Numero_Animales : Optional[int] = None
+    Leche_Total : Optional [float] = None
+    Hora : Optional[str] = None
+    Antibiotico : Optional[str] = None
+    Terneras : Optional[str] = None   
+    class Config:
+        orm_mode = True
+        
 class Leche_VacaT(BaseModel):
     #ID_Leche_vaca : int   
     ID_VACA : int
@@ -678,6 +777,15 @@ class Leche_VacaT(BaseModel):
 class Leche_Vacai(Leche_VacaT):
     ID_Leche_vaca : int      
 
+class Leche_VacaU(BaseModel):
+    ID_VACA : Optional[int] = None
+    ID_OPERARIO : Optional[int] = None
+    FECHA : Optional[datetime] = None
+    Litros : Optional [float] = None
+    Ciclo_Lactancia : Optional[int] = None
+    Numero_Partos : Optional[int] = None
+    class Config:
+        orm_mode = True 
 
 ##########################################################################################################
 
@@ -740,8 +848,8 @@ class monitoreo_descargas_sentinelT(BaseModel):
 
 ########################################   ESTACION METEOROLOGICA   #######################################
 class MeteorologiaT(BaseModel):
-    ID_FINCA : int
-    ID_CLIENTE : int
+    ID_Estacion : int
+    #ID_CLIENTE : int
     FECHA_HORA : date
     activacion : Optional [int] = None
     DHT_Humidity_mean : Optional [float] = None
@@ -774,4 +882,8 @@ class MeteorologiaT(BaseModel):
     class Config:
         orm_mode = True  
 
+class EstacionesT(BaseModel):
+    ID_Estacion : int
+    ID_Finca : Optional [int] = None
+    comentarios : Optional [str] = None
 ###########################################################################################################

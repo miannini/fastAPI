@@ -243,7 +243,22 @@ def get_all_privs(db: Session, name:Optional[int]=None, description:Optional[str
         return db.query(models.API_Users_PrivT).filter(*filtros).all()
     else:
         return db.query(models.API_Users_PrivT).all() 
-    
+
+#get_all_permisos
+def get_permisos(db: Session, name:Optional[int]=None, user:Optional[int]=None, id_cliente:Optional[str]=None):
+    filtros=[]
+    if name:
+        filtros.append(models.API_UsersT.name.contains(name))
+    if user:
+        filtros.append(models.PermisosT.User_ID == user)
+    if len(filtros)>0:
+        return db.query(models.PermisosT).join(models.API_UsersT).filter(*filtros).all()
+    else:
+        return db.query(models.PermisosT).all() 
+#patch
+def update_permiso(db: Session, permiso: schemas.PermisosU, user_id: int):
+    db.query(models.PermisosT).filter(models.PermisosT.User_ID == user_id).update(permiso.dict(exclude_unset=True))
+    db.commit()      
 ###################################################################################################
 
 
@@ -282,21 +297,28 @@ def create_cliente(db: Session, cliente: schemas.ClientesCreate):
     email_cliente(db_cliente, datetime.now().strftime("%Y-%m-%d"))
     return db_cliente.ID_CLIENTE
 #edit clientes
+#patch
+def update_cliente(db: Session, cliente: schemas.ClientesU, cliente_id: int):
+    db.query(models.ClientesT).filter(models.ClientesT.ID_CLIENTE == cliente_id).update(cliente.dict(exclude_unset=True))
+    db.commit()
 
 ####################################################################################################
 
 
 ##################################      OPERARIOS    #################################################
 ### Operarios
-def get_operarios(db: Session, finca:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None,  id_cliente: str = 0):
+def get_operarios(db: Session, finca:Optional[str]=None, id_operario:Optional[str]=None, rol:Optional[str]=None, nombre:Optional[str]=None,  id_cliente: str = 0):
     filtros=[]
     filtros.append(models.OperarioT.ID_CLIENTE == id_cliente)
     if finca:
         filtros.append((models.OperarioT.ID_FINCA == finca))
+    if id_operario:
+        filtros.append((models.OperarioT.ID_OPERARIO == id_operario))
     if rol:
         filtros.append((models.OperarioT.Rol.contains(rol)))
     if nombre:
-        filtros.append((models.OperarioT.NombreOperario.contains(nombre)))   
+        filtros.append((models.OperarioT.NombreOperario.contains(nombre)))
+    
     return db.query(models.OperarioT).filter(*filtros).all()
     #evaluar si retornar con Usuario API joined
 
@@ -311,8 +333,6 @@ def delete_operario(db: Session, id_operario: int): #operario: schemas.OperarioD
     db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).delete()
     db.commit()
  
-# -- edit operario
-
 ### Operarios sin user App
 def get_oper_sin_user(db: Session, nombre:Optional[str]=None,  id_cliente: str = 0):
     filtros=[]
@@ -320,6 +340,11 @@ def get_oper_sin_user(db: Session, nombre:Optional[str]=None,  id_cliente: str =
     if nombre:
         filtros.append((models.Operario_Sin_UserT.NombreOperario.contains(nombre)))   
     return db.query(models.Operario_Sin_UserT).join(models.OperarioT).filter(*filtros).all()
+
+#patch
+def update_operario(db: Session, operario: schemas.OperarioN, id_operario: int):
+    db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).update(operario.dict(exclude_unset=True))
+    db.commit()
 
 ##########################################################################################################
 
@@ -342,7 +367,10 @@ def create_finca(db: Session, finca: schemas.FincaP, id_cliente: str = 0):
     return db_finca.ID_FINCA
 
 #-- edit
-
+def update_finca(db: Session, finca: schemas.FincaU, id_finca: int):
+    db.query(models.FincaT).filter(models.FincaT.ID_FINCA == id_finca).update(finca.dict(exclude_unset=True))
+    db.commit()
+    
 ###########################################################################################################
 
 
@@ -477,7 +505,10 @@ def create_hato(db: Session, hato: schemas.HatosP, id_cliente: str = 0):
     return db_hato.ID_HATO
 
 # -- edit
-
+def update_hato(db: Session, hato: schemas.HatosP, id_hato: int):
+    db.query(models.HatosT).filter(models.HatosT.ID_HATO == id_hato).update(hato.dict(exclude_unset=True))
+    db.commit() 
+    
 ### traslado hatos
 def update_ubica_hato(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, id_cliente: str = 0): #vaca:Optional[str]=None
     filtros=[]
@@ -699,7 +730,7 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
 
 #solution to join tables
 #https://stackoverflow.com/questions/27280862/sqlalchemy-getting-a-single-object-from-joining-multiple-tables/60883545#60883545?newreg=418bba09a46f4fe5b0b02ab0e8514acc
-def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : # 
+def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_mastitis:Optional[int]=None, id_cliente: str = 0) : # 
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
@@ -710,6 +741,8 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
         filtros.append((models.ActividadesVacasT.ID_TipoOperacion == operacion))
     if operario:
         filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
+    if id_mastitis:
+        filtros.append((models.MastitisT.ID_ACTIVIDAD == id_mastitis))
     res = db.query(models.MastitisT, models.ActividadesVacasT).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()  
     #remover ID_TipoOperacion, ID_Resultado, ID_Categoria, ID_Actividad
     avoid = ['ID_TipoOperacion', 'ID_Resultado', 'ID_Categoria', 'ID_Actividad']
@@ -731,6 +764,12 @@ def get_last_mastitis(db: Session, vaca:Optional[str]=None, id_cliente: str = 0)
     #res_b = flatten_join_av(res, avoid) #res_b = flatten_join(res)
     
     return res#_b
+
+#patch
+def update_mastitis(db: Session, mastitis: schemas.MastitisU, acts:schemas.ActividadesU, id_mastitis: int):
+    db.query(models.MastitisT).filter(models.MastitisT.ID_ACTIVIDAD == id_mastitis).update(mastitis.dict(exclude_unset=True))
+    db.query(models.ActividadesVacasT).filter(models.ActividadesVacasT.ID_Actividad == id_mastitis).update(acts.dict(exclude_unset=True))
+    db.commit()  
 
 ### Registrar Actividad - cualquiera
 def reg_acti_2(db: Session, data: schemas.ActInfo): #Mast_Requi
@@ -908,13 +947,15 @@ def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
 
 #########################################    LECHE    #####################################################     
 # leche hatos
-def get_leche_hatos(db: Session, id_hato:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0): 
+def get_leche_hatos(db: Session, id_hato:Optional[int]=None, id_operario:Optional[int]=None, id_leche_ha:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0): 
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     if id_operario:
         filtros.append(models.Leche_HatosT.ID_OPERARIO == id_operario)
     if id_hato:
         filtros.append(models.Leche_HatosT.ID_HATO== id_hato)
+    if id_leche_ha:
+        filtros.append(models.Leche_HatosT.ID_Leche_hato== id_leche_ha)
     filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) >= datetime.strptime(date1,'%Y-%m-%d').date())#.isoformat(timespec='milliseconds'))
     filtros.append(func.DATE(models.Leche_HatosT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date())#.isoformat(timespec='milliseconds')) 
     return db.query(models.Leche_HatosT).join(models.HatosT).filter(*filtros).all()
@@ -927,15 +968,21 @@ def create_leche_hatos(db: Session, le_ha: schemas.Leche_HatosT):
     return "post_leche_hatos=Success"
 
 #edit leche hatos, solo para admin
-
+def update_leche_ha(db: Session, leche: schemas.Leche_HatosU, id_leche: int):
+    db.query(models.Leche_HatosT).filter(models.Leche_HatosT.ID_Leche_hato == id_leche).update(leche.dict(exclude_unset=True))
+    db.commit() 
+    
+    
 # leche vaca
-def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None, id_leche_va:Optional[int]=None,date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     if id_operario:
         filtros.append(models.Leche_VacaT.ID_OPERARIO == id_operario)
     if id_vaca:
         filtros.append(models.Leche_VacaT.ID_VACA == id_vaca)
+    if id_leche_va:
+        filtros.append(models.Leche_VacaT.ID_Leche_vaca== id_leche_va)
     filtros.append(func.DATE(models.Leche_VacaT.FECHA) >= datetime.strptime(date1,'%Y-%m-%d').date())
     filtros.append(func.DATE(models.Leche_VacaT.FECHA) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
     return db.query(models.Leche_VacaT).join(models.VacasT).filter(*filtros).all()
@@ -957,7 +1004,10 @@ def create_leche_vaca_list(db: Session, le_va: List[schemas.Leche_VacaT]):
     return "post_leche_vacas_list=Success"
 
 #edit solo para admins
-
+def update_leche_va(db: Session, leche: schemas.Leche_VacaU, id_leche: int):
+    db.query(models.Leche_VacaT).filter(models.Leche_VacaT.ID_Leche_vaca == id_leche).update(leche.dict(exclude_unset=True))
+    db.commit()
+    
 ##########################################################################################################
 
 ######################################### OTRAS FUENTES LOTES   #########################################
@@ -1024,13 +1074,15 @@ def registrar_meteo(db: Session, meteo: schemas.MeteorologiaT):
     db.refresh(reg_meteo)
     return reg_meteo
 
-def get_meteo(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), finca:Optional[str]=None, id_cliente: str = 0) : 
+def get_meteo(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), estacion:Optional[str]=None, finca:Optional[str]=None, id_cliente: str = 0) : 
     filtros=[]
-    filtros.append(models.MeteorologiaT.ID_CLIENTE == id_cliente)
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
     filtros.append(func.DATE(models.MeteorologiaT.FECHA_HORA) >= datetime.strptime(date1,'%Y-%m-%d').date())
     filtros.append(func.DATE(models.MeteorologiaT.FECHA_HORA) <= datetime.strptime(date2,'%Y-%m-%d').date())    
+    if estacion:
+        filtros.append((models.MeteorologiaT.ID_Estacion == estacion))
     if finca:
-        filtros.append((models.MeteorologiaT.ID_FINCA == finca))
-    return db.query(models.MeteorologiaT).filter(*filtros).all()
+        filtros.append((models.EstacionesT.ID_Finca == finca))
+    return db.query(models.MeteorologiaT).join(models.EstacionesT).join(models.FincaT).filter(*filtros).all()
 
 ###########################################################################################################
