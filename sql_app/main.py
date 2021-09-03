@@ -817,16 +817,41 @@ async def imagen_lotes(date1: str='2020-01-01', date2: str = datetime.now().strf
             headers = { "Content-Disposition": f"attachment; filename=images.zip"}
             )
 '''
+import shutil
+@app.post("/Image_load/{clase_id}", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
+async def imagen_load(clase_id:str, image: UploadFile = File(...) , db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user) ): 
+    id_cliente = current_user.ID_CLIENTE
+    Tipo_clase=clase_id
+    buck= 'api-images-user'
+    destination_name = "ID_CLIENTE-" + str(id_cliente) +"/"+ Tipo_clase + "/" + image.filename #"test.jpg" #+ image.filename
+    blob = GCP_functions.upload_blob_file(storage_client, buck, destination_name)
+    blob.create_resumable_upload_session()
+    blob.upload_from_file(image.file)  #.file) #buffer)
+    return {"file_name":image.filename}
 
-@app.post("/Image_load/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
-async def imagen_load(image: UploadFile = File(...) ): #, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
-    images_route = 'Data/Upload_Images/'#'ID_CLIENTE-'
+
+@app.post("/Multi_Image/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
+async def imagen_multid(clase_id:str, files: List[UploadFile] = File(...) , db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
+    for img in files:
+        id_cliente = current_user.ID_CLIENTE
+        Tipo_clase=clase_id
+        buck= 'api-images-user'
+        destination_name = "ID_CLIENTE-" + str(id_cliente) +"/"+ Tipo_clase + "/" + img.filename 
+        #with open(f'{img.filename}', 'wb') as buffer:
+        #    shutil.copyfileobj(img.file, buffer)
+        blob = GCP_functions.upload_blob_file(storage_client, buck, destination_name)
+        blob.create_resumable_upload_session()
+        blob.upload_from_file(img.file)
+        
+    return {"file_name":"Good"}
+    
+    #images_route = 'Data/Upload_Images/'#'ID_CLIENTE-'
     #id_cliente = current_user.ID_CLIENTE
-    buck= 'satellite_storage'
+    #buck= 'satellite_storage'
     #datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
     #open_file = GCP_functions.open_blob(storage_client,buck, datos[numero]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
     
-    return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
+    #return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
 
 
 #id_cliente = str(1) #id_cliente

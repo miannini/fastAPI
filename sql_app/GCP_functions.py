@@ -56,6 +56,25 @@ def upload_blob(storage_client, bucket_name, source_file_name, destination_blob_
         )
     )
 
+
+### subir datos a un bucket
+def upload_blob_file(storage_client, bucket_name, destination_blob_name):
+    """Uploads a file to the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_file_name = "local/path/to/file"
+    # destination_blob_name = "storage-object-name"
+    #storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    return blob
+    
+    '''blob.upload_from_file(source_file_name)
+    print(
+        "File {} uploaded to {}.".format(
+            source_file_name, destination_blob_name
+        )
+    )
+    '''
 #usar la funcion
 #folder = 'Satellite/Data/Data/Database/-MAa0O5PMyE81I_AFC6E/'
 #file = 'D:/M4A/git_folder/Data/cloud_masks_valid.png'
