@@ -56,6 +56,7 @@ class PermisosT(Base):
     Animales_Salud = Column(Integer)
     Lotes = Column(Integer)
 
+#Permisos_Tipo
 
 ###################################################################################################
 
@@ -136,10 +137,21 @@ class LotesT(Base):
     LONGITUD = Column(Float, nullable=True)
     AREA = Column(Float, nullable=True)
     DESCRIPCION = Column(String(45), nullable=True)
-    ID_variedad = Column(Integer, nullable=True)
+    ID_variedad = Column(Integer, ForeignKey("tipo_cultivo.ID_variedad"), nullable=True)
     finca_madre = relationship("FincaT", back_populates="lotes_list")
     #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
 
+class tipo_cultivoT(Base):
+    __tablename__ = "tipo_cultivo"
+    ID_cultivo = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(45), nullable=True)
+    clase = Column(String(45), nullable=True)
+    
+class variedad_cultivoT(Base):
+    __tablename__ = "variedad_cultivo"
+    ID_variedad = Column(Integer, primary_key=True, index=True)
+    ID_cultivo = Column(Integer, ForeignKey("tipo_cultivo.ID_cultivo"))
+    nombre = Column(String(45), nullable=True)
 ###########################################################################################################
 
 
@@ -167,6 +179,16 @@ class AforoT(Base):
     __tablename__ = "Aforo"
     ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Lotes.ID_ACT_LOTE"), primary_key=True)
     Aforo = Column(Float)
+    
+class Ultimas_Act_LotesT(Base):
+    __tablename__ = "Ultimas_Act_Lotes"
+    ID_ACT_LOTE = Column(Integer, ForeignKey("Actividades_Lotes.ID_ACT_LOTE"), primary_key=True)
+    ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
+    FECHA_ACTIVIDAD = Column(DateTime)
+    ID_Tipo_Actividad = Column(Integer, ForeignKey("Tipo_Actividades_Lotes.IDTipo_Actividades_Lotes"))
+    Dias = Column(Integer, nullable=True)
+    
+#Categoria_Actividades_Lotes
 ###########################################################################################################
 
 
@@ -188,6 +210,7 @@ class Traslado_HatosT(Base):
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
     ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
 
+#RangoFechas_Hato
 ###########################################################################################################
 
 
@@ -252,6 +275,9 @@ class siresT(Base):
     Registro = Column(String(45), nullable=True)
     Raza = Column(Integer, nullable=True)
     Fecha_descontinuado = Column(DateTime, nullable=True)
+
+#Estado_vaca = remover y hacer en forma de View
+#Tipo_Origen
     
 #########################################################################################################
 
@@ -358,6 +384,14 @@ class celoT(Base):
     ID_vaca = Column(Integer, ForeignKey("vacas.ID_VACA"))
     date = Column(DateTime, nullable=True)
     celotron = Column(Integer, nullable=True)
+    
+#DiagPre
+#Pesos
+#servicios
+#log_traslados_vacas_lotes
+#parto_vaca_Full
+#RangoFechas_Vacas
+#vacas_mastitis
 ##########################################################################################################
 
 
@@ -384,6 +418,31 @@ class Leche_VacaT(Base):
     Litros = Column(Float, nullable=True)
     Ciclo_Lactancia = Column(Integer, nullable=True)    ## deberia ir en vaca
     Numero_Partos = Column(Integer, nullable=True)      ##deberia ir en vaca
+
+#Leche_Entregada
+#Leche_tanque_Diaria
+#Resultado_Tanques
+#Tanque_hatos
+#Tanque_Finca
+#Test_tanque
+
+
+##################################### PRODUCTOS   ##############################################3
+#Actividades_Producto
+#Map_clases_suministros
+#Productos
+#Proveedores
+#Suministros
+#Suministros_destino
+#Suministros_origen
+#Tipo_Suministros
+
+
+##################################### COMUNICACION  ##############################################
+#Contact_Comm
+#Items_Communicacion
+#Logicas_Comunicacion
+#Pref_Client_Comm
 
 ##########################################################################################################
 
@@ -426,6 +485,11 @@ class Lotes_quimicosT(Base):
     Boro = Column(Float, nullable=True)
     Comentarios = Column(String(450), nullable=True)
 
+#Test_Bromatologico
+#crecimiento_lotes_meteo
+#rangocrecimiento_lotes
+
+
 ###########################################################################################################
 
 ##########################################  Monitoreo procesamiento imagenes satel   ######################
@@ -435,6 +499,9 @@ class monitoreo_descargas_sentinelT(Base):
     file = Column(String(45))
     fecha  = Column(Date)
     process_date = Column(DateTime)
+
+#Indices_remote_sense
+#monitoreo_imagenes_proces
 
 ###########################################################################################################
 

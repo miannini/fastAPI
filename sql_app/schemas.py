@@ -263,6 +263,28 @@ class LoteInfo2(LotesN):
     class Config:
         orm_mode = True
 
+
+class tipo_cultivoT(BaseModel):
+    nombre : Optional[str] = None
+    clase : Optional[str] = None
+    class Config:
+        orm_mode = True
+        
+class tipo_cultivoFull(tipo_cultivoT):      
+    ID_cultivo : int
+    class Config:
+        orm_mode = True
+    
+class variedad_cultivoT(BaseModel):
+    ID_cultivo : int
+    nombre : Optional[str] = None
+    class Config:
+        orm_mode = True
+
+class variedad_cultivoFull(variedad_cultivoT):
+    ID_variedad  : int
+    class Config:
+        orm_mode = True
 ###########################################################################################################
 
 
@@ -322,7 +344,15 @@ class Tipo_Actividades_LotesT(BaseModel):
     ID_Categoria_Act : int
     class Config:
         orm_mode = True
-        
+
+class Ultimas_Act_LotesT(BaseModel):
+    ID_ACT_LOTE : int
+    ID_LOTE : int
+    FECHA_ACTIVIDAD : datetime
+    ID_Tipo_Actividad : int
+    Dias : Optional[int] = None 
+    class Config:
+        orm_mode = True    
 ###########################################################################################################
 
 

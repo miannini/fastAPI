@@ -348,6 +348,25 @@ def update_lotes_id(ID_LOTE: int, lote: schemas.LotesN, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_lote_id
 
+#Tipo_Cultivo
+@app.get("/tipo_cultivo/", response_model=List[schemas.tipo_cultivoFull], tags=["Lotes"])
+def read_tipo_culti(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_cultivo:Optional[int]=None, nombre:Optional[str]=None, clase:Optional[str]=None):
+    tipo_culti = crud.get_tipo_cultivo(db, id_cultivo=id_cultivo, nombre=nombre, clase=clase, id_cliente = current_user.ID_CLIENTE)
+    return tipo_culti
+
+@app.post("/Wr_tipo_cultivo/", status_code=201, tags=["Lotes"])
+def wr_tipo_culti(tipo: schemas.tipo_cultivoT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_tipo_cultivo(db=db, tipo=tipo)
+
+#Variedad_cultivo
+@app.get("/variedad_cultivo/", response_model=List[schemas.variedad_cultivoFull], tags=["Lotes"])
+def read_variedad_culti(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_variedad:Optional[int]=None, id_cultivo:Optional[int]=None, nombre:Optional[str]=None):
+    variedad_culti = crud.get_variedad_cultivo(db, id_variedad=id_variedad, id_cultivo=id_cultivo, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
+    return variedad_culti
+
+@app.post("/Wr_variedad_cultivo/", status_code=201, tags=["Lotes"])
+def wr_variedad_culti(variedad: schemas.variedad_cultivoT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_variedad_cultivo(db=db, variedad=variedad)
 ###########################################################################################################
 
 
@@ -372,6 +391,11 @@ def wr_acti_aforo(ac_fo: schemas.Aforo_Requi, db: Session = Depends(get_db), cur
 def read_tip_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     tipo_acti_lotes = crud.get_tipo_acti_lotes(db)
     return tipo_acti_lotes
+
+@app.get("/Ultimas_Acti_Lotes/", response_model=List[schemas.Ultimas_Act_LotesT], tags=["Actividades-Lotes"])
+def read_ult_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user), id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, id_tipo_act:Optional[int]=None):
+    acti_lotes = crud.get_ulti_acti_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre_lote=nombre_lote, id_tipo_act=id_tipo_act, id_cliente = current_user.ID_CLIENTE)
+    return acti_lotes
 
 ###########################################################################################################
 

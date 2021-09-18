@@ -422,6 +422,50 @@ def update_lote2(db: Session, lote: List[schemas.LotesPasto], id_cliente: str = 
     return "patch_update_lotes = success" 
 '''    
 
+
+### Tipo_cultivo Lotes    
+def get_tipo_cultivo(db: Session, id_cultivo:Optional[int]=None, nombre:Optional[str]=None, clase:Optional[str]=None, id_cliente: str = 0):
+    filtros=[]
+    if id_cultivo:
+        filtros.append(models.tipo_cultivoT.ID_cultivo == id_cultivo)   
+    if nombre:
+        filtros.append(models.tipo_cultivoT.nombre.contains(nombre))
+    if clase:
+        filtros.append((models.tipo_cultivoT.clase.contains(clase)))            
+    if len(filtros)>0:
+        return db.query(models.tipo_cultivoT).filter(*filtros).all()
+    else:
+         return db.query(models.tipo_cultivoT).all()
+
+def create_tipo_cultivo(db: Session, tipo: schemas.tipo_cultivoT):
+    db_lote = models.tipo_cultivoT(**tipo.dict(exclude_unset=True))
+    db.add(db_lote)
+    db.commit()
+    db.refresh(db_lote)
+    return db_lote.ID_cultivo
+
+### variedad_cultivo Lotes    
+def get_variedad_cultivo(db: Session, id_variedad:Optional[int]=None, id_cultivo:Optional[int]=None, nombre:Optional[str]=None, id_cliente: str = 0):
+    filtros=[]
+    if id_variedad:
+        filtros.append(models.variedad_cultivoT.ID_variedad == id_variedad)  
+    if id_cultivo:
+        filtros.append(models.variedad_cultivoT.ID_cultivo == id_cultivo)   
+    if nombre:
+        filtros.append(models.variedad_cultivoT.nombre.contains(nombre))
+               
+    if len(filtros)>0:
+        return db.query(models.variedad_cultivoT).filter(*filtros).all()
+    else:
+         return db.query(models.variedad_cultivoT).all()
+
+def create_variedad_cultivo(db: Session, variedad: schemas.variedad_cultivoT):
+    db_lote = models.variedad_cultivoT(**variedad.dict(exclude_unset=True))
+    db.add(db_lote)
+    db.commit()
+    db.refresh(db_lote)
+    return db_lote.ID_variedad
+
 ###########################################################################################################
 
 
@@ -481,6 +525,24 @@ def create_acti_aforo(db: Session, ac_fo: schemas.Aforo_Requi, id_to_use):
 ### tipo de operaciones  lotes   
 def get_tipo_acti_lotes(db: Session):
         return db.query(models.Tipo_Actividades_LotesT).all() 
+
+
+
+#Ultimas Actividades Lotes View
+def get_ulti_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, id_tipo_act:Optional[int]=None, id_cliente: str = 0): #
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente) 
+    if id_finca:
+        filtros.append(models.LotesT.ID_FINCA == id_finca)   
+    if id_lote:
+        filtros.append(models.Ultimas_Act_LotesT.ID_LOTE == id_lote) 
+    if nombre_lote:
+        filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre_lote)))
+    if id_tipo_act:
+        filtros.append(models.Ultimas_Act_LotesT.ID_Tipo_Actividad == id_tipo_act)
+    return db.query(models.Ultimas_Act_LotesT).join(models.LotesT).join(models.FincaT).filter(*filtros).all()  
+    #evaluar si se quisiera obtener el join completo
+
     
 #update actividades lotes
 #cambiar de programada a ejecutada o fechas
