@@ -830,7 +830,7 @@ async def imagen_load(clase_id:str, image: UploadFile = File(...) , db: Session 
     return {"file_name":image.filename}
 
 
-@app.post("/Multi_Image/", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
+@app.post("/Multi_Image/{clase_id}", tags=["Stream Images"]) #response_model=List[schemas.MeteorologiaT]
 async def imagen_multid(clase_id:str, files: List[UploadFile] = File(...) , db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)): 
     for img in files:
         id_cliente = current_user.ID_CLIENTE

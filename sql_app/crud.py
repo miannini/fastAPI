@@ -311,7 +311,7 @@ def get_operarios(db: Session, finca:Optional[str]=None, id_operario:Optional[st
     filtros=[]
     filtros.append(models.OperarioT.ID_CLIENTE == id_cliente)
     if finca:
-        filtros.append((models.OperarioT.ID_FINCA == finca))
+        filtros.append((models.Operarios_FincasT.ID_FINCA == finca))
     if id_operario:
         filtros.append((models.OperarioT.ID_OPERARIO == id_operario))
     if rol:
@@ -319,7 +319,11 @@ def get_operarios(db: Session, finca:Optional[str]=None, id_operario:Optional[st
     if nombre:
         filtros.append((models.OperarioT.NombreOperario.contains(nombre)))
     
-    return db.query(models.OperarioT).filter(*filtros).all()
+    if finca:
+        return db.query(models.OperarioT).outerjoin(models.Operarios_FincasT).filter(*filtros).all()
+    else:
+        return db.query(models.OperarioT).filter(*filtros).all()
+    
     #evaluar si retornar con Usuario API joined
 
 def create_operario(db: Session, operario: schemas.OperarioN):
@@ -346,6 +350,8 @@ def update_operario(db: Session, operario: schemas.OperarioN, id_operario: int):
     db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).update(operario.dict(exclude_unset=True))
     db.commit()
 
+#add fincas de operario
+#update fincas de operario
 ##########################################################################################################
 
 

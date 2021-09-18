@@ -86,7 +86,7 @@ class OperarioT(Base):
     __tablename__ = "Operario"
     ID_OPERARIO = Column(Integer, primary_key=True, index=True)
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
-    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
+    #ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     NombreOperario = Column(String(32))
     FechaDeIngreso = Column(Date, nullable=True)
     Telefono = Column(Integer, nullable=True)
@@ -101,6 +101,12 @@ class Operario_Sin_UserT(Base):
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), primary_key=True, index=True)
     NombreOperario = Column(String(32))
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
+
+class Operarios_FincasT(Base):
+    __tablename__ = "Operarios_Fincas"
+    ID = Column(Integer, primary_key=True, index=True)
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"))
+    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
 
 
 ##########################################################################################################

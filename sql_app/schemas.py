@@ -172,7 +172,7 @@ class Operario_id(BaseModel):
     
 class OperarioT(Operario_id): 
     ID_CLIENTE: int
-    ID_FINCA: int
+    #ID_FINCA: int
     NombreOperario: str
     FechaDeIngreso: Optional[date] = None
     Telefono: Optional[int] = None
@@ -185,7 +185,7 @@ class OperarioT(Operario_id):
 
 class OperarioN(BaseModel): 
     ID_CLIENTE: Optional[int] = None
-    ID_FINCA: Optional[int] = None
+    #ID_FINCA: Optional[int] = None
     NombreOperario: Optional[str] = None
     FechaDeIngreso: Optional[date] = None
     Telefono: Optional[int] = None
@@ -207,6 +207,14 @@ class Operario_Sin_UserT(BaseModel):
     ID_CLIENTE : int
     class Config:
         orm_mode = True
+
+class Operarios_FincasT(BaseModel):
+    ID : int
+    ID_OPERARIO : int
+    ID_FINCA: int
+    class Config:
+        orm_mode = True
+
 
 ##########################################################################################################
 
