@@ -86,6 +86,10 @@ tags_metadata = [
          "description":"Operations with Milk/Leche.",
      },
     {
+         "name": "Tanques-Leche",
+         "description":"Operations with Milk Tanks / Tanques de Leche.",
+     },
+    {
          "name": "Otras Fuentes Lotes",
          "description":"Operations related to terrain properties and characteristics.",
      },
@@ -709,7 +713,88 @@ def update_leche_va(ID_leche: int, leche: schemas.Leche_VacaU, db: Session = Dep
     if db_leche_va is None:
         raise HTTPException(status_code=404, detail="Lote_ID not found")
     return db_leche_va
+
+### Leche Entregada
+@app.get("/Leche_Entregada/", response_model=List[schemas.Leche_EntregadaF], tags=["Leche"])
+def read_leche_entre(db: Session = Depends(get_db), id_leche_entregada:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    leche_entre = crud.get_leche_entregada(db, id_leche_entregada=id_leche_entregada, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
+    return leche_entre
+
+@app.post("/Wr_Leche_Entregada/", status_code=201, tags=["Leche"])
+def wr_leche_entre(le_en: schemas.Leche_EntregadaT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_leche_entregada(db=db, le_en=le_en)
+
+@app.patch("/Leche_Entregada/{id_leche_ent}", response_model=schemas.Leche_EntregadaF, tags=["Leche"])
+def update_leche_en(id_leche_ent: int, leche: schemas.Leche_EntregadaT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_leche_entre(db=db, leche=leche, id_leche_ent=id_leche_ent)
+    db_leche_en = crud.get_leche_entregada(db, id_leche_entregada=id_leche_ent, id_cliente = current_user.ID_CLIENTE)
+    if db_leche_en is None:
+        raise HTTPException(status_code=404, detail="Leche_Entregada ID not found")
+    return db_leche_en
+
 ##########################################################################################################
+
+####################################### TANQUES   ########################################################
+### Tanque_Finca
+@app.get("/Tanque_Finca/", response_model=List[schemas.Tanques_FincaF], tags=["Tanques-Leche"])
+def read_tanque_finca(db: Session = Depends(get_db), id_tanque:Optional[int]=None, id_finca:Optional[int]=None, capacidad_min:Optional[int]=None, capacidad_max:Optional[int]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    tanque_finca = crud.get_tanque_finca(db, id_tanque=id_tanque, id_finca=id_finca, capacidad_min=capacidad_min, capacidad_max=capacidad_max, id_cliente = current_user.ID_CLIENTE) #, date1=date
+    return tanque_finca
+
+@app.post("/Wr_Tanque_Finca/", status_code=201, tags=["Tanques-Leche"])
+def wr_tanque_finca(ta_fi: schemas.Tanques_FincaT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_tanque_finca(db=db, ta_fi=ta_fi)
+
+#update
+
+##Tanque_hatos
+@app.get("/Tanque_Hato/", response_model=List[schemas.Tanques_HatosF], tags=["Tanques-Leche"])
+def read_tanque_hato(db: Session = Depends(get_db), id_tanque:Optional[int]=None, id_finca:Optional[int]=None, id_hato:Optional[int]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    tanque_hato = crud.get_tanque_hato(db, id_tanque=id_tanque, id_finca=id_finca, id_hato=id_hato, id_cliente = current_user.ID_CLIENTE) #, date1=date
+    return tanque_hato
+
+@app.post("/Wr_Tanque_Hato/", status_code=201, tags=["Tanques-Leche"])
+def wr_tanque_hato(ta_ha: schemas.Tanques_HatosT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_tanque_hato(db=db, ta_ha=ta_ha)
+
+#update
+
+## Leche_tanque_diaria
+@app.get("/Leche_Tanque_Diaria/", response_model=List[schemas.Leche_Tanque_DiariaF], tags=["Tanques-Leche"])
+def read_leche_tanque_dia(db: Session = Depends(get_db), id_tanque:Optional[int]=None, id_finca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    leche_tanque_dia = crud.get_leche_tanque_diaria(db, id_tanque=id_tanque, id_finca=id_finca, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
+    return leche_tanque_dia
+
+@app.post("/Wr_Leche_Tanque_Diaria/", status_code=201, tags=["Tanques-Leche"])
+def wr_leche_tanque_dia(ta_le: schemas.Leche_Tanque_DiariaT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_leche_tanque_diaria(db=db, ta_le=ta_le)
+
+#update
+
+## Test tanques
+@app.get("/Test_Tanque/", response_model=List[schemas.Test_TanquesF], tags=["Tanques-Leche"])
+def read_test_tanque(db: Session = Depends(get_db), id_tanque:Optional[int]=None, id_finca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    test_tanque = crud.get_test_tanque(db, id_tanque=id_tanque, id_finca=id_finca, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE) #, date1=date
+    return test_tanque
+
+@app.post("/Wr_Test_Tanque/", status_code=201, tags=["Tanques-Leche"])
+def wr_test_tanque(ta_te: schemas.Test_TanquesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_test_tanque(db=db, ta_te=ta_te)
+
+#update
+
+##Resultado tanques
+@app.get("/Resultado_Tanque/", response_model=List[schemas.Resultados_TanquesF], tags=["Tanques-Leche"])
+def read_result_tanque(db: Session = Depends(get_db), id_tanque:Optional[int]=None, id_finca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), cod:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)): #date1: date = '2020-01-01'
+    result_tanque = crud.get_result_tanque(db, id_tanque=id_tanque, id_finca=id_finca, date1=date1, date2=date2, cod=cod, id_cliente = current_user.ID_CLIENTE) #, date1=date
+    return result_tanque
+
+@app.post("/Wr_Resultado_Tanque/", status_code=201, tags=["Tanques-Leche"])
+def wr_result_tanque(ta_re: schemas.Resultados_TanquesT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_result_tanque(db=db, ta_re=ta_re)
+
+
+###########################################################################################################
 
 ######################################### OTRAS FUENTES LOTES   #########################################
 @app.post("/Wr_lotes_variables/", status_code=201, tags=["Otras Fuentes Lotes"]) #, response_model=schemas.Leche_Vacai)

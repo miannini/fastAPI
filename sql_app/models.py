@@ -420,11 +420,65 @@ class Leche_VacaT(Base):
     Numero_Partos = Column(Integer, nullable=True)      ##deberia ir en vaca
 
 #Leche_Entregada
-#Leche_tanque_Diaria
-#Resultado_Tanques
-#Tanque_hatos
+class Leche_EntregadaT(Base):
+    __tablename__ = "Leche_Entregada"
+    ID_Leche_Entregada = Column(Integer, primary_key=True, index=True)
+    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), nullable=True)
+    Fecha= Column(DateTime, nullable=True)
+    Leche_entregada_lts = Column(Float, nullable=True)
+
+#################################### TANQUE   ###############################################################
 #Tanque_Finca
+class Tanques_FincaT(Base):
+    __tablename__ = "Tanques_Finca"
+    ID_TANQUE = Column(Integer, primary_key=True, index=True)
+    ID_Finca= Column(Integer, ForeignKey("Finca.ID_FINCA"), nullable=True)
+    Capacidad_Max = Column(Float, nullable=True)
+
+#Tanque_hatos
+class Tanques_HatosT(Base):
+    __tablename__ = "Tanques_Hatos"
+    ID_TANQUE_HATO = Column(Integer, primary_key=True, index=True)
+    ID_TANQUE= Column(Integer, ForeignKey("Tanques_Finca.ID_TANQUE"), nullable=True)
+    ID_HATO= Column(Integer, ForeignKey("Hatos.ID_HATO"), nullable=True)
+
+    
+#Leche_tanque_Diaria
+class Leche_Tanque_DiariaT(Base):
+    __tablename__ = "Leche_Tanque_Diaria"
+    ID = Column(Integer, primary_key=True, index=True)
+    ID_TANQUE = Column(Integer, ForeignKey("Tanques_Finca.ID_TANQUE"), nullable=True)
+    Fecha= Column(DateTime, nullable=True)
+    Litros = Column(Float, nullable=True)
+
 #Test_tanque
+class Test_TanquesT(Base):
+    __tablename__ = "Test_Tanques"
+    ID = Column(Integer, primary_key=True, index=True)
+    ID_TANQUE = Column(Integer, ForeignKey("Tanques_Finca.ID_TANQUE"), nullable=True)
+    Fecha_Test= Column(DateTime, nullable=True)
+    Proveedor = Column(String(45), nullable=True)
+    Cod_seguimiento = Column(Integer, nullable=True)
+    Tipo_Muestra = Column(String(45), nullable=True)
+    Estado = Column(Integer, nullable=True)
+
+#Resultado_Tanques
+class Resultados_TanquesT(Base):
+    __tablename__ = "Resultados_Tanques"
+    ID = Column(Integer, primary_key=True, index=True)
+    ID_TANQUE = Column(Integer, ForeignKey("Tanques_Finca.ID_TANQUE"), nullable=True)
+    Fecha_recepcion= Column(DateTime, nullable=True)
+    Fecha_resultado= Column(DateTime, nullable=True)
+    Cod_seguimiento = Column(Integer, ForeignKey("Test_Tanques.Cod_seguimiento"), nullable=True)
+    GRASA = Column(Float, nullable=True)
+    PROTEINA = Column(Float, nullable=True)
+    #RELACION_GP = Column(Float, nullable=True)
+    SOLIDOS_TOTALES = Column(Float, nullable=True)
+    LACTOSA = Column(Float, nullable=True)
+    MUN = Column(Float, nullable=True)
+    UFC = Column(Float, nullable=True)
+    RCS = Column(Float, nullable=True)
+    
 
 
 ##################################### PRODUCTOS   ##############################################3

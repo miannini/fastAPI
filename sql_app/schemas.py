@@ -825,6 +825,81 @@ class Leche_VacaU(BaseModel):
     class Config:
         orm_mode = True 
 
+class Leche_EntregadaT(BaseModel):
+    ID_CLIENTE : int
+    Fecha :datetime
+    Leche_entregada_lts :float
+    class Config:
+        orm_mode = True
+        
+class Leche_EntregadaF(Leche_EntregadaT):
+    ID_Leche_Entregada : int
+
+        
+########################################## TANQUES   ##################################################
+class Tanques_FincaT(BaseModel):
+    ID_Finca : int
+    Capacidad_Max : float
+    class Config:
+        orm_mode = True
+
+class Tanques_FincaF(Tanques_FincaT):
+    ID_TANQUE : int
+
+
+class Tanques_HatosT(BaseModel):
+    ID_TANQUE : int
+    ID_HATO : int 
+    class Config:
+        orm_mode = True
+        
+class Tanques_HatosF(Tanques_HatosT):
+    ID_TANQUE_HATO : int
+ 
+        
+class Leche_Tanque_DiariaT(BaseModel):
+    ID_TANQUE : int
+    Fecha : datetime
+    Litros : float
+    class Config:
+        orm_mode = True
+        
+class Leche_Tanque_DiariaF(Leche_Tanque_DiariaT):
+    ID : int
+    
+class Test_TanquesT(BaseModel):
+    ID_TANQUE : int
+    Fecha_Test: datetime
+    Proveedor : str
+    Cod_seguimiento : int
+    Tipo_Muestra : str
+    Estado : int
+    class Config:
+        orm_mode = True
+
+class Test_TanquesF(Test_TanquesT):
+    ID : int
+
+
+class Resultados_TanquesT(BaseModel):
+    ID_TANQUE : int
+    Fecha_recepcion : datetime
+    Fecha_resultado : datetime
+    Cod_seguimiento : int
+    GRASA : float
+    PROTEINA : float
+    SOLIDOS_TOTALES : float
+    LACTOSA : float
+    MUN : float
+    UFC : float
+    RCS : float
+    class Config:
+        orm_mode = True
+
+class Resultados_TanquesF(Resultados_TanquesT):
+    ID : int
+    #RELACION_GP : float
+
 ##########################################################################################################
 
 ######################################### OTRAS FUENTES LOTES   #########################################

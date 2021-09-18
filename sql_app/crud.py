@@ -1075,8 +1075,157 @@ def create_leche_vaca_list(db: Session, le_va: List[schemas.Leche_VacaT]):
 def update_leche_va(db: Session, leche: schemas.Leche_VacaU, id_leche: int):
     db.query(models.Leche_VacaT).filter(models.Leche_VacaT.ID_Leche_vaca == id_leche).update(leche.dict(exclude_unset=True))
     db.commit()
-    
+
+
+## Leche_Entregada
+def get_leche_entregada(db: Session, id_leche_entregada:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.Leche_EntregadaT.ID_CLIENTE == id_cliente)
+    if id_leche_entregada:
+        filtros.append(models.Leche_EntregadaT.ID_Leche_Entregada == id_leche_entregada)
+    filtros.append(func.DATE(models.Leche_EntregadaT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Leche_EntregadaT.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    return db.query(models.Leche_EntregadaT).filter(*filtros).all()
+
+def create_leche_entregada(db: Session, le_en: schemas.Leche_EntregadaT):
+    db_le_en = models.Leche_EntregadaT(**le_en.dict(exclude_unset=True))
+    db.add(db_le_en)
+    db.commit()
+    return "post_leche_entregada=Success"
+
+#edit solo para admins
+def update_leche_entre(db: Session, leche: schemas.Leche_EntregadaT, id_leche_ent: int):
+    db.query(models.Leche_EntregadaT).filter(models.Leche_EntregadaT.ID_Leche_Entregada == id_leche_ent).update(leche.dict(exclude_unset=True))
+    db.commit()
+
 ##########################################################################################################
+
+########################################### TANQUES   ##################################################
+## Tanque_Finca
+def get_tanque_finca(db: Session, id_tanque:Optional[int]=None, id_finca:Optional[int]=None, capacidad_min:Optional[int]=None, capacidad_max:Optional[int]=None, id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if id_tanque:
+        filtros.append(models.Tanques_FincaT.ID_TANQUE == id_tanque)
+    if id_finca:
+        filtros.append(models.Tanques_FincaT.ID_Finca == id_finca)
+    if capacidad_min:
+        filtros.append(models.Tanques_FincaT.Capacidad_Max >= capacidad_min)
+    if capacidad_max:
+        filtros.append(models.Tanques_FincaT.Capacidad_Max <= capacidad_max)
+    return db.query(models.Tanques_FincaT).join(models.FincaT).filter(*filtros).all()
+
+def create_tanque_finca(db: Session, ta_fi: schemas.Tanques_FincaT):
+    db_ta_fi = models.Tanques_FincaT(**ta_fi.dict(exclude_unset=True))
+    db.add(db_ta_fi)
+    db.commit()
+    return "post_tanque-finca=Success"
+
+#edit solo para admins
+def update_tanque_finca(db: Session, ta_fi: schemas.Tanques_FincaT, id_tanque: int):
+    db.query(models.Tanques_FincaT).filter(models.Tanques_FincaT.ID_TANQUE == id_tanque).update(ta_fi.dict(exclude_unset=True))
+    db.commit()
+
+## Tanques Hatos
+def get_tanque_hato(db: Session, id_tanque:Optional[int]=None, id_finca:Optional[int]=None, id_hato:Optional[int]=None, id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if id_tanque:
+        filtros.append(models.Tanques_HatosT.ID_TANQUE == id_tanque)
+    if id_finca:
+        filtros.append(models.Tanques_FincaT.ID_Finca == id_finca)
+    if id_hato:
+        filtros.append(models.Tanques_HatosT.ID_HATO == id_hato)
+    return db.query(models.Tanques_HatosT).join(models.Tanques_FincaT).join(models.FincaT).filter(*filtros).all()
+
+def create_tanque_hato(db: Session, ta_ha: schemas.Tanques_HatosT):
+    db_ta_ha = models.Tanques_HatosT(**ta_ha.dict(exclude_unset=True))
+    db.add(db_ta_ha)
+    db.commit()
+    return "post_tanque-hato=Success"
+
+def update_tanque_hato(db: Session, ta_ha: schemas.Tanques_HatosT, id_tanque: int):
+    db.query(models.Tanques_HatosT).filter(models.Tanques_HatosT.ID_TANQUE == id_tanque).update(ta_ha.dict(exclude_unset=True))
+    db.commit()
+    
+#also Delete
+
+##Leche_tanque_diaria
+def get_leche_tanque_diaria(db: Session, id_tanque:Optional[int]=None, id_finca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if id_tanque:
+        filtros.append(models.Leche_Tanque_DiariaT.ID_TANQUE == id_tanque)
+    if id_finca:
+        filtros.append(models.Tanques_FincaT.ID_Finca == id_finca)
+    filtros.append(func.DATE(models.Leche_Tanque_DiariaT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Leche_Tanque_DiariaT.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    return db.query(models.Leche_Tanque_DiariaT).join(models.Tanques_FincaT).join(models.FincaT).filter(*filtros).all()
+
+def create_leche_tanque_diaria(db: Session, ta_le: schemas.Leche_Tanque_DiariaT):
+    db_ta_le = models.Leche_Tanque_DiariaT(**ta_le.dict(exclude_unset=True))
+    db.add(db_ta_le)
+    db.commit()
+    return "post_tanque-hato=Success"
+
+def update_tanque_leche(db: Session, ta_le: schemas.Leche_Tanque_DiariaT, id_tanque_leche: int):
+    db.query(models.Leche_Tanque_DiariaT).filter(models.Leche_Tanque_DiariaT.ID == id_tanque_leche).update(ta_le.dict(exclude_unset=True))
+    db.commit()
+    
+## Test tanques
+def get_test_tanque(db: Session, id_tanque:Optional[int]=None, id_finca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), cod:Optional[str]=None, proveedor:Optional[str]=None, estado:Optional[int]=None, id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if id_tanque:
+        filtros.append(models.Test_TanquesT.ID_TANQUE == id_tanque)
+    if id_finca:
+        filtros.append(models.Tanques_FincaT.ID_Finca == id_finca)
+    if cod:
+        filtros.append(models.Test_TanquesT.Cod_seguimiento.contains(cod))
+    if proveedor:
+        filtros.append(models.Test_TanquesT.Proveedor.contains(proveedor))
+    if estado:
+        filtros.append(models.Test_TanquesT.Estado == estado)
+    filtros.append(func.DATE(models.Test_TanquesT.Fecha_Test) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Test_TanquesT.Fecha_Test) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    return db.query(models.Test_TanquesT).join(models.Tanques_FincaT).join(models.FincaT).filter(*filtros).all()
+
+def create_test_tanque(db: Session, ta_te: schemas.Test_TanquesT):
+    db_ta_te = models.Test_TanquesT(**ta_te.dict(exclude_unset=True))
+    db.add(db_ta_te)
+    db.commit()
+    return "post_tanque-test=Success"
+
+def update_tanque_test(db: Session, ta_te: schemas.Test_TanquesT, id_tanque_test: int):
+    db.query(models.Test_TanquesT).filter(models.Test_TanquesT.ID == id_tanque_test).update(ta_te.dict(exclude_unset=True))
+    db.commit()
+
+
+## Resultado tanques
+def get_result_tanque(db: Session, id_tanque:Optional[int]=None, id_finca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), cod:Optional[str]=None,  id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.FincaT.ID_cliente == id_cliente)
+    if id_tanque:
+        filtros.append(models.Resultados_TanquesT.ID_TANQUE == id_tanque)
+    if id_finca:
+        filtros.append(models.Tanques_FincaT.ID_Finca == id_finca)
+    if cod:
+        filtros.append(models.Resultados_TanquesT.Cod_seguimiento.contains(cod))
+    filtros.append(func.DATE(models.Resultados_TanquesT.Fecha_recepcion) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Resultados_TanquesT.Fecha_recepcion) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    return db.query(models.Resultados_TanquesT).join(models.Tanques_FincaT).join(models.FincaT).filter(*filtros).all()
+
+def create_result_tanque(db: Session, ta_re: schemas.Resultados_TanquesT):
+    db_ta_re = models.Resultados_TanquesT(**ta_re.dict(exclude_unset=True))
+    db.add(db_ta_re)
+    db.commit()
+    return "post_tanque-Resultado=Success"
+
+def update_tanque_result(db: Session, ta_re: schemas.Resultados_TanquesT, id_tanque_result: int):
+    db.query(models.Resultados_TanquesT).filter(models.Resultados_TanquesT.ID == id_tanque_result).update(ta_re.dict(exclude_unset=True))
+    db.commit()
+    
+#########################################################################################################
 
 ######################################### OTRAS FUENTES LOTES   #########################################
 # Variables de Lotes [Remote Sensing]
