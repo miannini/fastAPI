@@ -478,14 +478,14 @@ def get_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[in
     filtros.append(func.DATE(models.Actividades_LotesT.FECHA_ACTIVIDAD) >= datetime.strptime(date1,'%Y-%m-%d').date())
     filtros.append(func.DATE(models.Actividades_LotesT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
     if id_finca:
-        filtros.append(models.LotesT.ID_FINCA == id_finca)   
+        filtros.append(models.LotesT.ID_FINCA == id_finca)   #ID_FINCA 
     if id_lote:
         filtros.append(models.LotesT.ID_LOTE == id_lote) 
     if nombre_lote:
         filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre_lote)))
     if nombre_oper:
         filtros.append((models.OperarioT.NombreOperario.contains(nombre_oper)))               
-    return db.query(models.Actividades_LotesT).join(models.OperarioT).join(models.LotesT).join(models.FincaT).filter(*filtros).all()  
+    return db.query(models.Actividades_LotesT).join(models.LotesT).join(models.FincaT).join(models.Operarios_FincasT).join(models.OperarioT).filter(*filtros).all()  
     #evaluar si se quisiera obtener el join completo
 
 def create_acti_lotes(db: Session, ac_lo: schemas.Acti_lotes_post):

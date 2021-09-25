@@ -30,13 +30,16 @@ class API_UsersT(Base):
     id_user_rol = Column(Integer, ForeignKey("API_Users_Privileges.id_user_rol"), nullable=True)
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), nullable=True)
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
-
+    Deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class API_Users_PrivT(Base):
     __tablename__ = "API_Users_Privileges"
     id_user_rol = Column(Integer, primary_key=True, index=True)
     name = Column(String(45), nullable=True)
     description= Column(String(45), nullable=True)
+    Deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 class PermisosT(Base):
     __tablename__ = "Permisos"
@@ -73,11 +76,15 @@ class ClientesT(Base):
     DIRECCION = Column(String(32), nullable=True)
     CIUDAD = Column(String(32), nullable=True)
     DEPARTAMENTO = Column(String(32), nullable=True)
-    DESCRIPCION = Column(String(32), nullable=True)
+    DESCRIPCION = Column(String(45), nullable=True)
     FECHA_CONTRATO = Column(Date, nullable=True)
-    #Vencimiento_contrato, activo, categoria(oro,plata,etc)
-    #is_active = Column(Boolean, default=True)
-    #operarios = relationship("OperarioT", back_populates="owner_CLIENTE") #the magic
+    FECHA_VENCIMIENTO = Column(Date, nullable=True)
+    ESTADO = Column(String(33), nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
+    Fecha_Hoy = Column(DateTime, nullable=True)
+    Dias_vencimiento = Column(DateTime, nullable=True)
+
 
 ####################################################################################################
 
@@ -87,7 +94,6 @@ class OperarioT(Base):
     __tablename__ = "Operario"
     ID_OPERARIO = Column(Integer, primary_key=True, index=True)
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
-    #ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     NombreOperario = Column(String(32))
     FechaDeIngreso = Column(Date, nullable=True)
     Telefono = Column(Integer, nullable=True)
@@ -95,7 +101,9 @@ class OperarioT(Base):
     Descripcion = Column(String(140), nullable=True)
     Email = Column(String(32), nullable=True)
     Direccion = Column(String(32), nullable=True)
-    #owner_CLIENTE = relationship("ClientesT", back_populates="operarios")
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class Operario_Sin_UserT(Base):
     __tablename__ = "Operario_sin_user"
@@ -108,7 +116,8 @@ class Operarios_FincasT(Base):
     ID = Column(Integer, primary_key=True, index=True)
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"))
     ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
-
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 ##########################################################################################################
 
@@ -121,6 +130,10 @@ class FincaT(Base):
     NOMBRE = Column(String(32), nullable=True)
     DESCRIPCION = Column(String(134), nullable=True)
     sentinel_zone =  Column(String(32),ForeignKey("monitoreo_descargas_sentinel.zona"), nullable=True)
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
+    ID_Zone_sentinel = Column(Integer, nullable=True)
     lotes_list = relationship("LotesT", back_populates="finca_madre")
     
 ###########################################################################################################
@@ -130,7 +143,6 @@ class FincaT(Base):
 class LotesT(Base):
     __tablename__ = "lotes"
     ID_LOTE = Column(Integer, primary_key=True, index=True)
-    #ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
     ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     NOMBRE_LOTE = Column(String(32))
     LATITUD = Column(Float, nullable=True)
@@ -138,20 +150,29 @@ class LotesT(Base):
     AREA = Column(Float, nullable=True)
     DESCRIPCION = Column(String(45), nullable=True)
     ID_variedad = Column(Integer, ForeignKey("tipo_cultivo.ID_variedad"), nullable=True)
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     finca_madre = relationship("FincaT", back_populates="lotes_list")
-    #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_lote")
+    
 
 class tipo_cultivoT(Base):
     __tablename__ = "tipo_cultivo"
     ID_cultivo = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(45), nullable=True)
     clase = Column(String(45), nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 class variedad_cultivoT(Base):
     __tablename__ = "variedad_cultivo"
     ID_variedad = Column(Integer, primary_key=True, index=True)
     ID_cultivo = Column(Integer, ForeignKey("tipo_cultivo.ID_cultivo"))
     nombre = Column(String(45), nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
+    
+#Lotes_geometry
 ###########################################################################################################
 
 
@@ -167,6 +188,7 @@ class Actividades_LotesT(Base):
     Comentario = Column(String(45), nullable=True)
     Fecha_programada = Column(DateTime, nullable=True)
     Estado = Column(Integer, nullable=True)
+    
 
 class Tipo_Actividades_LotesT(Base):
     __tablename__ = "Tipo_Actividades_Lotes"
@@ -174,6 +196,8 @@ class Tipo_Actividades_LotesT(Base):
     Code = Column(String(45))
     Nombre = Column(String(45))
     ID_Categoria_Act = Column(Integer)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class AforoT(Base):
     __tablename__ = "Aforo"
@@ -189,6 +213,13 @@ class Ultimas_Act_LotesT(Base):
     Dias = Column(Integer, nullable=True)
     
 #Categoria_Actividades_Lotes
+class Categoria_Actividades_LotesT(Base):
+    __tablename__ = "Categoria_Actividades_Lotes"
+    ID_Categoria_Act_Lote = Column(Integer, primary_key=True, index=True)
+    Code = Column(String(45))
+    Nombre = Column(String(45))
+    Deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 ###########################################################################################################
 
 
@@ -201,7 +232,9 @@ class HatosT(Base):
     Nombre_Hato = Column(String(45), nullable=True)
     TIPO_Hato = Column(String(32), nullable=True)
     Descripcion = Column(String(32), nullable=True)
-    #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_hato")
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class Traslado_HatosT(Base):
     __tablename__ = "Traslado_Hatos"
@@ -209,6 +242,7 @@ class Traslado_HatosT(Base):
     Fecha_Traslado = Column(DateTime)
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
     ID_LOTE = Column(Integer, ForeignKey("lotes.ID_LOTE"))
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
 
 #RangoFechas_Hato
 ###########################################################################################################
@@ -248,6 +282,9 @@ class razaT(Base):
     Leche = Column(String(33), nullable=True)
     Carne = Column(String(33), nullable=True)
     Pureza = Column(Float, nullable=True)
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    Deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 class sexoT(Base):
     __tablename__ = "Sexo"
@@ -257,13 +294,17 @@ class sexoT(Base):
     Genero = Column(Integer, nullable=True)
     VacaRep = Column(Integer, nullable=True)
     ToroRep  = Column(Integer, nullable=True)
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class tipo_destinoT(Base):
     __tablename__ = "Tipo_Destino"
     IDTipo_Destino= Column(Integer,  primary_key=True)
     Nombre = Column(String(45), nullable=True)
     Descripcion = Column(String(45), nullable=True)
-
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class siresT(Base):
     __tablename__ = "Sires"
@@ -274,10 +315,20 @@ class siresT(Base):
     Nombre_Largo = Column(String(45), nullable=True)
     Registro = Column(String(45), nullable=True)
     Raza = Column(Integer, nullable=True)
-    Fecha_descontinuado = Column(DateTime, nullable=True)
-
+    #Fecha_descontinuado = Column(DateTime, nullable=True)
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
+    
 #Estado_vaca = remover y hacer en forma de View
 #Tipo_Origen
+class tipo_origenT(Base):
+    __tablename__ = "Tipo_origen"
+    IDTipo_origen= Column(Integer,  primary_key=True)
+    Nombre = Column(String(45), nullable=True)
+    Descripcion = Column(String(45), nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 #########################################################################################################
 
@@ -288,6 +339,8 @@ class tipo_operacionesT(Base):
     ID_TipoOperaciones= Column(Integer,  primary_key=True)
     Codigo = Column(String(45), nullable=True)
     Nombre = Column(String(45), nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 class MastitisT(Base):
     __tablename__ = "Mastitis"
@@ -344,12 +397,16 @@ class Actividades_vacas_categoriaT(Base):
     ID_Categoria= Column(Integer,  primary_key=True)
     Nombre = Column(String(45))
     Descripcion = Column(String(45), nullable=True)
+    Deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 class Actividades_vacas_resultadoT(Base):
     __tablename__ = "Actividades_vacas_resultado"
     ID_Resutlado= Column(Integer,  primary_key=True)
     Nombre = Column(String(45))
     Descripcion = Column(String(45), nullable=True)
+    Deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 class Ubicacion_VacasT(Base):
     __tablename__ = "Ubicacion_Vacas"
@@ -377,6 +434,7 @@ class Traslado_VacasT(Base):
     Fecha_Traslado = Column(DateTime)
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
+    ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
     
 class celoT(Base):
     __tablename__ = "celo"
@@ -434,6 +492,9 @@ class Tanques_FincaT(Base):
     ID_TANQUE = Column(Integer, primary_key=True, index=True)
     ID_Finca= Column(Integer, ForeignKey("Finca.ID_FINCA"), nullable=True)
     Capacidad_Max = Column(Float, nullable=True)
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 
 #Tanque_hatos
 class Tanques_HatosT(Base):
@@ -441,7 +502,9 @@ class Tanques_HatosT(Base):
     ID_TANQUE_HATO = Column(Integer, primary_key=True, index=True)
     ID_TANQUE= Column(Integer, ForeignKey("Tanques_Finca.ID_TANQUE"), nullable=True)
     ID_HATO= Column(Integer, ForeignKey("Hatos.ID_HATO"), nullable=True)
-
+    Fecha_Creacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
     
 #Leche_tanque_Diaria
 class Leche_Tanque_DiariaT(Base):
@@ -556,7 +619,7 @@ class monitoreo_descargas_sentinelT(Base):
 
 #Indices_remote_sense
 #monitoreo_imagenes_proces
-
+#Zonas_sentinel
 ###########################################################################################################
 
 ########################################   ESTACION METEOROLOGICA   #######################################
@@ -599,4 +662,7 @@ class EstacionesT(Base):
     ID_Estacion = Column(Integer, primary_key=True) #ForeignKey("Finca.ID_FINCA"),
     ID_Finca = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     comentarios = Column(String(45))
+    Fecha_instalacion = Column(DateTime, nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
 ###########################################################################################################

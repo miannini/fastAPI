@@ -209,13 +209,19 @@ class Operario_Sin_UserT(BaseModel):
         orm_mode = True
 
 class Operarios_FincasT(BaseModel):
-    ID : int
+    #ID : int
     ID_OPERARIO : int
     ID_FINCA: int
     class Config:
         orm_mode = True
 
-
+class Operarios_FincasF(Operarios_FincasT):
+    ID : int
+    #ID_OPERARIO : int
+    #ID_FINCA: int
+    class Config:
+        orm_mode = True
+        
 ##########################################################################################################
 
 
