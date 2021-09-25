@@ -217,10 +217,8 @@ def get_password_hash(password):
 
 def get_user(db: Session, username: str):
     if get_user_by_username(db, user=username) is not None :
-        #user_dict_all = get_user_by_username(db, username) #: models.API_UsersT =
-        #only_user = schemas.UserInDB(user_dict_all)
         db_user_info: schemas.UserInDB = get_user_by_username(db, username)
-        return db_user_info #schemas.UserInDB(only_user)
+        return db_user_info
 
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
@@ -280,7 +278,7 @@ def get_clientes(db: Session, ciudad:Optional[str]=None, departamento:Optional[s
     else:
         return db.query(models.ClientesT).all()
 
-def create_cliente(db: Session, cliente: schemas.ClientesCreate):
+def create_cliente(db: Session, cliente: schemas.ClientesU):
     #cliente2 = cliente.pop('ID_CLIENTE')
     db_cliente = models.ClientesT(**cliente.dict(exclude_unset=True)) #cliente.dict().pop('ID_CLIENTE'))
     #del db_cliente['ID_CLIENTE']
@@ -326,7 +324,7 @@ def get_operarios(db: Session, finca:Optional[str]=None, id_operario:Optional[st
     
     #evaluar si retornar con Usuario API joined
 
-def create_operario(db: Session, operario: schemas.OperarioN):
+def create_operario(db: Session, operario: schemas.OperarioC):
     db_operario = models.OperarioT(**operario.dict(exclude_unset=True))
     db.add(db_operario)
     db.commit()
@@ -346,7 +344,7 @@ def get_oper_sin_user(db: Session, nombre:Optional[str]=None,  id_cliente: str =
     return db.query(models.Operario_Sin_UserT).join(models.OperarioT).filter(*filtros).all()
 
 #patch
-def update_operario(db: Session, operario: schemas.OperarioN, id_operario: int):
+def update_operario(db: Session, operario: schemas.OperarioC, id_operario: int):
     db.query(models.OperarioT).filter(models.OperarioT.ID_OPERARIO == id_operario).update(operario.dict(exclude_unset=True))
     db.commit()
 

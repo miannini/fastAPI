@@ -238,7 +238,7 @@ def read_clientes(db: Session = Depends(get_db), current_user: schemas.UserInfo 
     return clientes
 
 @app.post("/Cliente/", status_code=201, tags=["Clients"])
-async def write_cliente(cliente: schemas.ClientesCreate, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
+async def write_cliente(cliente: schemas.ClientesU, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_cliente(db=db, cliente=cliente)
     #esto seria bueno asociarlo con enviar un email, con formulario y que el ID de cliente se guarde
     #para asignarlo al usuario creado
@@ -263,7 +263,7 @@ def read_operarios(db: Session = Depends(get_db), finca:Optional[str]=None, id_o
     return operarios
 
 @app.post("/create_operario/", status_code=201, tags=["Operarios"])
-def write_operario(operario: schemas.OperarioN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def write_operario(operario: schemas.OperarioC, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_operario(db=db, operario=operario)
 '''
 @app.delete("/Operario_del/{ID_OPERARIO}", tags=["Operarios"])
@@ -284,7 +284,7 @@ def read_oper_sin_user(db: Session = Depends(get_db), nombre:Optional[str]=None,
 
 #patch operario
 @app.patch("/Operario/{ID_OPERARIO}", response_model=List[schemas.OperarioT], tags=["Operarios"])
-def update_operario(Operario_ID: int, operario: schemas.OperarioN, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def update_operario(Operario_ID: int, operario: schemas.OperarioC, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     crud.update_operario(db=db, operario=operario, id_operario=Operario_ID)
     db_operario_id = crud.get_operarios(db, id_operario=Operario_ID, id_cliente = current_user.ID_CLIENTE)
     if db_operario_id is None:
@@ -309,7 +309,7 @@ def read_fincass(db: Session = Depends(get_db), current_user: schemas.UserInfo =
 def wr_finca(finca: schemas.FincaP, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_finca(db=db, finca=finca, id_cliente= current_user.ID_CLIENTE)
 #solo funciona si tabla lotes tiene finca_id creada ... cambiar SQL, sino se puede, APP debera crear finca y lote al tiempo
-#obteniendo max finca_id, asignando en tabla lotes y despues en tabla fincas
+
 
 #patch finca
 @app.patch("/Fincas/{ID_FINCA}", response_model=List[schemas.FincaT], tags=["Fincas"])

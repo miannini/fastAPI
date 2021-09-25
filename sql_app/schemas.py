@@ -56,6 +56,8 @@ class User(BaseModel):
     id_user_rol : Optional[int] = None
     ID_CLIENTE : Optional[int] = None
     ID_OPERARIO : Optional[int] = None
+    Deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     
 class UserInDB(User):
     password: str
@@ -70,6 +72,8 @@ class API_Users_PrivT(BaseModel):
     id_user_rol : int
     name : Optional[str] = None
     description : Optional[str] = None
+    Deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
         
@@ -117,7 +121,6 @@ class PermisosU(BaseModel):
 
 ############################       CLIENTS      ###############################################
 class ClientesU(BaseModel):
-    #ID_CLIENTE: int
     NOMBRE: Optional[str] = None
     NIT_CC: Optional[int] = None
     RAZON_SOCIAL: Optional[str] = None
@@ -128,24 +131,20 @@ class ClientesU(BaseModel):
     CIUDAD: Optional[str] = None
     DEPARTAMENTO: Optional[str] = None
     FECHA_CONTRATO: Optional[date] = None
+    FECHA_VENCIMIENTOCO : Optional[date] = None
+    ESTADO : Optional[str] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
+    Fecha_Hoy : Optional[datetime] = None
+    Dias_vencimiento : Optional[datetime] = None
     class Config:
         orm_mode = True
 
 class ClientesT(ClientesU):
     ID_CLIENTE: int
-    #NOMBRE: Optional[str] = None
-    #NIT_CC: Optional[int] = None
-    #RAZON_SOCIAL: Optional[str] = None
-    #TELEFONO: Optional[int] = None
-    #EMAIL: Optional[str] = None
-    #DIRECCION: Optional[str] = None
-    #DESCRIPCION: Optional[str] = None
-    #CIUDAD: Optional[str] = None
-    #DEPARTAMENTO: Optional[str] = None
-    #FECHA_CONTRATO: Optional[date] = None
     class Config:
         orm_mode = True
-
+'''
 class Clientes_id(BaseModel):
     ID_CLIENTE: int
     
@@ -162,15 +161,12 @@ class ClientesCreate(BaseModel): #(Clientes_id):
     FECHA_CONTRATO: Optional[date] = None
     class Config:
         orm_mode = True
-        
+'''       
 ####################################################################################################
 
 
 ##################################      OPERARIOS    #################################################
-class Operario_id(BaseModel): 
-    ID_OPERARIO: int
-    
-class OperarioT(Operario_id): 
+class OperarioC(BaseModel): 
     ID_CLIENTE: int
     #ID_FINCA: int
     NombreOperario: str
@@ -180,9 +176,17 @@ class OperarioT(Operario_id):
     Descripcion: Optional[str] = None
     Email: Optional[str] = None
     Direccion: Optional[str] = None
+    Fecha_Creacion : Optional[datetime] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
 
+class OperarioT(OperarioC): 
+    ID_OPERARIO: int
+    class Config:
+        orm_mode = True  
+'''    
 class OperarioN(BaseModel): 
     ID_CLIENTE: Optional[int] = None
     #ID_FINCA: Optional[int] = None
@@ -200,7 +204,7 @@ class OperarioInfo2(OperarioN):
     ID_OPERARIO: int
     class Config:
         orm_mode = True 
-        
+'''        
 class Operario_Sin_UserT(BaseModel):
     ID_OPERARIO : int
     NombreOperario : str
@@ -208,17 +212,17 @@ class Operario_Sin_UserT(BaseModel):
     class Config:
         orm_mode = True
 
+
 class Operarios_FincasT(BaseModel):
-    #ID : int
     ID_OPERARIO : int
     ID_FINCA: int
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
 
 class Operarios_FincasF(Operarios_FincasT):
     ID : int
-    #ID_OPERARIO : int
-    #ID_FINCA: int
     class Config:
         orm_mode = True
         
@@ -226,27 +230,13 @@ class Operarios_FincasF(Operarios_FincasT):
 
 
 ###########################################    LOTES    ###################################################
-class LotesT(BaseModel): 
-    ID_LOTE: int
-    #ID_CLIENTE: int
-    ID_FINCA: int
-    NOMBRE_LOTE: Optional[str] = None
-    LATITUD: Optional[float] = None
-    LONGITUD: Optional[float] = None
-    AREA: Optional[float] = None
-    DESCRIPCION: Optional[str] = None
-    ID_variedad: Optional[int] = None
-    #finca_madre: int
-    class Config:
-        orm_mode = True
-
+'''
 class LotesT2(BaseModel): 
     NOMBRE_LOTE: Optional[str] = None
     class Config:
         orm_mode = True
-
+'''
 class LotesN(BaseModel): 
-    #ID_LOTE: int
     ID_FINCA: Optional[int] = None
     NOMBRE_LOTE: Optional[str] = None
     LATITUD: Optional[float] = None
@@ -254,25 +244,34 @@ class LotesN(BaseModel):
     AREA: Optional[float] = None
     DESCRIPCION: Optional[str] = None
     ID_variedad: Optional[int] = None
-    #finca_madre: int
+    Fecha_Creacion : Optional[datetime] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
 
+class LotesT(LotesN): 
+    ID_LOTE: int
+    class Config:
+        orm_mode = True
+'''        
 class LotesPasto(BaseModel): 
     ID_LOTE: int
     ID_variedad: Optional[int] = None
     class Config:
         orm_mode = True
-        
+      
 class LoteInfo2(LotesN):
     ID_LOTE: int
     class Config:
         orm_mode = True
-
+'''  
 
 class tipo_cultivoT(BaseModel):
     nombre : Optional[str] = None
     clase : Optional[str] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
         
@@ -284,6 +283,8 @@ class tipo_cultivoFull(tipo_cultivoT):
 class variedad_cultivoT(BaseModel):
     ID_cultivo : int
     nombre : Optional[str] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
 
@@ -298,7 +299,7 @@ class variedad_cultivoFull(variedad_cultivoT):
 class Actividades_LotesT(BaseModel):
     ID_ACT_LOTE : int
     ID_LOTE : int
-    FECHA_ACTIVIDAD  : datetime #datetime
+    FECHA_ACTIVIDAD  : datetime
     ID_Tipo_Actividad : int
     Producto : Optional[str] = None
     ID_OPERARIO : int
@@ -308,9 +309,9 @@ class Actividades_LotesT(BaseModel):
     class Config:
         orm_mode = True
 
-class Actividades_LotesT2(BaseModel):
+class Actividades_LotesT2(BaseModel): #Afoto
     ID_LOTE : int
-    FECHA_ACTIVIDAD  : datetime #datetime
+    FECHA_ACTIVIDAD  : datetime
     ID_Tipo_Actividad : int
     ID_OPERARIO : int
     class Config:
@@ -348,95 +349,106 @@ class Tipo_Actividades_LotesT(BaseModel):
     Code : str
     Nombre  : str
     ID_Categoria_Act : int
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
 
-class Ultimas_Act_LotesT(BaseModel):
+class Categoria_Actividades_LotesT(BaseModel):
+    Code : str
+    Nombre : str
+    Deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
+    class Config:
+        orm_mode = True  
+        
+class Categoria_Actividades_LotesF(Categoria_Actividades_LotesT):
+    ID_Categoria_Act_Lote : int
+
+class Ultimas_Act_LotesT(BaseModel): #VIEW
     ID_ACT_LOTE : int
     ID_LOTE : int
     FECHA_ACTIVIDAD : datetime
     ID_Tipo_Actividad : int
     Dias : Optional[int] = None 
     class Config:
-        orm_mode = True    
+        orm_mode = True  
+        
+        
 ###########################################################################################################
 
 
 #################################     FINCAS  (down here to make word lotes_list)   ######################################
 class FincaU(BaseModel):
-    #ID_FINCA: int
-    #ID_cliente: int
     NOMBRE: Optional[str] = None
     DESCRIPCION: Optional[str] = None
-    #lotes_list: List[LotesT] = []
     sentinel_zone: Optional[str] = None
+    Fecha_Creacion : Optional[datetime] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
+    ID_Zone_sentinel: Optional[int] = None
     class Config:
         orm_mode = True
 
 class FincaT(FincaU):
     ID_FINCA: int
     ID_cliente: int
-    #NOMBRE: Optional[str] = None
-    #DESCRIPCION: Optional[str] = None
     lotes_list: List[LotesT] = []
-    #sentinel_zona: Optional[str] = None
     class Config:
         orm_mode = True
   
 class FincaP(BaseModel):
-    #ID_FINCA: int #posiblemente quitar, para que no se defina por el usuario
     ID_cliente: int
     NOMBRE: Optional[str] = None
     DESCRIPCION: Optional[str] = None
-    #lotes_list: List[LotesT] = []
     class Config:
         orm_mode = True
 
-class FincaR(BaseModel):
+class FincaR(BaseModel): #Finca_Small
     ID_FINCA: int
     ID_cliente: int
     NOMBRE: Optional[str] = None
-    #DESCRIPCION: Optional[str] = None
-    #lotes_list: List[LotesT] = []
     class Config:
         orm_mode = True
 
 ###########################################################################################################
 
-########################################    HATOS     #################################################### 
-class HatosT(BaseModel):
-    ID_HATO : int
-    ID_CLIENTE : int
-    ID_FINCA : int
-    Nombre_Hato : Optional[str] = None
-    TIPO_Hato : Optional[str] = None
-    Descripcion : Optional[str] = None
-    class Config:
-        orm_mode = True
-        
+########################################    HATOS     ####################################################       
 class HatosP(BaseModel):
-    #ID_HATO : int = 0 #posiblemente quitar, para que no se defina por el usuario
     ID_CLIENTE : Optional[int] = None
     ID_FINCA : Optional[int] = None
     Nombre_Hato : Optional[str] = None
     TIPO_Hato : Optional[str] = None
     Descripcion : Optional[str] = None
+    Fecha_Creacion : Optional[datetime] = None
+    deshabilitado : Optional[int] = None
+    Fecha_deshabilitado : Optional[datetime] = None
     class Config:
         orm_mode = True
         
-class HatosR(BaseModel):
+class HatosT(HatosP):
+    ID_HATO : int
+    #ID_CLIENTE : int
+    #ID_FINCA : int
+    #Nombre_Hato : Optional[str] = None
+    #TIPO_Hato : Optional[str] = None
+    #Descripcion : Optional[str] = None
+    class Config:
+        orm_mode = True
+        
+class HatosR(BaseModel): #Hatos_Small
     ID_HATO : int
     ID_CLIENTE : int
     ID_FINCA : int
     Nombre_Hato : Optional[str] = None
     class Config:
         orm_mode = True
-        
+'''        
 class HatosT2(BaseModel):
     Nombre_Hato : Optional[str] = None
     class Config:
         orm_mode = True
-        
+'''        
 class Traslado_Hatos_id(BaseModel):
     ID_TRASLADO_HATO : int
     
@@ -444,6 +456,7 @@ class Traslado_HatosT(Traslado_Hatos_id):
     Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ID_HATO : int
     ID_LOTE : int
+    ID_OPERARIO : int
     class Config:
         orm_mode = True
 
@@ -451,34 +464,15 @@ class Traslado_HatosT(Traslado_Hatos_id):
 
 
 #############################################   VACAS    ################################################# 
-class VacasT(BaseModel):
-    ID_VACA : int
-    ID_CLIENTE : int
-    #ID_FINCA : int
-    ElectronicID : Optional[str] = None
-    Nombre_Vaca : str
-    Raza : Optional[int] = None
-    Sexo : Optional[int] = None
-    VacaMadre : Optional[int] = None
-    IDparto : Optional[int] = None
-    FechaRegistro : Optional[date] = None
-    IDTipoOrigen : Optional[int] = None
-    FechaNacimiento : Optional[date] = None
-    IDTipoSalida : Optional[int] = None
-    FechaSalida : Optional[date] = None 
-    Sire : Optional[int] = None    
-    #Estado : Optional[int] = None
-    #Estado_Final : Optional[int] = None 
-    class Config:
-        orm_mode = True   
-        
+'''        
 class VacasT2(BaseModel):
     #ID_VACA : int
     Nombre_Vaca : str
     class Config:
         orm_mode = True 
+'''
 
-class VacasR(BaseModel):
+class VacasR(BaseModel): #Vacas_small
     ID_VACA : int
     ID_CLIENTE : int
     Nombre_Vaca : str
@@ -504,29 +498,51 @@ class VacaN(BaseModel):
     Sire : Optional[int] = None
     class Config:
         orm_mode = True
-    
+        
+class VacasT(BaseModel):
+    ID_VACA : int
+    #ID_CLIENTE : int
+    #ElectronicID : Optional[str] = None
+    #Nombre_Vaca : str
+    #Raza : Optional[int] = None
+    #Sexo : Optional[int] = None
+    #VacaMadre : Optional[int] = None
+    #IDparto : Optional[int] = None
+    #FechaRegistro : Optional[date] = None
+    #IDTipoOrigen : Optional[int] = None
+    #FechaNacimiento : Optional[date] = None
+    #IDTipoSalida : Optional[int] = None
+    #FechaSalida : Optional[date] = None 
+    #Sire : Optional[int] = None
+    class Config:
+        orm_mode = True   
+'''    
 class VacaInfo2(VacaN):
     ID_VACA: int
     class Config:
         orm_mode = True
-        
-class razaT(BaseModel):
+'''
+  
+class razaR(BaseModel): #Raza-small
     ID_RAZA : int
     Codigo : Optional [str] = None
     Nombre : Optional [str] = None
+    class Config:
+        orm_mode = True
+        
+class razaT(razaR):
+    #ID_RAZA : int
+    #Codigo : Optional [str] = None
+    #Nombre : Optional [str] = None
     Gestacion : Optional [int] = None 
     MaxGestacion : Optional [int] = None
     MinGestacion  : Optional [int] = None
     Leche : Optional [str] = None
     Carne : Optional [str] = None
     Pureza : Optional [float] = None
-    class Config:
-        orm_mode = True
-        
-class razaR(BaseModel):
-    ID_RAZA : int
-    Codigo : Optional [str] = None
-    Nombre : Optional [str] = None
+    Fecha_Creacion : Optional [datetime] = None
+    Deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
     
@@ -537,6 +553,9 @@ class sexoT(BaseModel):
     Genero : Optional [int] = None 
     VacaRep : Optional [int] = None
     ToroRep  : Optional [int] = None
+    Fecha_Creacion : Optional [datetime] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True  
     
@@ -544,6 +563,9 @@ class tipo_destinoT(BaseModel):
     IDTipo_Destino : int
     Nombre : Optional [str] = None
     Descripcion : Optional [str] = None
+    Fecha_Creacion : Optional [datetime] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
 
@@ -555,10 +577,21 @@ class siresT(BaseModel):
     Nombre_Largo : Optional [str] = None
     Registro : Optional [str] = None
     Raza : Optional [int] = None
-    Fecha_descontinuado : Optional[datetime] = None
+    #Fecha_descontinuado : Optional[datetime] = None
+    Fecha_Creacion : Optional [datetime] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
     
+class tipo_origenT(BaseModel):
+    IDTipo_origen: Optional [int] = None
+    Nombre : Optional [str] = None
+    Descripcion : Optional [str] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
+    class Config:
+        orm_mode = True
 #########################################################################################################
 
 
@@ -600,6 +633,8 @@ class tipo_operacionesT(BaseModel):
     ID_TipoOperaciones : int
     Codigo : Optional [str] = None
     Nombre : Optional [str] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
         
@@ -607,6 +642,8 @@ class Actividades_vacas_categoriaT(BaseModel):
     ID_Categoria : int
     Nombre : Optional [str] = None
     Descripcion : Optional [str] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
         
@@ -614,6 +651,8 @@ class Actividades_vacas_resultadoT(BaseModel):
     ID_Resutlado : int
     Nombre : Optional [str] = None
     Descripcion : Optional [str] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
 
@@ -846,6 +885,9 @@ class Leche_EntregadaF(Leche_EntregadaT):
 class Tanques_FincaT(BaseModel):
     ID_Finca : int
     Capacidad_Max : float
+    Fecha_Creacion : Optional [datetime] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
 
@@ -856,6 +898,9 @@ class Tanques_FincaF(Tanques_FincaT):
 class Tanques_HatosT(BaseModel):
     ID_TANQUE : int
     ID_HATO : int 
+    Fecha_Creacion : Optional [datetime] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
         
@@ -1005,4 +1050,7 @@ class EstacionesT(BaseModel):
     ID_Estacion : int
     ID_Finca : Optional [int] = None
     comentarios : Optional [str] = None
+    Fecha_instalacion : Optional [datetime] = None
+    deshabilitado : Optional [int] = None
+    Fecha_deshabilitado : Optional [datetime] = None
 ###########################################################################################################

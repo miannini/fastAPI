@@ -78,7 +78,7 @@ class ClientesT(Base):
     DEPARTAMENTO = Column(String(32), nullable=True)
     DESCRIPCION = Column(String(45), nullable=True)
     FECHA_CONTRATO = Column(Date, nullable=True)
-    FECHA_VENCIMIENTO = Column(Date, nullable=True)
+    FECHA_VENCIMIENTOCO = Column(Date, nullable=True)
     ESTADO = Column(String(33), nullable=True)
     deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
@@ -212,7 +212,7 @@ class Ultimas_Act_LotesT(Base):
     ID_Tipo_Actividad = Column(Integer, ForeignKey("Tipo_Actividades_Lotes.IDTipo_Actividades_Lotes"))
     Dias = Column(Integer, nullable=True)
     
-#Categoria_Actividades_Lotes
+
 class Categoria_Actividades_LotesT(Base):
     __tablename__ = "Categoria_Actividades_Lotes"
     ID_Categoria_Act_Lote = Column(Integer, primary_key=True, index=True)
@@ -253,7 +253,6 @@ class VacasT(Base):
     __tablename__ = "vacas"
     ID_VACA = Column(Integer, primary_key=True, index=True)
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
-    #ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"))
     ElectronicID = Column(String(32), nullable=True)
     Nombre_Vaca = Column(String(32))
     Raza = Column(Integer, ForeignKey("Raza.ID_RAZA"), nullable=True)
@@ -265,12 +264,8 @@ class VacasT(Base):
     FechaNacimiento = Column(Date, nullable=True)
     IDTipoSalida = Column(Integer, nullable=True)
     FechaSalida = Column(Date, nullable=True)
-    #FECHA_NACIMIENTO = Column(Date, nullable=True)
     Sire = Column(Integer, nullable=True)
-    #Estado = Column(Integer, nullable=True)
-    #Estado_Final = Column(Integer, nullable=True)
-    #ubicacion_vaca = relationship("Ubicacion_VacasT", back_populates="nombre_vaca") #, uselist=False, remote_side=[ID_VACA,Nombre_Vaca]
-
+    
 class razaT(Base):
     __tablename__ = "Raza"
     ID_RAZA= Column(Integer,  primary_key=True)
