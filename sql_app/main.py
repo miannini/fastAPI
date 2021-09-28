@@ -430,7 +430,7 @@ def update_hato(Hato_ID: int, hato: schemas.HatosP, db: Session = Depends(get_db
     return db_hato_id
 
 
-@app.get("/TrasHatos/", response_model=List[schemas.Traslado_HatosT], tags=["Hatos"])
+@app.get("/TrasHatos/", response_model=List[schemas.Traslado_HatosF], tags=["Hatos"])
 async def read_hist_trashatos(db: Session = Depends(get_db), id_hato:Optional[str]=None, id_lote:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
     hist_trashatos = crud.get_trashato(db, id_hato=id_hato, id_lote=id_lote, date1=date1, date2=date2, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
     return hist_trashatos

@@ -449,17 +449,17 @@ class HatosT2(BaseModel):
     class Config:
         orm_mode = True
 '''        
-class Traslado_Hatos_id(BaseModel):
-    ID_TRASLADO_HATO : int
-    
-class Traslado_HatosT(Traslado_Hatos_id):
+   
+class Traslado_HatosT(BaseModel):
     Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ID_HATO : int
     ID_LOTE : int
-    ID_OPERARIO : int
+    #ID_OPERARIO : Optional[int] = None
     class Config:
         orm_mode = True
 
+class Traslado_HatosF(Traslado_HatosT):
+    ID_TRASLADO_HATO : int
 ###########################################################################################################
 
 
@@ -786,6 +786,7 @@ class Traslado_VacasT(Traslado_Vacas_id):
     Fecha_Traslado : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ID_VACA : int
     ID_HATO : int
+    #ID_OPERARIO : Optional[int] = None #activar y simplificar esquemas
     class Config:
         orm_mode = True
         

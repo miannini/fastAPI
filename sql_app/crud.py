@@ -595,6 +595,14 @@ def write_trashato(db: Session, sch_ubi: schemas.Ubicacion_VacasBasic, Fecha_Tra
     db.refresh(reg_th)
     return reg_th
 
+####
+#Como hacer insert de la fecha en el Dictionary y reemplazar valor?
+
+####
+#db_le_ha = models.Leche_HatosT(**le_ha.dict(exclude_unset=True))
+#    db.add(db_le_ha)
+#    db.commit()
+    
 def get_trashato(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
     filtros=[]
     #filtros.append()
