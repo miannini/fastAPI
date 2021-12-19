@@ -553,6 +553,11 @@ async def read_act_vacas(date1: str='2020-01-01', date2: str = datetime.now().st
     act_vacas = crud.get_act_vacas(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
     return act_vacas
 
+@app.get("/ActiVacasView/", response_model=List[schemas.ActividadesVacasView], tags=["Actividades-Vacas"])
+async def view_act_vacas(vaca:Optional[str]=None, cod_oper:Optional[str]=None, operacion:Optional[str]=None, result:Optional[str]=None, categ:Optional[str]=None, operario:Optional[str]=None, rol:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
+    view_actvacas = crud.get_view_activacas(db, vaca=vaca, cod_oper=cod_oper, operacion=operacion, result=result, categ=categ, operario=operario, rol=rol, date1 =date1, date2=date2, id_cliente = current_user.ID_CLIENTE)
+    return view_actvacas
+
 '''
 @app.get("/Mastit_get/", response_model=List[Union[schemas.MastitisT,schemas.ActInfo]])
 async def read_mastitis(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): #skip: int = 0, limit: int = 100,
@@ -668,7 +673,34 @@ async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depe
 
 #patch traslado vacas
 
+#Pesos
+@app.post("/Peso/", status_code=201, tags=["Actividades-Vacas"])
+async def write_peso(data: schemas.peso_Requi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    id_to_use = crud.reg_acti_2(db=db, data=data)
+    id_to_use
+    id_to_use = id_to_use.ID_Actividad 
+    return crud.registrar_peso(db=db, data=data, id_to_use=id_to_use)
 
+@app.get("/IncrePesosView/", response_model=List[schemas.Incre_Pesos_View], tags=["Actividades-Vacas"])
+async def view_incr_pesos(id_vaca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    view_pesos = crud.get_view_pesos(db, id_vaca=id_vaca, date1 =date1, date2=date2, id_cliente = current_user.ID_CLIENTE)
+    return view_pesos
+
+#Servicios
+@app.post("/Servicio/", status_code=201, tags=["Actividades-Vacas"])
+async def write_servicio(data: schemas.Servicios_Requi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    id_to_use = crud.reg_acti_2(db=db, data=data)
+    id_to_use
+    id_to_use = id_to_use.ID_Actividad 
+    return crud.registrar_servicio(db=db, data=data, id_to_use=id_to_use)
+
+#Diagpre
+@app.post("/DiagPre/", status_code=201, tags=["Actividades-Vacas"])
+async def write_diagpre(data: schemas.DiagPre_Requi, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    id_to_use = crud.reg_acti_2(db=db, data=data)
+    id_to_use
+    id_to_use = id_to_use.ID_Actividad 
+    return crud.registrar_diagpre(db=db, data=data, id_to_use=id_to_use)
 ##########################################################################################################
 
 

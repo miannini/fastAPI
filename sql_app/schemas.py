@@ -628,6 +628,20 @@ class ActividadesU(BaseModel):
     Comentario : Optional[str] = None
     class Config:
         orm_mode = True 
+        
+class ActividadesVacasView(BaseModel):
+    ID_Actividad : int
+    Vaca : str
+    Codigo_oper : Optional[str] = None
+    Operacion : Optional[str] = None
+    Resultado : Optional[str] = None
+    Categoria : Optional[str] = None
+    Operario : Optional[str] = None
+    Rol : Optional[str] = None
+    Fecha : Optional[datetime] = None
+    Comentario : Optional[str] = None
+    class Config:
+        orm_mode = True 
 
 class tipo_operacionesT(BaseModel):
     ID_TipoOperaciones : int
@@ -648,7 +662,7 @@ class Actividades_vacas_categoriaT(BaseModel):
         orm_mode = True
         
 class Actividades_vacas_resultadoT(BaseModel):   
-    ID_Resutlado : int
+    ID_Resultado : int
     Nombre : Optional [str] = None
     Descripcion : Optional [str] = None
     deshabilitado : Optional [int] = None
@@ -811,6 +825,64 @@ class celo_get(celoT):
     id_celo : int
     class Config:
         orm_mode = True 
+
+
+#Pesos
+class peso_Requi(BaseModel):
+    ID_VACA : int
+    ID_TipoOperacion : int = 10
+    ID_Resultado : int = 1
+    ID_OPERARIO : int = 35
+    ID_Categoria : int = 1
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    Comentario : Optional[str] = None
+    Peso : int
+    class Config:
+        orm_mode = True 
+        
+   
+class Incre_Pesos_View(BaseModel):
+    ID_VACA : int
+    Peso : int
+    Fecha : Optional[datetime] = None
+    previous_fecha : Optional[datetime] = None
+    previous_peso : Optional[int] = None
+    dif_fecha : Optional[int] = None
+    dif_peso : Optional[int] = None
+    Peso_gain_by_day : Optional[float] = None
+    class Config:
+        orm_mode = True
+        
+class Servicios_Requi(BaseModel):
+    ID_VACA : int
+    ID_TipoOperacion : int = 2
+    ID_Resultado : int = 2
+    ID_OPERARIO : int = 35
+    ID_Categoria : int = 12 #Inseminacion
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    Comentario : Optional[str] = None
+    Sire : Optional[int] = None
+    ID_Embrion : Optional[int] = None
+    class Config:
+        orm_mode = True
+    #IDservicio : int
+    #ID_ACTIVIDAD : int
+    
+class DiagPre_Requi(BaseModel):
+    ID_VACA : int
+    ID_TipoOperacion : int = 7 #or 3 to 8
+    ID_Resultado : int = 7 # or 6, 8, 9, 10
+    ID_OPERARIO : int = 35
+    ID_Categoria : int = 18 #Diag Pre
+    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    Comentario : Optional[str] = None
+    ID_Resultado : int
+    Dias : Optional[int] = None #Change to calculated field
+    ID_servicio : Optional[int] = None
+    class Config:
+        orm_mode = True
+    #IDdiagpre : int
+    #ID_ACTIVIDAD : int
 
 ##########################################################################################################
 

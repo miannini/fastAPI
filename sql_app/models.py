@@ -373,12 +373,25 @@ class ActividadesVacasT(Base):
     __tablename__ = "Actividades_Vacas"
     ID_Actividad = Column(Integer, primary_key=True, index=True)
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
-    ID_TipoOperacion = Column(Integer) #, ForeignKey
-    ID_Resultado = Column(Integer) #, ForeignKey
+    ID_TipoOperacion = Column(Integer)
+    ID_Resultado = Column(Integer, ForeignKey("Actividades_vacas_resultado.ID_Resultado"))
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"))
-    ID_Categoria = Column(Integer) #, ForeignKey
+    ID_Categoria = Column(Integer)
     Fecha = Column(Date, nullable=True)
     Comentario = Column(String(450), nullable=True)
+
+class ActividadesVacasView(Base):
+    __tablename__ = "Actividades_vacas_view"
+    ID_Actividad = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), primary_key=True, index=True)
+    Vaca = Column(String(45), ForeignKey("vacas.Nombre_Vaca"))
+    Codigo_oper = Column(String(45), nullable=True)
+    Operacion = Column(String(45), nullable=True)
+    Resultado = Column(String(45), nullable=True)
+    Categoria = Column(String(45), nullable=True)
+    Operario = Column(String(45), nullable=True)
+    Rol = Column(String(45), nullable=True)
+    Fecha  = Column(Date, nullable=True)
+    Comentario = Column(String(45), nullable=True)
 
 class CriaT(Base):
     __tablename__ = "Cria"
@@ -397,7 +410,7 @@ class Actividades_vacas_categoriaT(Base):
     
 class Actividades_vacas_resultadoT(Base):
     __tablename__ = "Actividades_vacas_resultado"
-    ID_Resutlado= Column(Integer,  primary_key=True)
+    ID_Resultado= Column(Integer,  primary_key=True)
     Nombre = Column(String(45))
     Descripcion = Column(String(45), nullable=True)
     Deshabilitado = Column(Integer, nullable=True)
@@ -438,9 +451,51 @@ class celoT(Base):
     date = Column(DateTime, nullable=True)
     celotron = Column(Integer, nullable=True)
     
-#DiagPre
+
 #Pesos
+class PesosT(Base):
+    __tablename__ = "Pesos"
+    IDpeso= Column(Integer, primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    Peso = Column(Integer)
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"))
+    
+class Incre_Pesos_View(Base):
+    __tablename__ = "incremento_pesos"
+    ID_VACA= Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True, index=False)
+    Peso = Column(Integer)
+    Fecha = Column(DateTime, nullable=True)
+    previous_fecha = Column(DateTime, nullable=True)
+    previous_peso = Column(Integer, nullable=True)
+    dif_fecha = Column(Integer, nullable=True)
+    dif_peso = Column(Integer, nullable=True)
+    Peso_gain_by_day = Column(Float, nullable=True)
+
 #servicios
+class ServiciosT(Base):
+    __tablename__ = "Servicios"
+    IDservicio= Column(Integer, primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    Sire = Column(Integer, ForeignKey("Sires.IDsire"), nullable=True)
+    ID_Embrion = Column(Integer, nullable=True) #, ForeignKey("To be defined.ID_Embrion"))
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"))
+
+#View de servicios sin diagnostico, para filtro rapido en App
+
+
+#DiagPre
+class DiagPreT(Base):
+    __tablename__ = "DiagPre"
+    IDdiagpre= Column(Integer, primary_key=True, index=True)
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    ID_Resultado = Column(Integer, ForeignKey("Actividades_vacas_resultado.ID_Resultado"))
+    Dias = Column(Integer, nullable=True) #calculated between diagpre date and service date
+    ID_servicio = Column(Integer, ForeignKey("Servicios.IDservicio"), nullable=True)
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"))
+    
+
+
+
 #log_traslados_vacas_lotes
 #parto_vaca_Full
 #RangoFechas_Vacas

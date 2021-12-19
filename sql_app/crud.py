@@ -774,7 +774,8 @@ def get_last_actividad(db: Session):
 '''
 
 ## Obtener actividades_vacas Mastitis
-def get_act_vacas(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : 
+def get_act_vacas(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, 
+                  operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : 
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
@@ -786,6 +787,28 @@ def get_act_vacas(db: Session, date1: str = '2020-01-01', date2: str = datetime.
     if operario:
         filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
     return db.query(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()
+
+def get_view_activacas(db: Session, vaca:Optional[str]=None, cod_oper:Optional[str]=None, operacion:Optional[str]=None, result:Optional[str]=None, categ:Optional[str]=None, operario:Optional[str]=None, 
+                       rol:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.ActividadesVacasView.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.ActividadesVacasView.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    if vaca:
+        filtros.append(models.ActividadesVacasView.Vaca == vaca)
+    if cod_oper:
+        filtros.append(models.ActividadesVacasView.Codigo_oper == cod_oper)
+    if operacion:
+        filtros.append(models.ActividadesVacasView.Operacion == operacion)
+    if result:
+        filtros.append(models.ActividadesVacasView.Resultado == result)
+    if categ:
+        filtros.append(models.ActividadesVacasView.Categoria == categ)
+    if operario:
+        filtros.append(models.ActividadesVacasView.Operario == operario)
+    if rol:
+        filtros.append(models.ActividadesVacasView.Rol == rol)
+    return db.query(models.ActividadesVacasView).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()
     
 '''    
 def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : # 
@@ -1016,6 +1039,52 @@ def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
     db.refresh(reg_celo) #descommented
     return  reg_celo.id_celo #"ok"
 
+#Registrar Peso
+def registrar_peso(db: Session, data: schemas.peso_Requi, id_to_use):   
+    #subida de datos a la API
+    reg_peso = models.PesosT(ID_ACTIVIDAD=id_to_use, Peso=data.Peso, ID_VACA=data.ID_VACA)
+    db.add(reg_peso)
+    db.commit()
+    db.refresh(reg_peso)
+    return "post_Registrar_Peso"
+
+def get_view_pesos(db: Session, id_vaca:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+    filtros=[]
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.Incre_Pesos_View.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Incre_Pesos_View.Fecha) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    if id_vaca:
+        filtros.append(models.Incre_Pesos_View.ID_VACA == id_vaca)
+    return db.query(models.Incre_Pesos_View).join(models.VacasT).filter(*filtros).all()
+
+
+#Registrar Servicio
+def registrar_servicio(db: Session, data: schemas.Servicios_Requi, id_to_use):   
+    #subida de datos a la API
+    reg_servicio = models.ServiciosT(ID_ACTIVIDAD=id_to_use, ID_VACA=data.ID_VACA, Sire=data.Sire, ID_Embrion=data.ID_Embrion)
+    db.add(reg_servicio)
+    db.commit()
+    db.refresh(reg_servicio)
+    return "post_Registrar_Servicio" 
+
+#Registrar Diagnostico Prenez
+def registrar_diagpre(db: Session, data: schemas.DiagPre_Requi, id_to_use):
+    """ change to get from main, and then post with calculated date in main
+    act_serv = db.query(models.ServiciosT).filter(models.ServiciosT.IDservicio == data.ID_servicio)
+    act_serv
+    print(act_serv)
+    act_serv = act_serv.ID_ACTIVIDAD
+    serv_date = db.query(models.ActividadesVacasT).filter(models.ActividadesVacasT.ID_Actividad == act_serv)
+    serv_date = serv_date.Fecha
+    days = (data.Fecha - serv_date).days
+    """
+    #subida de datos a la API
+    reg_diagpre = models.DiagPreT(ID_ACTIVIDAD=id_to_use, ID_VACA=data.ID_VACA, ID_servicio=data.ID_servicio, ID_Resultado=data.ID_Resultado, Dias=data.Dias)
+    db.add(reg_diagpre)
+    db.commit()
+    db.refresh(reg_diagpre)
+    return "post_Registrar_Diagpre" 
+    
 ##########################################################################################################
 
 
