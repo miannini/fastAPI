@@ -150,10 +150,10 @@ def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lot
     # Note: Client.list_blobs requires at least package version 1.17.0.
     blobs = storage_client.list_blobs(bucket_name, prefix=prefix,delimiter=delimiter)
     for blob in blobs:
-        if int(blob.name.split('/')[-1][0:8]) >= mindate and int(blob.name.split('/')[-1][0:8]) <= maxdate:
+        if int(blob.name.split('/')[-1].split('_')[-1][0:8]) >= mindate and int(blob.name.split('/')[-1].split('_')[-1][0:8]) <= maxdate:
             if lote is not None: #si ha restriccion de lote
                 if prop is not None: #tambien hay restriccion de propiedad
-                    if re.search(r'_'+re.escape(lote)+r'_'+re.escape(prop),blob.name):
+                    if re.search(re.escape(lote)+r'_'+re.escape(prop),blob.name):
                         lista.append(blob.name)
                 else:               #no hay restriccion de propiedad
                     if re.search(r'_'+re.escape(lote)+r'_',blob.name):
@@ -164,6 +164,32 @@ def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lot
                         lista.append(blob.name)
                 else:               #no hay restriccion de lote ni de propiedad
                     lista.append(blob.name)   
+    return lista
+
+### listar objetos de un bucket
+def list_spec_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lote=None, prop=None, mindate=0, maxdate=np.inf): #prefix is initial route, delimiter is '/', lote, prop
+    #cred
+    """Lists all the blobs in the bucket, with specified Lote and Prop."""
+    lista = []
+    #storage_client = storage.Client()
+    # Note: Client.list_blobs requires at least package version 1.17.0.
+    blobs = storage_client.list_blobs(bucket_name, prefix=prefix,delimiter=delimiter, timeout=120)
+    for blob in blobs:
+        #print(blob.name)
+        if int(blob.name.split('/')[-1].split('_')[-1][0:8]) >= mindate and int(blob.name.split('/')[-1].split('_')[-1][0:8]) <= maxdate:
+            #if lote is not None: #si ha restriccion de lote
+            #    if prop is not None: #tambien hay restriccion de propiedad
+            if re.search(re.escape(lote)+r'_'+re.escape(prop),blob.name):
+                lista.append(blob.name)
+            #    else:               #no hay restriccion de propiedad
+            #        if re.search(r'_'+re.escape(lote)+r'_',blob.name):
+            #            lista.append(blob.name)
+            #else:                   #no hay restriccion de lote
+            #    if prop is not None:    #si hay restriccion de propiedad
+            #        if re.search(r'_'+re.escape(prop),blob.name):
+            #            lista.append(blob.name)
+            #    else:               #no hay restriccion de lote ni de propiedad
+            #        lista.append(blob.name)   
     return lista
 
 #usar la funcion

@@ -31,7 +31,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 ##################################  security ############################################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-with open('GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source:
+with open('GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source: #local run ../ before GCP_secrets
     info = json.load(source)
     project_id = 'data-science-proj-280908'
 storage_credentials = service_account.Credentials.from_service_account_info(info)
@@ -901,9 +901,11 @@ async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strft
     mindate = int(''.join(date1.split('-')))
     maxdate = int(''.join(date2.split('-')))
     print(mindate,maxdate)
-    datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
-    open_file = GCP_functions.open_blob(storage_client,buck, datos[numero]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
-    return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
+    if lote is not None and prop is not None:
+        datos = GCP_functions.list_spec_blobs(storage_client,buck,images_route+str(id_cliente)+'/18NXM/lotes/'+lote+'/'+prop+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
+        #print(datos)
+        open_file = GCP_functions.open_blob(storage_client,buck, datos[numero]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
+        return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
 
 
 # https://stackoverflow.com/questions/61163024/return-multiple-files-from-fastapi
@@ -915,13 +917,14 @@ async def imagen_lotes(date1: str='2020-01-01', date2: str = datetime.now().strf
     mindate = int(''.join(date1.split('-')))
     maxdate = int(''.join(date2.split('-')))
     print(mindate,maxdate)
-    datos = GCP_functions.list_all_blobs(storage_client,buck,images_route+str(id_cliente)+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
-    results ={}
-    for dato in datos:
-        open_file = GCP_functions.open_blob(storage_client,buck, dato)
-        #results[str(dato.split('/')[-1])]: (StreamingResponse(io.BytesIO(open_file), media_type="image/png"))
-        results[str(dato.split('/')[-1])]: io.BytesIO(open_file)
-    return results
+    if lote is not None and prop is not None:
+        datos = GCP_functions.list_spec_blobs(storage_client,buck,images_route+str(id_cliente)+'/18NXM/lotes/'+lote+'/'+prop+'/','/', lote=lote, prop=prop, mindate=mindate, maxdate=maxdate)
+        results ={}
+        for dato in datos:
+            open_file = GCP_functions.open_blob(storage_client,buck, dato)
+            #results[str(dato.split('/')[-1])]: (StreamingResponse(io.BytesIO(open_file), media_type="image/png"))
+            results[str(dato.split('/')[-1])]: io.BytesIO(open_file)
+            return results
         
     
     #return StreamingResponse(io.BytesIO(GCP_functions.open_multi_blob(storage_client,buck, datos)), media_type="image/png")
