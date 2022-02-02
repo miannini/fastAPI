@@ -866,6 +866,10 @@ async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strfti
 def write_meteo(meteo: schemas.MeteorologiaT, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.registrar_meteo(db=db, meteo=meteo)
 
+@app.post("/Meteo_iot/", status_code=201, tags=["Estacion Meteorologica"]) #, response_model=schemas.Leche_Vacai)
+def wr_meteo_hora(met_iot: List[schemas.Meteo_iot], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.registrar_meteo_iot(db=db, met_iot=met_iot)
+
 @app.get("/Meteo_get/", response_model=List[schemas.MeteorologiaT], tags=["Estacion Meteorologica"])
 async def read_meteo_sta(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), estacion:Optional[str]=None, finca:Optional[str]=None, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)): 
     meteo_data = crud.get_meteo(db, date1=date1, date2=date2, estacion=estacion, finca=finca, id_cliente = current_user.ID_CLIENTE)# skip=skip, limit=limit)
@@ -906,6 +910,8 @@ async def imagen_lote(date1: str='2020-01-01', date2: str = datetime.now().strft
         #print(datos)
         open_file = GCP_functions.open_blob(storage_client,buck, datos[numero]) #, "../"+os.path.basename(datos[0].split('/')[-1]))
         return StreamingResponse(io.BytesIO(open_file), media_type="image/png")
+
+#To FIX: folders with more than 250 files will fail. be more flexible with undefined lote or property.
 
 
 # https://stackoverflow.com/questions/61163024/return-multiple-files-from-fastapi

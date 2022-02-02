@@ -715,4 +715,19 @@ class EstacionesT(Base):
     Fecha_instalacion = Column(DateTime, nullable=True)
     deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
+    
+class Meteo_iot(Base):
+    __tablename__ = "Meteo_iot"
+    ID_Estacion = Column(Integer, ForeignKey("Estaciones_Meteo.ID_Estacion"), primary_key=True) 
+    Date_Time = Column(DateTime, primary_key=True, index=True)
+    DHT_Humidity = Column(Float, nullable=True)
+    DHT_Temp = Column(Float, nullable=True)
+    DS18b20_cap = Column(Float, nullable=True)
+    Hum_Gnd = Column(Float, nullable=True)
+    Rain_mm = Column(Float, nullable=True)
+    Solar_Volt = Column(Float, nullable=True)
+    Sunlight = Column(Float, nullable=True)
+    Thermo_Couple = Column(Float, nullable=True)
+    Wind_Dir = Column(String(45), nullable=True)
+    Wind_Speed = Column(Float, nullable=True)
 ###########################################################################################################

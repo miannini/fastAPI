@@ -1126,4 +1126,20 @@ class EstacionesT(BaseModel):
     Fecha_instalacion : Optional [datetime] = None
     deshabilitado : Optional [int] = None
     Fecha_deshabilitado : Optional [datetime] = None
+
+class Meteo_iot(BaseModel):
+    ID_Estacion : int
+    Date_Time : datetime
+    DHT_Humidity : Optional [float] = None
+    DHT_Temp : Optional [float] = None
+    DS18b20_cap : Optional [float] = None
+    Hum_Gnd : Optional [float] = None
+    Rain_mm : Optional [float] = None
+    Solar_Volt : Optional [float] = None
+    Sunlight : Optional [float] = None
+    Thermo_Couple : Optional [float] = None
+    Wind_Dir : Optional [str] = None
+    Wind_Speed : Optional [float] = None
+    class Config:
+        orm_mode = True 
 ###########################################################################################################

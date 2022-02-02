@@ -149,6 +149,11 @@ def list_all_blobs(storage_client, bucket_name, prefix=None, delimiter=None, lot
     #storage_client = storage.Client()
     # Note: Client.list_blobs requires at least package version 1.17.0.
     blobs = storage_client.list_blobs(bucket_name, prefix=prefix,delimiter=delimiter)
+    #for page in blobs.pages:
+    #    print(page)
+    #    for blob in page:
+    #        print(blob.name)
+            
     for blob in blobs:
         if int(blob.name.split('/')[-1].split('_')[-1][0:8]) >= mindate and int(blob.name.split('/')[-1].split('_')[-1][0:8]) <= maxdate:
             if lote is not None: #si ha restriccion de lote

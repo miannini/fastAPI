@@ -1377,4 +1377,12 @@ def get_meteo(db: Session, date1: str = '2020-01-01', date2: str = datetime.now(
         filtros.append((models.EstacionesT.ID_Finca == finca))
     return db.query(models.MeteorologiaT).join(models.EstacionesT).join(models.FincaT).filter(*filtros).all()
 
+def registrar_meteo_iot(db: Session, met_iot: List[schemas.Meteo_iot]):
+    db_iot = []
+    for dictio in met_iot:
+        db_iot.append(models.Meteo_iot(**dictio.dict(exclude_unset=True)))
+    db.bulk_save_objects(db_iot)
+    db.commit()
+    return "post_Meteo_IoT=Success"
+
 ###########################################################################################################
