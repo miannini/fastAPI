@@ -867,7 +867,7 @@ def write_meteo(meteo: schemas.MeteorologiaT, db: Session = Depends(get_db)): #,
     return crud.registrar_meteo(db=db, meteo=meteo)
 
 @app.post("/Meteo_iot/", status_code=201, tags=["Estacion Meteorologica"]) #, response_model=schemas.Leche_Vacai)
-def wr_meteo_hora(met_iot: List[schemas.Meteo_iot], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+def wr_meteo_hora(met_iot: List[schemas.Meteo_iot], db: Session = Depends(get_db)): #To Avoid secure access, for Usage in RBPY. , current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.registrar_meteo_iot(db=db, met_iot=met_iot)
 
 @app.get("/Meteo_get/", response_model=List[schemas.MeteorologiaT], tags=["Estacion Meteorologica"])
