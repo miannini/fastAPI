@@ -1126,8 +1126,8 @@ def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optiona
         filtros.append(models.Leche_VacaT.ID_VACA == id_vaca)
     if id_leche_va:
         filtros.append(models.Leche_VacaT.ID_Leche_vaca== id_leche_va)
-    filtros.append(func.DATE(models.Leche_VacaT.FECHA) >= datetime.strptime(date1,'%Y-%m-%d').date())
-    filtros.append(func.DATE(models.Leche_VacaT.FECHA) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
+    filtros.append(func.DATE(models.Leche_VacaT.Fecha_c) >= datetime.strptime(date1,'%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Leche_VacaT.Fecha_c) <= datetime.strptime(date2,'%Y-%m-%d').date())
     return db.query(models.Leche_VacaT).join(models.VacasT).filter(*filtros).all()
     
 def create_leche_vacas(db: Session, le_va: schemas.Leche_VacaT):

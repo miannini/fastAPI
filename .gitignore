@@ -33,7 +33,7 @@ MANIFEST
 *.spec
 
 #own files
-sql_app/secrets.py
+api_folder/secrets.py
 GCP_secrets/
 *.json
 

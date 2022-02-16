@@ -923,10 +923,10 @@ class Leche_VacaT(BaseModel):
     #ID_Leche_vaca : int   
     ID_VACA : int
     ID_OPERARIO : Optional[int] = None
-    FECHA : datetime #datetime
-    Litros : Optional [float] = None
-    Ciclo_Lactancia : Optional[int] = None
-    Numero_Partos : Optional[int] = None
+    Fecha_c : datetime #datetime
+    Leche_lts : Optional [float] = None
+    #Ciclo_Lactancia : Optional[int] = None
+    #Numero_Partos : Optional[int] = None
     class Config:
         orm_mode = True 
 
@@ -936,10 +936,10 @@ class Leche_Vacai(Leche_VacaT):
 class Leche_VacaU(BaseModel):
     ID_VACA : Optional[int] = None
     ID_OPERARIO : Optional[int] = None
-    FECHA : Optional[datetime] = None
-    Litros : Optional [float] = None
-    Ciclo_Lactancia : Optional[int] = None
-    Numero_Partos : Optional[int] = None
+    Fecha_c : Optional[datetime] = None
+    Leche_lts : Optional [float] = None
+    #Ciclo_Lactancia : Optional[int] = None
+    #Numero_Partos : Optional[int] = None
     class Config:
         orm_mode = True 
 

@@ -522,10 +522,10 @@ class Leche_VacaT(Base):
     ID_Leche_vaca = Column(Integer, primary_key=True, index=True)    #, ForeignKey("Actividades_Vacas.ID_Actividad")
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
-    FECHA = Column(DateTime)
-    Litros = Column(Float, nullable=True)
-    Ciclo_Lactancia = Column(Integer, nullable=True)    ## deberia ir en vaca
-    Numero_Partos = Column(Integer, nullable=True)      ##deberia ir en vaca
+    Fecha_c = Column(DateTime)
+    Leche_lts = Column(Float, nullable=True)
+    #Ciclo_Lactancia = Column(Integer, nullable=True)    ## deberia ir en vaca
+    #Numero_Partos = Column(Integer, nullable=True)      ##deberia ir en vaca
 
 #Leche_Entregada
 class Leche_EntregadaT(Base):

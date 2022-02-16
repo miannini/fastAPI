@@ -829,7 +829,7 @@ def wr_result_tanque(ta_re: schemas.Resultados_TanquesT, db: Session = Depends(g
 ###########################################################################################################
 
 ######################################### OTRAS FUENTES LOTES   #########################################
-@app.post("/Wr_lotes_variables/", status_code=201, tags=["Otras Fuentes Lotes"]) #, response_model=schemas.Leche_Vacai)
+@app.post("/Wr_lotes_variables/", status_code=201, tags=["Otras Fuentes Lotes"])
 def wr_lotes_var(lo_va: List[schemas.Lotes_variablesT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_var(db=db, lo_va=lo_va)
 
@@ -837,7 +837,7 @@ def wr_lotes_var(lo_va: List[schemas.Lotes_variablesT], db: Session = Depends(ge
 
 #patch
 
-@app.post("/Wr_lotes_quimicos/", status_code=201, tags=["Otras Fuentes Lotes"]) #, response_model=schemas.Leche_Vacai)
+@app.post("/Wr_lotes_quimicos/", status_code=201, tags=["Otras Fuentes Lotes"])
 def wr_lotes_qui(lo_qu: List[schemas.Lotes_quimicosT], db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_lotes_qui(db=db, lo_qu=lo_qu)
 
@@ -849,7 +849,7 @@ def wr_lotes_qui(lo_qu: List[schemas.Lotes_quimicosT], db: Session = Depends(get
 ###########################################################################################################
 
 ##########################################  Monitoreo procesamiento imagenes satel   ######################
-@app.post("/Wr_monitoreo_descargas/", status_code=201, tags=["Monitoreo Descargas satelitales"]) #, response_model=schemas.Leche_Vacai)
+@app.post("/Wr_monitoreo_descargas/", status_code=201, tags=["Monitoreo Descargas satelitales"])
 def wr_moni_des(mo_des: schemas.monitoreo_descargas_sentinelT, db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_moni_des(db=db, mo_des=mo_des)
 
@@ -866,7 +866,7 @@ async def read_meteo(date1: str='2020-01-01', date2: str = datetime.now().strfti
 def write_meteo(meteo: schemas.MeteorologiaT, db: Session = Depends(get_db)): #, current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.registrar_meteo(db=db, meteo=meteo)
 
-@app.post("/Meteo_iot/", status_code=201, tags=["Estacion Meteorologica"]) #, response_model=schemas.Leche_Vacai)
+@app.post("/Meteo_iot/", status_code=201, tags=["Estacion Meteorologica"])
 def wr_meteo_hora(met_iot: List[schemas.Meteo_iot], db: Session = Depends(get_db)): #To Avoid secure access, for Usage in RBPY. , current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.registrar_meteo_iot(db=db, met_iot=met_iot)
 

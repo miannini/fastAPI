@@ -1,12 +1,20 @@
 ### FastAPI development used for Herd-management App
 
-- App Folder / Contains all python required files to run the API;
+- api_folder / Contains all python required files to run the API;
 - Requirements: List of all required libraries to run the API in Python;
 
 
 # API developed using fastAPI for Python
+to Run it, execute:
+- uvicorn api_folder.main:app --reload
 
+to explore locally the content, open the browser and got to:
+- http://127.0.0.1:8000/docs
 
+to deploy in GCP:
+- push the changes ti GitHub
+- Pull the changes in GCP, fastAPI folder
+- 
 **Table of Contents**
 
 [TOCM]
