@@ -14,7 +14,9 @@ to explore locally the content, open the browser and got to:
 to deploy in GCP:
 - push the changes ti GitHub
 - Pull the changes in GCP, fastAPI folder
-- 
+- gcloud app deploy app.yaml
+  - when prompted, authorize and then type "y" to deploy the service
+
 **Table of Contents**
 
 [TOCM]
