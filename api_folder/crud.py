@@ -1083,9 +1083,10 @@ def registrar_diagpre(db: Session, data: schemas.DiagPre_Requi, id_to_use):
     db.add(reg_diagpre)
     db.commit()
     db.refresh(reg_diagpre)
-    return "post_Registrar_Diagpre" 
-    
-##########################################################################################################
+    return "post_Registrar_Diagpre"
+
+def get_dif_parto(db: Session):
+    return db.query(models.Dificultad_PartoT).all()
 
 
 #########################################    LECHE    #####################################################     

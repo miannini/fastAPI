@@ -493,6 +493,11 @@ class DiagPreT(Base):
     ID_servicio = Column(Integer, ForeignKey("Servicios.IDservicio"), nullable=True)
     ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"))
     
+#Dificultad parto
+class Dificultad_PartoT(Base):
+    __tablename__ = "Dificultad_Parto"
+    ID_dificultad= Column(Integer, primary_key=True, index=True)
+    Dificultad = Column(String(45), nullable=True)
 
 
 

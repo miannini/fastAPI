@@ -701,6 +701,12 @@ async def write_diagpre(data: schemas.DiagPre_Requi, db: Session = Depends(get_d
     id_to_use
     id_to_use = id_to_use.ID_Actividad 
     return crud.registrar_diagpre(db=db, data=data, id_to_use=id_to_use)
+
+@app.get("/Dificultad_parto/", response_model=List[schemas.Dificultad_PartoT], tags=["Actividades-Vacas"])
+async def get_dif_parto(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    dif_parto = crud.get_dif_parto(db)
+    return dif_parto
+
 ##########################################################################################################
 
 

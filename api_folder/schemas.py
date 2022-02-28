@@ -884,6 +884,13 @@ class DiagPre_Requi(BaseModel):
     #IDdiagpre : int
     #ID_ACTIVIDAD : int
 
+class Dificultad_PartoT(BaseModel):
+    ID_dificultad: int
+    Dificultad : str
+    class Config:
+        orm_mode = True
+
+
 ##########################################################################################################
 
 
