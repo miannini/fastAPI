@@ -13,8 +13,9 @@ import pymysql
 DB_USER = secrets.DB_USER
 PASSWORD = secrets.PASSWORD
 IP = secrets.IP
+SCHEMA = secrets.SCHEMA
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+PASSWORD+"@"+IP+"/lv_test"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+PASSWORD+"@"+IP+SCHEMA
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
