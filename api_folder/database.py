@@ -9,13 +9,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import pymysql
+from api_folder.encrypt import decrypt
+import os
 
-DB_USER = secrets.DB_USER
-PASSWORD = secrets.PASSWORD
-IP = secrets.IP
-SCHEMA = secrets.SCHEMA
+DB_USER = decrypt(str.encode(os.getenv('DB_USER')), secrets.key).decode()
+PASSWORD = decrypt(str.encode(os.getenv('PASSWORD')), secrets.key).decode()
+IP = decrypt(str.encode(os.getenv('IP')), secrets.key).decode()
+SCHEMA = os.getenv('SCHEMA')
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+PASSWORD+"@"+IP+SCHEMA
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+PASSWORD+"@"+IP+"/"+SCHEMA
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL

@@ -16,8 +16,11 @@ to deploy in GCP:
 - Pull the changes in GCP, fastAPI folder
 - gcloud app deploy app.yaml
   - when prompted, authorize and then type "y" to deploy the service
+* To deploy Prod and Test Versions use:
+  ***gcloud app deploy app.yaml test.yaml***
 
-**Table of Contents**
+
+  **Table of Contents**
 
 [TOCM]
 
