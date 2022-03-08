@@ -592,6 +592,27 @@ class tipo_origenT(BaseModel):
     Fecha_deshabilitado : Optional [datetime] = None
     class Config:
         orm_mode = True
+
+class eventosT(BaseModel):
+    ID_evento: int
+    evento: Optional [str] = None
+    class Config:
+        orm_mode = True
+
+class Precios_VacasT(BaseModel):
+    #ID_Precios: int
+    ID_Vaca: Optional [int] = None
+    ID_razon: Optional [int] = None
+    Fecha: Optional [datetime] = None
+    precio: Optional [int] = None
+    tipo_moneda: Optional [str] = None
+    class Config:
+        orm_mode = True
+
+class Precios_get(Precios_VacasT):
+    ID_Precios: int
+    class Config:
+        orm_mode = True
 #########################################################################################################
 
 

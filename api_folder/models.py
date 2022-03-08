@@ -324,7 +324,20 @@ class tipo_origenT(Base):
     Descripcion = Column(String(45), nullable=True)
     deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
-    
+
+class eventosT(Base):
+    __tablename__ = "eventos"
+    ID_evento= Column(Integer,  primary_key=True)
+    evento = Column(String(45), nullable=True)
+
+class Precios_VacasT(Base):
+    __tablename__ = "Precios_Vacas"
+    ID_Precios= Column(Integer,  primary_key=True)
+    ID_Vaca = Column(Integer,  ForeignKey("vacas.ID_VACA"))
+    ID_razon = Column(Integer, ForeignKey("eventos.ID_evento"))
+    Fecha = Column(DateTime, nullable=True)
+    precio = Column(Integer, nullable=True)
+    tipo_moneda = Column(String(45), nullable=True)
 #########################################################################################################
 
 

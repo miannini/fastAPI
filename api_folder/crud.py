@@ -724,6 +724,28 @@ def get_sires(db: Session, id_sire:Optional[int]=None, id_oficial:Optional[str]=
         return db.query(models.siresT).filter(*filtros).all()
     else:
         return db.query(models.siresT).all()
+
+def get_eventos(db: Session):
+    return db.query(models.eventosT).all()
+
+def get_precios_vacas(db: Session, date1: str='2020-01-01', date2: str=datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None,
+                  razon: Optional[str]=None , id_cliente: str = 0):
+    filtros = []
+    filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
+    filtros.append(func.DATE(models.Precios_VacasT.Fecha) >= datetime.strptime(date1, '%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Precios_VacasT.Fecha) <= datetime.strptime(date2, '%Y-%m-%d').date())
+    if vaca:
+        filtros.append((models.Precios_VacasT.ID_Vaca == vaca))
+    if razon:
+        filtros.append((models.Precios_VacasT.ID_razon == razon))
+    return db.query(models.Precios_VacasT).join(models.VacasT).filter(*filtros).all()
+
+def write_precios_vaca(db: Session, sch_pre: schemas.Precios_VacasT, id_cliente: str = 0):
+    reg_pre = models.Precios_VacasT(**sch_pre.dict())
+    db.add(reg_pre)
+    db.commit()
+    db.refresh(reg_pre) #descommented
+    return "post_Registrar_precio_vaca"
 #########################################################################################################
 
 

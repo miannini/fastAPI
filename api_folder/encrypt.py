@@ -16,5 +16,3 @@ def decrypt(token: bytes, key: bytes) -> bytes:
 
 #token = enc_user
 #dec_user = decrypt(token, key).decode()
-
-#print('aqui voy')
