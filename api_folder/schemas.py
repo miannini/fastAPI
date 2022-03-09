@@ -772,30 +772,30 @@ class PartosT(BaseModel):
         orm_mode = True 
     
 class Parto_Requi(BaseModel):
-    ID_VACA : int
-    ID_TipoOperacion : int = 1
-    ID_Resultado : int = 1
-    ID_OPERARIO : int = 35
-    ID_Categoria : int = 1
-    Fecha  : Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
-    Comentario : Optional[str] = None
-    Fecha_programada : Optional[datetime] = None
-    Sire : Optional [int] = None
+    ID_VACA: int
+    ID_TipoOperacion: int = 1
+    ID_Resultado: int = 1
+    ID_OPERARIO: int = 35
+    ID_Categoria: int = 1
+    Fecha: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    Comentario: Optional[str] = None
+    Fecha_programada: Optional[datetime] = None
+    Sire: Optional[int] = None
     Dificultad: Optional[str] = None
     class Config:
         orm_mode = True 
 
 class Ubicacion_VacasT(BaseModel):
-    ID_VACA : Optional [int] = None
-    ID_HATO : Optional [int] = None
-    ID_LOTE : Optional [int] = None
+    ID_VACA : Optional[int] = None
+    ID_HATO : Optional[int] = None
+    ID_LOTE : Optional[int] = None
     class Config:
         orm_mode = True 
 
 class Ubicacion_VacasBasic(BaseModel):
     #ID_VACA : Optional [int] = None
-    ID_HATO : Optional [int] = None
-    ID_LOTE : Optional [int] = None    
+    ID_HATO : Optional[int] = None
+    ID_LOTE : Optional[int] = None
     class Config:
         orm_mode = True 
 
