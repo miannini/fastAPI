@@ -766,7 +766,8 @@ class PartosT(BaseModel):
     ID_VACA : int
     Numero_Parto : Optional [int] = None
     Sire : Optional [int] = None
-    ID_ACTIVIDAD : Optional [int] = None
+    ID_ACTIVIDAD : Optional[int] = None
+    Dificultad: Optional[str] = None
     class Config:
         orm_mode = True 
     
@@ -780,6 +781,7 @@ class Parto_Requi(BaseModel):
     Comentario : Optional[str] = None
     Fecha_programada : Optional[datetime] = None
     Sire : Optional [int] = None
+    Dificultad: Optional[str] = None
     class Config:
         orm_mode = True 
 

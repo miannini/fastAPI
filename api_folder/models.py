@@ -381,6 +381,7 @@ class PartosT(Base):
     Numero_Parto = Column(Integer, nullable=True)
     Sire = Column(Integer, nullable=True)
     ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), nullable=True)
+    Dificultad = Column(String(250), nullable=True)
 
 class ActividadesVacasT(Base):
     __tablename__ = "Actividades_Vacas"

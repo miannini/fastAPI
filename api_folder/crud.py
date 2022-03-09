@@ -979,7 +979,8 @@ def get_max_partos(db: Session, vaca:Optional[str]=None, id_cliente: str = 0):
 ### Registrar Partos
 def registrar_parto(db: Session, data: schemas.Parto_Requi, id_to_use, numero):
     #subida de datos a la API
-    reg_parto = models.PartosT(ID_VACA=data.ID_VACA, Numero_Parto=numero, Sire=data.Sire, ID_ACTIVIDAD=id_to_use) #IDparto=0, 
+    reg_parto = models.PartosT(ID_VACA=data.ID_VACA, Numero_Parto=numero, Sire=data.Sire, ID_ACTIVIDAD=id_to_use,
+                               Dificultad=data.Dificultad)
     db.add(reg_parto)
     db.commit()
     db.refresh(reg_parto)
