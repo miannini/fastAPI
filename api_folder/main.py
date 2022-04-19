@@ -11,6 +11,7 @@ from fastapi import Depends, FastAPI, HTTPException, status, Response, File, Upl
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from sqlalchemy.orm import Session, joinedload
 from datetime import timedelta, date, datetime
 from typing import Optional
@@ -21,6 +22,7 @@ from .database import SessionLocal, engine
 import pandas as pd
 import io
 import os
+import time
 import json
 from google.oauth2 import service_account
 from google.cloud import storage
@@ -124,7 +126,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 ##############################################################################################
 
 
@@ -304,8 +306,12 @@ def update_operario(Operario_ID: int, operario: schemas.OperarioC, db: Session =
 @app.get("/Fincas/", response_model=List[schemas.FincaT], tags=["Fincas"])
 def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
                 finca:Optional[int]=None, nombre:Optional[str]=None):
+    #start_time = time.time()
     fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
+    # print("Time took to process the request and return response is {} sec".format(time.time() - start_time))
     return fincas
+
+
 
 @app.get("/Fincas_small/", response_model=List[schemas.FincaR], tags=["Fincas"])
 def read_fincass(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
