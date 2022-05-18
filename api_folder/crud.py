@@ -1054,13 +1054,6 @@ def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=
         filtros.append(models.Traslado_VacasT.ID_VACA == id_vaca)
     return db.query(models.Traslado_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all()
 
-def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
-    #reg_celo = models.celoT(**sch_celo.dict())  
-    reg_celo = models.celoT(ID_vaca=1234, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S") , celotron=987654321)  
-    db.add(reg_celo)
-    db.commit()
-    db.refresh(reg_celo) #descommented
-    return  reg_celo.id_celo #"ok"
 
 #Registrar Peso
 def registrar_peso(db: Session, data: schemas.peso_Requi, id_to_use):   
@@ -1410,3 +1403,18 @@ def registrar_meteo_iot(db: Session, met_iot: List[schemas.Meteo_iot]):
     return "post_Meteo_IoT=Success"
 
 ###########################################################################################################
+
+def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
+    #reg_celo = models.celoT(**sch_celo.dict())
+    reg_celo = models.celoT(ID_vaca=1234, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S") , celotron=987654321)
+    db.add(reg_celo)
+    db.commit()
+    db.refresh(reg_celo) #descommented
+    return reg_celo.id_celo #"ok"
+
+def registrar_celo(db: Session, celo: schemas.celo_gsmT):
+    reg_celo_gsm = models.celo_gsmT(**celo.dict())
+    db.add(reg_celo_gsm)
+    db.commit()
+    #db.refresh(reg_celo_gsm)
+    return "post_celo_gsm= OK"

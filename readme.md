@@ -5,18 +5,21 @@
 
 
 # API developed using fastAPI for Python
-to Run it, execute:
+to Run it locally, execute:
 - uvicorn api_folder.main:app --reload
+- Don't try to debug or run with pycharm buttons, only use Pycharm terminal
+
 
 to explore locally the content, open the browser and got to:
 - http://127.0.0.1:8000/docs
 
 to deploy in GCP:
-- push the changes ti GitHub
+- push the changes to GitHub
 - Pull the changes in GCP, fastAPI folder
 - gcloud app deploy app.yaml
   - when prompted, authorize and then type "y" to deploy the service
-* To deploy Prod and Test Versions use:
+
+* To deploy Prod and Test Versions use: \
   ***gcloud app deploy app.yaml test.yaml***
 
 

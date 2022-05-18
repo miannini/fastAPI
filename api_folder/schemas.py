@@ -835,20 +835,6 @@ class CriasT(BaseModel):
     class Config:
         orm_mode = True
 
-class celoT(BaseModel):
-    #id_celo: int
-    ID_vaca: int
-    date: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    celotron: Optional[int] = None
-    class Config:
-        orm_mode = True
-
-
-class celo_get(celoT):
-    id_celo: int
-    class Config:
-        orm_mode = True
-
 
 #Pesos
 class peso_Requi(BaseModel):
@@ -1173,3 +1159,32 @@ class Meteo_iot(BaseModel):
     class Config:
         orm_mode = True
 ###########################################################################################################
+
+class celoT(BaseModel):
+    #id_celo: int
+    ID_vaca: int
+    date: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    celotron: Optional[int] = None
+    class Config:
+        orm_mode = True
+
+
+class celo_get(celoT):
+    id_celo: int
+    class Config:
+        orm_mode = True
+
+
+class celo_gsmT(BaseModel):
+    tag: int
+    date: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    sensor: Optional[int] = None
+    battery: Optional[float] = None
+    duration: Optional[int] = None
+    class Config:
+        orm_mode = True
+
+class celo_gsm_get(celo_gsmT):
+    id_celo_gsm: int
+    class Config:
+        orm_mode = True

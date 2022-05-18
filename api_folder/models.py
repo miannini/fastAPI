@@ -457,14 +457,7 @@ class Traslado_VacasT(Base):
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
     ID_HATO = Column(Integer, ForeignKey("Hatos.ID_HATO"))
     ID_OPERARIO = Column(Integer, ForeignKey("Operario.ID_OPERARIO"), nullable=True)
-    
-class celoT(Base):
-    __tablename__ = "celo"
-    id_celo = Column(Integer, primary_key=True, index=True)
-    ID_vaca = Column(Integer, ForeignKey("vacas.ID_VACA"))
-    date = Column(DateTime, nullable=True)
-    celotron = Column(Integer, nullable=True)
-    
+
 
 #Pesos
 class PesosT(Base):
@@ -750,3 +743,20 @@ class Meteo_iot(Base):
     Wind_Dir = Column(String(45), nullable=True)
     Wind_Speed = Column(Float, nullable=True)
 ###########################################################################################################
+
+class celoT(Base):
+    __tablename__ = "celo"
+    id_celo = Column(Integer, primary_key=True, index=True)
+    ID_vaca = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    date = Column(DateTime, nullable=True)
+    celotron = Column(Integer, nullable=True)
+
+
+class celo_gsmT(Base):
+    __tablename__ = "celo_gsm"
+    id_celo_gsm = Column(Integer, primary_key=True, index=True)
+    tag = Column(String(45)) #, ForeignKey("celotron_tags.TAG_NAME"))
+    date = Column(DateTime, nullable=True)
+    sensor = Column(Integer, nullable=True)
+    battery = Column(Float, nullable=True)
+    duration = Column(Integer, nullable=True)

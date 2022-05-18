@@ -1174,4 +1174,6 @@ async def celo_detect(db: Session = Depends(get_db)):
     crud.sms_celo()
     return str(resp)
 
-#invalid content type application-json
+@app.post("/Heat_GSM/", status_code=200, tags=["Deteccion Celo"])
+def write_celo(celo: schemas.celo_gsmT, db: Session = Depends(get_db)):
+    return crud.registrar_celo(db=db, celo=celo)

@@ -10,9 +10,12 @@ def encrypt(message: bytes, key: bytes) -> bytes:
 def decrypt(token: bytes, key: bytes) -> bytes:
     return Fernet(key).decrypt(token)
 
+
 """Manually encrypt each variable, and store the encrypted value in the YML files as ENV Variable"""
-#message = 'here copy string'
+#message = "type message"
 #enc_user = encrypt(message.encode(), key)
 
 #token = enc_user
 #dec_user = decrypt(token, key).decode()
+
+#print(enc_user)
