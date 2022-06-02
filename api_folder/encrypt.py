@@ -13,7 +13,7 @@ def decrypt(token: bytes, key: bytes) -> bytes:
 
 
 """Manually encrypt each variable, and store the encrypted value in the YML files as ENV Variable"""
-message = "35.185.0.199" #"type message"
+#message = "35.185.0.199" #"type message"
 #en_ucser = encrypt(message.encode(), key)
 
 #token = enc_user
