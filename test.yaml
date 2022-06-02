@@ -1,4 +1,4 @@
-service: test_new
+service: test-new
 runtime: python37
 instance_class: F4
 entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker api_folder.main:app
