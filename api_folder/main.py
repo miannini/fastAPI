@@ -112,10 +112,10 @@ tags_metadata = [
 
 # APP
 app = FastAPI(
-    title="My Kau API project",
-    description= "This is the API for connecting MySQL 8.0 DB to the APP, Dashboard and other front ends",
-    version="0.0.2",
-    openapi_tags=tags_metadata
+    title = "My Kau API project",
+    description = "This is the API for connecting MySQL 8.0 DB to the APP, Dashboard and other front ends",
+    version = "0.0.3",
+    openapi_tags = tags_metadata
     )
 ################################  CORS   ######################################################
 app.add_middleware(
