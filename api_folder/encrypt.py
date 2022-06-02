@@ -13,10 +13,10 @@ def decrypt(token: bytes, key: bytes) -> bytes:
 
 
 """Manually encrypt each variable, and store the encrypted value in the YML files as ENV Variable"""
-message = "type message"
-enc_user = encrypt(message.encode(), key)
+#message = "type message"
+#enc_user = encrypt(message.encode(), key)
 
-token = enc_user
-dec_user = decrypt(token, key).decode()
+#token = enc_user
+#dec_user = decrypt(token, key).decode()
 
-print(enc_user)
+#print(enc_user)
