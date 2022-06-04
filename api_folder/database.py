@@ -14,7 +14,7 @@ import os
 
 DB_USER = decrypt(str.encode(os.getenv('DB_USER')), secrets.key).decode()
 PASSWORD = decrypt(str.encode(os.getenv('PASSWORD')), secrets.key).decode()
-IP = decrypt(str.encode(os.getenv('IP')), secrets.key).decode()
+IP = os.getenv('IP')
 SCHEMA = os.getenv('SCHEMA')
 
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://"+DB_USER+":"+PASSWORD+"@"+IP+"/"+SCHEMA
