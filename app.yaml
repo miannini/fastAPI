@@ -6,5 +6,5 @@ entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker api_folder.main:app
 env_variables:
   DB_USER: 'gAAAAABiJoGk7NPCI5dpjFgllYIdxTy6LHKb48KNP6Gv3qaMJO5UqS6d3-eqKj93UFexTHSVixTN0iPf0vHytZI4UDq6w1wClQ=='
   PASSWORD: 'gAAAAABiJoQuMjEDYj_zzspyV_07jh0y5RDfTqPRLeOZUAlQ8XDRIrcg-oDnB1GQJ4wL7h-k2fxkzU_yPUu4SG0DCupkQh4fCA=='
-  IP: 'gAAAAABiJoRcAqupxE-lTJ48LrL7ZthsnDs31pRaDR7_VGc1URom0AmlAS7-Fvlnc4WiR9du4XbQZHWALQZHeJStCIuyIdqu_g=='
+  IP: 'gAAAAABinLyYidmSPjpZkn7e5CfU8_26-bNmgQwMlWxE1LZs-SjBNcXlbi3OdUrAQJOYW9ECHNbzXnfn__5g2opj3llcgyFtQQ=='
   SCHEMA: Prod

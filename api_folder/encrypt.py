@@ -4,7 +4,6 @@ from cryptography.fernet import Fernet
 #key = Fernet.generate_key()  # store in a secure location
 #print("Key:", key.decode())
 
-
 def encrypt(message: bytes, key: bytes) -> bytes:
     return Fernet(key).encrypt(message)
 
@@ -13,7 +12,7 @@ def decrypt(token: bytes, key: bytes) -> bytes:
 
 
 """Manually encrypt each variable, and store the encrypted value in the YML files as ENV Variable"""
-#message = "35.194.36.107" #"type message"
+#message = "type message"
 #enc_user = encrypt(message.encode(), key)
 
 #token = enc_user
