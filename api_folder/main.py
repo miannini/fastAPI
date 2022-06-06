@@ -1177,3 +1177,8 @@ async def celo_detect(db: Session = Depends(get_db)):
 @app.post("/Heat_GSM/", status_code=200, tags=["Deteccion Celo"])
 def write_celo(celo: schemas.celo_gsmT, db: Session = Depends(get_db)):
     return crud.registrar_celo(db=db, celo=celo)
+
+@app.get("/Get_Heat_GSM/", response_model=List[schemas.celo_gsm_get], tags=["Deteccion Celo"])
+def read_celo(db: Session = Depends(get_db)):
+    celo_data = crud.get_celo_gsm(db)
+    return celo_data

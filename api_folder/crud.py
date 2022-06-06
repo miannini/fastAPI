@@ -1418,3 +1418,6 @@ def registrar_celo(db: Session, celo: schemas.celo_gsmT):
     db.commit()
     #db.refresh(reg_celo_gsm)
     return "post_celo_gsm= OK"
+
+def get_celo_gsm(db: Session) :
+    return db.query(models.celo_gsmT).all()
