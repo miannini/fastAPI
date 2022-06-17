@@ -756,6 +756,38 @@ async def tras_ubica_vacas(sch_ubi: schemas.Ubicacion_VacasT, db: Session = Depe
             raise HTTPException(status_code=404, detail="Traslado no registrado")   
     return db_tras_vaca
 
+
+@app.post("/Traslado_vaca_list/", status_code=201, tags=["Actividades-Vacas"])
+async def tras_ubica_vacas_list(sch_ubi: List[schemas.Ubicacion_VacasT], db: Session = Depends(get_db),
+                           Fecha_Traslado: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                           current_user: schemas.UserInfo = Depends(get_current_active_user)):
+
+    for n in range(len(sch_ubi)):
+        sch_ubi_local = sch_ubi[n]
+        # obtener lote_id del hato al que se mueve la vaca
+        id_lote = crud.get_ubha(db, id_hato=sch_ubi_local.ID_HATO, id_cliente=current_user.ID_CLIENTE)
+        id_lote2 = pd.DataFrame.from_records([s.__dict__ for s in id_lote])
+        id_lote2.reset_index(drop=True, inplace=True)
+        id_lote = id_lote2.ID_LOTE.mode()
+        # actualizar diccionario incluyendo datos del lote
+        sch_ubi_local.ID_LOTE=int(id_lote)
+        #actualizar datos de ubicacion
+        updated = crud.update_ubica_vaca(db=db, sch_ubi=sch_ubi_local, id_cliente= current_user.ID_CLIENTE)
+        if updated == 'ok':
+            print('ok')
+            #si la ubicacion ya existia y se actualizo, entonces escribir nuevo traslado id
+            db_tras_vaca = crud.write_trasvaca(db=db, sch_ubi=sch_ubi_local, Fecha_Traslado=Fecha_Traslado, id_cliente=current_user.ID_CLIENTE)
+            if db_tras_vaca is None:
+                raise HTTPException(status_code=404, detail="Traslado no registrado")
+        #si la ubicacion no existia, entonces escribir nueva ubicacion y nuevo traslado
+        else:
+            print('Vaca es nueva')
+            crud.write_ubi_vaca(db=db, sch_ubi=sch_ubi_local, id_cliente=current_user.ID_CLIENTE)
+            db_tras_vaca = crud.write_trasvaca(db=db, sch_ubi=sch_ubi_local, Fecha_Traslado=Fecha_Traslado, id_cliente=current_user.ID_CLIENTE)
+            if db_tras_vaca is None:
+                raise HTTPException(status_code=404, detail="Traslado no registrado")
+    return "ok"
+
 #patch traslado vacas
 
 #Pesos

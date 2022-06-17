@@ -1029,7 +1029,7 @@ def update_ubica_vaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, id_cliente
     data = db.query(models.Ubicacion_VacasT).join(models.VacasT).join(models.HatosT).filter(*filtros).all()
     print (data)
     if len(data) > 0:
-        db.query(models.Ubicacion_VacasT).filter(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA).update(sch_ubi.dict(exclude_unset=True)) #(ID_VACA=sch_ubi.ID_VACA, ID_HATO=sch_ubi.ID_HATO, ID_LOTE=id_lote) 
+        db.query(models.Ubicacion_VacasT).filter(models.Ubicacion_VacasT.ID_VACA == sch_ubi.ID_VACA).update(sch_ubi.dict(exclude_unset=True))
         db.commit() 
         return "ok"
  
