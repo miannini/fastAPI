@@ -4,10 +4,10 @@ Created on Tue Dec 15 20:17:18 2020
 
 @author: Marcelo
 """
-from fastapi import HTTPException
+from fastapi import HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_, inspect
-from typing import Optional, List
+from typing import Optional, List, Union
 from . import models, schemas, secrets
 from datetime import date, datetime
 from passlib.context import CryptContext
@@ -549,11 +549,13 @@ def get_ulti_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Option
 
 
 ########################################    HATOS     ####################################################    
-def get_hatos(db: Session, id_finca:Optional[int]=None, id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None,  id_cliente: str = 0):
+def get_hatos(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None,  id_cliente: str = 0):
+    # Optional[int]=None,
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     if id_finca:
-        filtros.append((models.HatosT.ID_FINCA == id_finca))
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
+        # filtros.append((models.HatosT.ID_FINCA == id_finca))
     if id_hato:
         filtros.append((models.HatosT.ID_HATO == id_hato))
     if nombre:

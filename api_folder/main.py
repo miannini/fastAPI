@@ -7,7 +7,7 @@ Created on Tue Dec 15 20:25:17 2020
 
 from typing import List, Union
 
-from fastapi import Depends, FastAPI, HTTPException, status, Response, File, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, status, Response, File, UploadFile, Query
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -390,8 +390,8 @@ def wr_variedad_culti(variedad: schemas.variedad_cultivoT, db: Session = Depends
 #########################################  ACTIVIDADES LOTES  ############################################
 @app.get("/Acti_Lotes/", response_model=List[schemas.Actividades_LotesT], tags=["Actividades-Lotes"])
 def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
-                    id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None,
-                    nombre_oper:Optional[str]=None, date1: str = '2020-01-01',
+                    id_finca: Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None,
+                    nombre_oper: Optional[str]=None, date1: str = '2020-01-01',
                     date2: str = datetime.now().strftime("%Y-%m-%d")):
     acti_lotes = crud.get_acti_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre_lote=nombre_lote,
                                      nombre_oper=nombre_oper, date1=date1, date2=date2, id_cliente=current_user.ID_CLIENTE)
@@ -434,8 +434,8 @@ def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_ha
     hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, tipo=tipo, id_cliente=current_user.ID_CLIENTE)
     return hatos
 
-@app.get("/Hatos_small/", response_model=List[schemas.HatosR], tags=["Hatos"])
-def read_hatoss(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_hato:Optional[int]=None,
+@app.get("/Hatos_small/", response_model=List[schemas.HatosR], tags=["Hatos"]) # id_finca:Optional[int]=None,
+def read_hatoss(db: Session = Depends(get_db), id_finca: Union[List[int], None] = Query(default=None), id_hato:Optional[int]=None,
                 nombre:Optional[str]=None, tipo:Optional[str]=None,
                 current_user: schemas.UserInfo = Depends(get_current_active_user)):
     hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, id_cliente=current_user.ID_CLIENTE)
