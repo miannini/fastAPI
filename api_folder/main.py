@@ -237,6 +237,20 @@ def update_permisos(User_ID: int, permiso: schemas.PermisosU, db: Session = Depe
         raise HTTPException(status_code=404, detail="User_ID not found")
     return db_permiso_id
 
+@app.get("/User_priv_finca/{User_ID}", response_model=schemas.New_List_Users_FincasT, tags=["Users"]) #response_model=List[schemas.New_List_Users_FincasT]
+def read_users_priv_finca(User_ID: int, db: Session = Depends(get_db),
+                          current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    fincas_auth = crud.get_fincas_user(db, user_id=User_ID, id_cliente=current_user.ID_CLIENTE)
+    if fincas_auth != []:
+        new_fincasa = pd.DataFrame.from_records([s.__dict__ for s in fincas_auth])
+        # print(new_fincasa['ID_FINCA'].to_list())
+        new_fincas = {"fincas": new_fincasa['ID_FINCA'].to_list()}
+        return new_fincas
+    else:
+        return []
+
+
+
 ###################################################################################################
 
 

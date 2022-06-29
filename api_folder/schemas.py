@@ -115,7 +115,27 @@ class PermisosU(BaseModel):
     Lotes: Optional[int] = None
     class Config:
         orm_mode = True
-    
+
+class API_Users_FincasT(BaseModel):
+    ID: int
+    ID_user: int
+    ID_FINCA: Optional[int] = None
+    deshabilitado: Optional[int] = None
+    Fecha_deshabilitado: Optional[datetime] = None
+    class Config:
+        orm_mode = True
+
+class List_Users_FincasT(BaseModel):
+    ID_FINCA: Optional[int] = None
+    class Config:
+        orm_mode = True
+
+class New_List_Users_FincasT(BaseModel):
+    fincas: Optional[List[int]] = None
+    class Config:
+        orm_mode = True
+
+
 ###################################################################################################
 
 

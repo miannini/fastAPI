@@ -256,7 +256,16 @@ def get_permisos(db: Session, name:Optional[int]=None, user:Optional[int]=None, 
 #patch
 def update_permiso(db: Session, permiso: schemas.PermisosU, user_id: int):
     db.query(models.PermisosT).filter(models.PermisosT.User_ID == user_id).update(permiso.dict(exclude_unset=True))
-    db.commit()      
+    db.commit()
+
+def get_fincas_user(db: Session, user_id: int, id_cliente:Optional[str]=None):
+    filtros=[]
+    filtros.append(models.API_Users_FincasT.ID_user == user_id)
+    if id_cliente:
+        filtros.append(models.API_UsersT.ID_CLIENTE == id_cliente)
+    return db.query(models.API_Users_FincasT).join(models.API_UsersT).filter(*filtros).all()
+
+
 ###################################################################################################
 
 

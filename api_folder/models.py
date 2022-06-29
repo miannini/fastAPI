@@ -59,6 +59,15 @@ class PermisosT(Base):
     Animales_Salud = Column(Integer)
     Lotes = Column(Integer)
 
+
+class API_Users_FincasT(Base):
+    __tablename__ = "API_Users_Fincas"
+    ID = Column(Integer, primary_key=True, index=True)
+    ID_user = Column(Integer,  ForeignKey("API_Users.id"))
+    ID_FINCA = Column(Integer, ForeignKey("Finca.ID_FINCA"), nullable=True)
+    deshabilitado = Column(Integer, nullable=True)
+    Fecha_deshabilitado = Column(DateTime, nullable=True)
+
 #Permisos_Tipo
 
 ###################################################################################################
