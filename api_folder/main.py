@@ -249,7 +249,10 @@ def read_users_priv_finca(User_ID: int, db: Session = Depends(get_db),
     else:
         return []
 
-
+# Update and post finca permissions for users
+@app.post("/User_finca/", status_code=201, tags=["Users"])
+async def write_user_finca(finca_user: schemas.API_Users_FincasU, db: Session = Depends(get_db)):
+    return crud.create_finca_user(db=db, finca_user=finca_user)
 
 ###################################################################################################
 

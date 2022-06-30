@@ -116,12 +116,16 @@ class PermisosU(BaseModel):
     class Config:
         orm_mode = True
 
-class API_Users_FincasT(BaseModel):
-    ID: int
+class API_Users_FincasU(BaseModel):
     ID_user: int
     ID_FINCA: Optional[int] = None
     deshabilitado: Optional[int] = None
     Fecha_deshabilitado: Optional[datetime] = None
+    class Config:
+        orm_mode = True
+
+class API_Users_FincasT(API_Users_FincasU):
+    ID: int
     class Config:
         orm_mode = True
 

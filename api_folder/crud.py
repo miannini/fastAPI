@@ -265,6 +265,12 @@ def get_fincas_user(db: Session, user_id: int, id_cliente:Optional[str]=None):
         filtros.append(models.API_UsersT.ID_CLIENTE == id_cliente)
     return db.query(models.API_Users_FincasT).join(models.API_UsersT).filter(*filtros).all()
 
+def create_finca_user(db: Session, finca_user: schemas.API_Users_FincasU):
+    db_user = models.API_Users_FincasT(**finca_user.dict(exclude_unset=True))
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return "post_finca_user=Success"
 
 ###################################################################################################
 
