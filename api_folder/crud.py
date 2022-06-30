@@ -272,6 +272,14 @@ def create_finca_user(db: Session, finca_user: schemas.API_Users_FincasU):
     db.refresh(db_user)
     return "post_finca_user=Success"
 
+def update_per_user_finca(db: Session, permiso: schemas.API_Users_FincasU, user_id: int, finca_id:Optional[int]=None):
+    filtros =[]
+    filtros.append(models.API_Users_FincasT.ID_user == user_id)
+    if finca_id:
+        filtros.append(models.API_Users_FincasT.ID_FINCA == finca_id)
+    db.query(models.API_Users_FincasT).filter(*filtros).update(permiso.dict(exclude_unset=True))
+    db.commit()
+
 ###################################################################################################
 
 

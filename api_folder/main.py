@@ -254,6 +254,14 @@ def read_users_priv_finca(User_ID: int, db: Session = Depends(get_db),
 async def write_user_finca(finca_user: schemas.API_Users_FincasU, db: Session = Depends(get_db)):
     return crud.create_finca_user(db=db, finca_user=finca_user)
 
+@app.patch("/Permisos_User_Finca/{User_ID}", response_model=List[schemas.API_Users_FincasT], tags=["Users"])
+def update_user_finca(User_ID: int, permiso: schemas.API_Users_FincasU, finca_id: Optional[int] = None,
+                      db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_per_user_finca(db=db, permiso=permiso, user_id=User_ID, finca_id=finca_id)
+    db_permiso_id = crud.get_fincas_user(db, user_id=User_ID, id_cliente=current_user.ID_CLIENTE)
+    if db_permiso_id is None:
+        raise HTTPException(status_code=404, detail="User_ID not found")
+    return db_permiso_id
 ###################################################################################################
 
 
