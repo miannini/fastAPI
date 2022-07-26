@@ -812,7 +812,31 @@ def get_av_resultado(db: Session, id_res:Optional[int]=None, nombre:Optional[str
     if len(filtros)>0:
         return db.query(models.Actividades_vacas_resultadoT).filter(*filtros).all()
     else:
-        return db.query(models.Actividades_vacas_resultadoT).all() 
+        return db.query(models.Actividades_vacas_resultadoT).all()
+
+### Eventos vs Categorias
+def get_event_categ(db: Session, id_even: Optional[int] = None, id_cate: Optional[int] = None):
+    filtros = []
+    if id_even:
+        filtros.append(models.Eventos_vs_categoriasT.ID_evento == id_even)
+    if id_cate:
+        filtros.append(models.Eventos_vs_categoriasT.ID_categoria == id_cate)
+    if len(filtros) > 0:
+        return db.query(models.Eventos_vs_categoriasT).filter(*filtros).all()
+    else:
+        return db.query(models.Eventos_vs_categoriasT).all()
+
+### Eventos vs Resultados
+def get_event_result(db: Session, id_even: Optional[int] = None, id_resul: Optional[int] = None):
+    filtros = []
+    if id_even:
+        filtros.append(models.Eventos_vs_resultadosT.ID_evento == id_even)
+    if id_resul:
+        filtros.append(models.Eventos_vs_resultadosT.ID_resultado == id_resul)
+    if len(filtros) > 0:
+        return db.query(models.Eventos_vs_resultadosT).filter(*filtros).all()
+    else:
+        return db.query(models.Eventos_vs_resultadosT).all()
 
 #last ID_Actividad
 '''

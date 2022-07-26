@@ -438,6 +438,18 @@ class Actividades_vacas_resultadoT(Base):
     Descripcion = Column(String(45), nullable=True)
     Deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
+
+class Eventos_vs_categoriasT(Base):
+    __tablename__ = "eventos_vs_categorias"
+    ID_eventos_vs_categorias = Column(Integer,  primary_key=True)
+    ID_evento = Column(Integer, nullable=True)
+    ID_categoria = Column(Integer, nullable=True)
+
+class Eventos_vs_resultadosT(Base):
+    __tablename__ = "eventos_vs_resultados"
+    ID_eventos_vs_resultados = Column(Integer,  primary_key=True)
+    ID_evento = Column(Integer, nullable=True)
+    ID_resultado = Column(Integer, nullable=True)
     
 class Ubicacion_VacasT(Base):
     __tablename__ = "Ubicacion_Vacas"
@@ -515,6 +527,33 @@ class Dificultad_PartoT(Base):
     ID_dificultad= Column(Integer, primary_key=True, index=True)
     Dificultad = Column(String(45), nullable=True)
 
+# View estatus Vacas
+class V_estatus_vacasT(Base):
+    __tablename__ = "v_estatus_vacas"
+    ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
+    ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"))
+    Genero = Column(String(45), nullable=True)
+    Edad_Years = Column(Float, nullable=True)
+    Activa = Column(String(45), nullable=True)
+    Ultimo_Peso_KG = Column(Float, nullable=True)
+    Fecha_pesaje = Column(DateTime, nullable=True)
+    Numero_Parto = Column(Integer, nullable=True)
+    Fecha_ultimo_parto = Column(DateTime, nullable=True)
+    Fecha_ultimo_servicio = Column(DateTime, nullable=True)
+    Fecha_ultimo_diagpre = Column(DateTime, nullable=True)
+    Diagpre_Resultado = Column(String(45), nullable=True)
+    Fecha_ultimo_diagpre_5 = Column(DateTime, nullable=True)
+    Diagpre5_Resultado = Column(String(45), nullable=True)
+    Fecha_ultima_eco = Column(DateTime, nullable=True)
+    Eco_Resultado = Column(String(45), nullable=True)
+    Fecha_ultima_eco2 = Column(DateTime, nullable=True)
+    Eco2_Resultado = Column(String(45), nullable=True)
+    Fecha_ultimo_exrep = Column(DateTime, nullable=True)
+    Exrep_Resultado = Column(String(45), nullable=True)
+    Fecha_ultimo_presecado = Column(DateTime, nullable=True)
+    Presecado_Resultado = Column(String(45), nullable=True)
+    Fecha_ultimo_secado = Column(DateTime, nullable=True)
+    Secado_Resultado = Column(String(45), nullable=True)
 
 
 #log_traslados_vacas_lotes

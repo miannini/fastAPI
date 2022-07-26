@@ -715,6 +715,20 @@ class Actividades_vacas_resultadoT(BaseModel):
     class Config:
         orm_mode = True
 
+class Eventos_vs_categoriasT(BaseModel):
+    ID_eventos_vs_categorias: int
+    ID_evento: Optional[int] = None
+    ID_categoria: Optional[int] = None
+    class Config:
+        orm_mode = True
+
+class Eventos_vs_resultadosT(BaseModel):
+    ID_eventos_vs_resultados: int
+    ID_evento: Optional[int] = None
+    ID_resultado: Optional[int] = None
+    class Config:
+        orm_mode = True
+
 class MastitisT(BaseModel):
     ID_ACTIVIDAD: int
     AI: Optional[int] = None
@@ -888,25 +902,24 @@ class Incre_Pesos_View(BaseModel):
         
 class Servicios_Requi(BaseModel):
     ID_VACA: int
-    ID_TipoOperacion: int = 2
-    ID_Resultado: int = 2
+    ID_TipoOperacion: int
+    ID_Resultado: int
     ID_OPERARIO: int = 35
-    ID_Categoria: int = 12 #Inseminacion
-    Fecha: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    ID_Categoria: int
+    Fecha: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     Comentario: Optional[str] = None
     Sire: Optional[int] = None
     ID_Embrion: Optional[int] = None
     class Config:
         orm_mode = True
-    #IDservicio: int
-    #ID_ACTIVIDAD: int
-    
+
+
 class DiagPre_Requi(BaseModel):
     ID_VACA: int
     ID_TipoOperacion: int = 7 #or 3 to 8
-    ID_Resultado: int = 7 # or 6, 8, 9, 10
+    ID_Resultado: int
     ID_OPERARIO: int = 35
-    ID_Categoria: int = 18 #Diag Pre
+    ID_Categoria: int
     Fecha: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
     Comentario: Optional[str] = None
     ID_Resultado: int
@@ -916,6 +929,7 @@ class DiagPre_Requi(BaseModel):
         orm_mode = True
     #IDdiagpre: int
     #ID_ACTIVIDAD: int
+
 
 class Dificultad_PartoT(BaseModel):
     ID_dificultad: int

@@ -251,7 +251,8 @@ def read_users_priv_finca(User_ID: int, db: Session = Depends(get_db),
 
 # Update and post finca permissions for users
 @app.post("/User_finca/", status_code=201, tags=["Users"])
-async def write_user_finca(finca_user: schemas.API_Users_FincasU, db: Session = Depends(get_db)):
+async def write_user_finca(finca_user: schemas.API_Users_FincasU, db: Session = Depends(get_db),
+                           current_user: schemas.UserInfo = Depends(get_current_active_user)):
     return crud.create_finca_user(db=db, finca_user=finca_user)
 
 @app.patch("/Permisos_User_Finca/{User_ID}", response_model=List[schemas.API_Users_FincasT], tags=["Users"])
@@ -627,6 +628,18 @@ async def read_av_result(db: Session = Depends(get_db), id_res:Optional[int]=Non
     av_res = crud.get_av_resultado(db, id_res=id_res, nombre=nombre)
     return av_res
 
+@app.get("/Event_cate/", response_model=List[schemas.Eventos_vs_categoriasT], tags=["Actividades-Vacas"])
+async def read_ev_cate(db: Session = Depends(get_db), id_even: Optional[int] = None, id_cate: Optional[int] = None,
+                         current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    ev_cate = crud.get_event_categ(db, id_even=id_even, id_cate=id_cate)
+    return ev_cate
+
+@app.get("/Event_resul/", response_model=List[schemas.Eventos_vs_resultadosT], tags=["Actividades-Vacas"])
+async def read_ev_cate(db: Session = Depends(get_db), id_even: Optional[int] = None, id_resul: Optional[int] = None,
+                         current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    ev_resul = crud.get_event_result(db, id_even=id_even, id_resul=id_resul)
+    return ev_resul
+
 
 @app.post("/Masti_2/", status_code=201, tags=["Actividades-Vacas"])
 async def write_masti_2(data: schemas.Mast_Requi, db: Session = Depends(get_db),
@@ -841,6 +854,7 @@ async def write_servicio(data: schemas.Servicios_Requi, db: Session = Depends(ge
     return crud.registrar_servicio(db=db, data=data, id_to_use=id_to_use)
 
 #Diagpre
+"""
 @app.post("/DiagPre/", status_code=201, tags=["Actividades-Vacas"])
 async def write_diagpre(data: schemas.DiagPre_Requi, db: Session = Depends(get_db),
                         current_user: schemas.UserInfo = Depends(get_current_active_user)):
@@ -848,7 +862,7 @@ async def write_diagpre(data: schemas.DiagPre_Requi, db: Session = Depends(get_d
     id_to_use
     id_to_use = id_to_use.ID_Actividad 
     return crud.registrar_diagpre(db=db, data=data, id_to_use=id_to_use)
-
+"""
 @app.get("/Dificultad_parto/", response_model=List[schemas.Dificultad_PartoT], tags=["Actividades-Vacas"])
 async def get_dif_parto(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     dif_parto = crud.get_dif_parto(db)
