@@ -528,6 +528,7 @@ class Dificultad_PartoT(Base):
     Dificultad = Column(String(45), nullable=True)
 
 # View estatus Vacas
+"""
 class V_estatus_vacasT(Base):
     __tablename__ = "v_estatus_vacas"
     ID_CLIENTE = Column(Integer, ForeignKey("clientes.ID_CLIENTE"))
@@ -554,7 +555,7 @@ class V_estatus_vacasT(Base):
     Presecado_Resultado = Column(String(45), nullable=True)
     Fecha_ultimo_secado = Column(DateTime, nullable=True)
     Secado_Resultado = Column(String(45), nullable=True)
-
+"""
 
 #log_traslados_vacas_lotes
 #parto_vaca_Full
