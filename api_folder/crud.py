@@ -827,10 +827,19 @@ def get_event_categ(db: Session, id_even: Optional[int] = None, id_cate: Optiona
         filtros.append(models.Eventos_vs_categoriasT.ID_evento == id_even)
     if id_cate:
         filtros.append(models.Eventos_vs_categoriasT.ID_categoria == id_cate)
-    if len(filtros) > 0:
-        return db.query(models.Eventos_vs_categoriasT).join(models.tipo_operacionesT).join(models.Actividades_vacas_categoriaT).filter(*filtros).all()
-    else:
-        return db.query(models.Eventos_vs_categoriasT).join(models.tipo_operacionesT).join(models.Actividades_vacas_categoriaT).all()
+    if len(filtros) == 0:
+        filtros.append(True)
+    stmt = select([models.Eventos_vs_categoriasT, models.tipo_operacionesT.Codigo.label('Evento_codigo'),
+                   models.tipo_operacionesT.Nombre.label('Evento_nombre'),
+                   models.Actividades_vacas_categoriaT.Nombre.label('Categoria_nombre')]). \
+        select_from(join(
+        join(models.Eventos_vs_categoriasT, models.tipo_operacionesT,
+             models.Eventos_vs_categoriasT.ID_evento == models.tipo_operacionesT.ID_TipoOperaciones),
+        models.Actividades_vacas_categoriaT,
+        models.Eventos_vs_categoriasT.ID_categoria == models.Actividades_vacas_categoriaT.ID_Categoria)). \
+        where(and_(*filtros))
+    obj = db.execute(stmt).fetchall()
+    return obj
 
 ### Eventos vs Resultados
 def get_event_result(db: Session, id_even: Optional[int] = None, id_resul: Optional[int] = None):
@@ -839,30 +848,18 @@ def get_event_result(db: Session, id_even: Optional[int] = None, id_resul: Optio
         filtros.append(models.Eventos_vs_resultadosT.ID_evento == id_even)
     if id_resul:
         filtros.append(models.Eventos_vs_resultadosT.ID_resultado == id_resul)
-    if len(filtros) > 0:
-        stmt = select([models.Eventos_vs_resultadosT, models.tipo_operacionesT.Codigo.label('Evento_codigo'),
-                       models.tipo_operacionesT.Nombre.label('Evento_nombre'),
-                       models.Actividades_vacas_resultadoT.Nombre.label('Resultado_nombre')]). \
-            select_from(join(
-            join(models.Eventos_vs_resultadosT, models.tipo_operacionesT,
-                 models.Eventos_vs_resultadosT.ID_evento == models.tipo_operacionesT.ID_TipoOperaciones),
-            models.Actividades_vacas_resultadoT,
-            models.Eventos_vs_resultadosT.ID_resultado == models.Actividades_vacas_resultadoT.ID_Resultado)).\
-            where(*filtros)
-        obj = db.execute(stmt).fetchall()
-        #res = db.query(models.Eventos_vs_resultadosT, models.tipo_operacionesT, models.Actividades_vacas_resultadoT).\
-        #    join(models.tipo_operacionesT).join(models.Actividades_vacas_resultadoT).filter(*filtros).all()
-    else:
-        stmt = select([models.Eventos_vs_resultadosT, models.tipo_operacionesT.Codigo.label('Evento_codigo'),
-                       models.tipo_operacionesT.Nombre.label('Evento_nombre'),
-                       models.Actividades_vacas_resultadoT.Nombre.label('Resultado_nombre')]).\
-            select_from(join(
-            join(models.Eventos_vs_resultadosT, models.tipo_operacionesT,
-                 models.Eventos_vs_resultadosT.ID_evento == models.tipo_operacionesT.ID_TipoOperaciones),
-            models.Actividades_vacas_resultadoT,
-            models.Eventos_vs_resultadosT.ID_resultado == models.Actividades_vacas_resultadoT.ID_Resultado))
-        obj = db.execute(stmt).fetchall()
-
+    if len(filtros) == 0:
+        filtros.append(True)
+    stmt = select([models.Eventos_vs_resultadosT, models.tipo_operacionesT.Codigo.label('Evento_codigo'),
+                   models.tipo_operacionesT.Nombre.label('Evento_nombre'),
+                   models.Actividades_vacas_resultadoT.Nombre.label('Resultado_nombre')]). \
+        select_from(join(
+        join(models.Eventos_vs_resultadosT, models.tipo_operacionesT,
+             models.Eventos_vs_resultadosT.ID_evento == models.tipo_operacionesT.ID_TipoOperaciones),
+        models.Actividades_vacas_resultadoT,
+        models.Eventos_vs_resultadosT.ID_resultado == models.Actividades_vacas_resultadoT.ID_Resultado)).\
+        where(and_(*filtros))
+    obj = db.execute(stmt).fetchall()
     return obj
 
 #last ID_Actividad
