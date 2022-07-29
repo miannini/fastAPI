@@ -4,7 +4,8 @@ Created on Tue Dec 15 18:59:35 2020
 
 @author: Marcelo
 """
-from . import secrets
+from . import secrets #deploy
+#import secrets #local
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker

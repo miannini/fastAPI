@@ -8,8 +8,8 @@ Created on Tue Dec 15 19:18:16 2020
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float#, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Date, DateTime, Time
-from .database import Base
-
+from .database import Base #deploy
+#from database import Base #local
 '''
 When accessing the attribute items in a User, as in my_user.items, it will have a list of Item SQLAlchemy models (from the items table) that have a foreign key pointing to this record in the users table.
 
@@ -358,6 +358,7 @@ class tipo_operacionesT(Base):
     Nombre = Column(String(45), nullable=True)
     deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
+    #evento_vs_cate = relationship('Eventos_vs_categoriasT')
 
 class MastitisT(Base):
     __tablename__ = "Mastitis"
@@ -439,18 +440,25 @@ class Actividades_vacas_resultadoT(Base):
     Deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
 
+
+
 class Eventos_vs_categoriasT(Base):
     __tablename__ = "eventos_vs_categorias"
     ID_eventos_vs_categorias = Column(Integer,  primary_key=True)
-    ID_evento = Column(Integer, nullable=True)
-    ID_categoria = Column(Integer, nullable=True)
+    ID_evento = Column(Integer, ForeignKey("Tipo_operaciones.ID_TipoOperaciones"), nullable=True)
+    ID_categoria = Column(Integer, ForeignKey("Actividades_vacas_categoria.ID_Categoria"), nullable=True)
+    #evento = relationship('tipo_operacionesT', backref='eventos_vs_categorias',  uselist=False, lazy='joined')
 
 class Eventos_vs_resultadosT(Base):
     __tablename__ = "eventos_vs_resultados"
     ID_eventos_vs_resultados = Column(Integer,  primary_key=True)
-    ID_evento = Column(Integer, nullable=True)
-    ID_resultado = Column(Integer, nullable=True)
-    
+    ID_evento = Column(Integer, ForeignKey("Tipo_operaciones.ID_TipoOperaciones"), nullable=True)
+    ID_resultado = Column(Integer, ForeignKey("Actividades_vacas_resultado.ID_Resultado"), nullable=True)
+
+
+
+
+
 class Ubicacion_VacasT(Base):
     __tablename__ = "Ubicacion_Vacas"
     ID_VACA = Column(Integer, ForeignKey("vacas.ID_VACA"), primary_key=True)#, index=True)

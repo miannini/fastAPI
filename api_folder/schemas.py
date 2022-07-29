@@ -722,10 +722,29 @@ class Eventos_vs_categoriasT(BaseModel):
     class Config:
         orm_mode = True
 
+class Eventos_vs_cate_namesT(BaseModel):
+    ID_eventos_vs_categorias: int
+    ID_evento: Optional[int] = None
+    ID_categoria: Optional[int] = None
+    Nombre: Optional[str] = None
+    #evento: Optional[str] = None
+    categoria: Optional[str] = None
+    class Config:
+        orm_mode = True
+
 class Eventos_vs_resultadosT(BaseModel):
     ID_eventos_vs_resultados: int
     ID_evento: Optional[int] = None
     ID_resultado: Optional[int] = None
+    class Config:
+        orm_mode = True
+
+class Eventos_vs_resul_namesT(BaseModel):
+    ID_eventos_vs_resultados: int
+    ID_evento: Optional[int] = None
+    ID_resultado: Optional[int] = None
+    evento: Optional[str] = None
+    resultado: Optional[str] = None
     class Config:
         orm_mode = True
 

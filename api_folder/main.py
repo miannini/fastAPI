@@ -16,9 +16,10 @@ from sqlalchemy.orm import Session, joinedload
 from datetime import timedelta, date, datetime
 from typing import Optional
 from jose import JWTError
-from . import crud, models, schemas, app_utils, secrets, GCP_functions
-#from . import GCP_functions
-from .database import SessionLocal, engine
+from . import crud, models, schemas, app_utils, secrets, GCP_functions  # deploy
+#import crud, models, schemas, app_utils, secrets, GCP_functions  # local debug
+from .database import SessionLocal, engine  # deploy
+#from database import SessionLocal, engine  # local debug
 import pandas as pd
 import io
 import os
@@ -33,7 +34,8 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 ##################################  security ############################################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-with open('GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source: #local run ../ before GCP_secrets
+with open('GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source:
+#with open('../GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source:  # local run
     info = json.load(source)
     project_id = 'data-science-proj-280908'
 storage_credentials = service_account.Credentials.from_service_account_info(info)
@@ -628,14 +630,14 @@ async def read_av_result(db: Session = Depends(get_db), id_res:Optional[int]=Non
     av_res = crud.get_av_resultado(db, id_res=id_res, nombre=nombre)
     return av_res
 
-@app.get("/Event_cate/", response_model=List[schemas.Eventos_vs_categoriasT], tags=["Actividades-Vacas"])
+@app.get("/Event_cate/",  tags=["Actividades-Vacas"]) #response_model=List[schemas.Eventos_vs_cate_namesT],
 async def read_ev_cate(db: Session = Depends(get_db), id_even: Optional[int] = None, id_cate: Optional[int] = None,
                          current_user: schemas.UserInfo = Depends(get_current_active_user)):
     ev_cate = crud.get_event_categ(db, id_even=id_even, id_cate=id_cate)
     return ev_cate
 
-@app.get("/Event_resul/", response_model=List[schemas.Eventos_vs_resultadosT], tags=["Actividades-Vacas"])
-async def read_ev_cate(db: Session = Depends(get_db), id_even: Optional[int] = None, id_resul: Optional[int] = None,
+@app.get("/Event_resul/",  tags=["Actividades-Vacas"]) #response_model=List[schemas.Eventos_vs_resul_namesT],
+async def read_ev_resu(db: Session = Depends(get_db), id_even: Optional[int] = None, id_resul: Optional[int] = None,
                          current_user: schemas.UserInfo = Depends(get_current_active_user)):
     ev_resul = crud.get_event_result(db, id_even=id_even, id_resul=id_resul)
     return ev_resul

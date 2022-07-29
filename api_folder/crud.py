@@ -6,9 +6,10 @@ Created on Tue Dec 15 20:17:18 2020
 """
 from fastapi import HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_, inspect
+from sqlalchemy import func, and_, inspect, select, join
 from typing import Optional, List, Union
 from . import models, schemas, secrets
+#import models, schemas, secrets
 from datetime import date, datetime
 from passlib.context import CryptContext
 import os
@@ -20,6 +21,8 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email
 from python_http_client.exceptions import HTTPError
+import itertools
+
 
 #CRUD = Create, Read, Update and Delete
 
@@ -36,7 +39,10 @@ def flatten_join(tup_list):
 
 #funcion para unir elementos de tablas, pero quitando variables que no se necesiten de la union
 def flatten_join_av(tup_list, avoid):
-    old_list = [{**obj_to_dict(a), **obj_to_dict(b)} for a,b in tup_list]
+    print(len(tup_list[0]))
+    old_list = [{**obj_to_dict(a), **obj_to_dict(b)} for a, b in tup_list]
+    #old_list = [ [{}.update(**obj_to_dict(n)) for n in tup_list[l]] for l in range(len(tup_list))]
+    print(old_list)
     new_list = [{k: v for k, v in d.items() if k not in avoid} for d in old_list]
     return new_list
 
@@ -822,9 +828,9 @@ def get_event_categ(db: Session, id_even: Optional[int] = None, id_cate: Optiona
     if id_cate:
         filtros.append(models.Eventos_vs_categoriasT.ID_categoria == id_cate)
     if len(filtros) > 0:
-        return db.query(models.Eventos_vs_categoriasT).filter(*filtros).all()
+        return db.query(models.Eventos_vs_categoriasT).join(models.tipo_operacionesT).join(models.Actividades_vacas_categoriaT).filter(*filtros).all()
     else:
-        return db.query(models.Eventos_vs_categoriasT).all()
+        return db.query(models.Eventos_vs_categoriasT).join(models.tipo_operacionesT).join(models.Actividades_vacas_categoriaT).all()
 
 ### Eventos vs Resultados
 def get_event_result(db: Session, id_even: Optional[int] = None, id_resul: Optional[int] = None):
@@ -834,9 +840,30 @@ def get_event_result(db: Session, id_even: Optional[int] = None, id_resul: Optio
     if id_resul:
         filtros.append(models.Eventos_vs_resultadosT.ID_resultado == id_resul)
     if len(filtros) > 0:
-        return db.query(models.Eventos_vs_resultadosT).filter(*filtros).all()
+        stmt = select([models.Eventos_vs_resultadosT, models.tipo_operacionesT.Codigo.label('Evento_codigo'),
+                       models.tipo_operacionesT.Nombre.label('Evento_nombre'),
+                       models.Actividades_vacas_resultadoT.Nombre.label('Resultado_nombre')]). \
+            select_from(join(
+            join(models.Eventos_vs_resultadosT, models.tipo_operacionesT,
+                 models.Eventos_vs_resultadosT.ID_evento == models.tipo_operacionesT.ID_TipoOperaciones),
+            models.Actividades_vacas_resultadoT,
+            models.Eventos_vs_resultadosT.ID_resultado == models.Actividades_vacas_resultadoT.ID_Resultado)).\
+            where(*filtros)
+        obj = db.execute(stmt).fetchall()
+        #res = db.query(models.Eventos_vs_resultadosT, models.tipo_operacionesT, models.Actividades_vacas_resultadoT).\
+        #    join(models.tipo_operacionesT).join(models.Actividades_vacas_resultadoT).filter(*filtros).all()
     else:
-        return db.query(models.Eventos_vs_resultadosT).all()
+        stmt = select([models.Eventos_vs_resultadosT, models.tipo_operacionesT.Codigo.label('Evento_codigo'),
+                       models.tipo_operacionesT.Nombre.label('Evento_nombre'),
+                       models.Actividades_vacas_resultadoT.Nombre.label('Resultado_nombre')]).\
+            select_from(join(
+            join(models.Eventos_vs_resultadosT, models.tipo_operacionesT,
+                 models.Eventos_vs_resultadosT.ID_evento == models.tipo_operacionesT.ID_TipoOperaciones),
+            models.Actividades_vacas_resultadoT,
+            models.Eventos_vs_resultadosT.ID_resultado == models.Actividades_vacas_resultadoT.ID_Resultado))
+        obj = db.execute(stmt).fetchall()
+
+    return obj
 
 #last ID_Actividad
 '''

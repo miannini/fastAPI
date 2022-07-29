@@ -5,7 +5,8 @@ Created on Tue Jan 12 22:58:28 2021
 @author: Marcelo
 """
 from datetime import timedelta, datetime
-from . import secrets
+from . import secrets #deploy
+#import secrets # local
 from jose import jwt
 ##########################
 # to get a string like this run:
