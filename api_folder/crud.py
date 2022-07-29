@@ -242,11 +242,10 @@ def get_all_privs(db: Session, name:Optional[int]=None, description:Optional[str
     if name:
         filtros.append(models.API_Users_PrivT.name.contains(name))
     if description:
-        filtros.append(models.API_Users_PrivT.description.contains(description)) 
-    if len(filtros)>0:
-        return db.query(models.API_Users_PrivT).filter(*filtros).all()
-    else:
-        return db.query(models.API_Users_PrivT).all() 
+        filtros.append(models.API_Users_PrivT.description.contains(description))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.API_Users_PrivT).filter(*filtros).all()
 
 #get_all_permisos
 def get_permisos(db: Session, name:Optional[int]=None, user:Optional[int]=None, id_cliente:Optional[str]=None):
@@ -255,10 +254,10 @@ def get_permisos(db: Session, name:Optional[int]=None, user:Optional[int]=None, 
         filtros.append(models.API_UsersT.name.contains(name))
     if user:
         filtros.append(models.PermisosT.User_ID == user)
-    if len(filtros)>0:
-        return db.query(models.PermisosT).join(models.API_UsersT).filter(*filtros).all()
-    else:
-        return db.query(models.PermisosT).all() 
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.PermisosT).join(models.API_UsersT).filter(*filtros).all()
+
 #patch
 def update_permiso(db: Session, permiso: schemas.PermisosU, user_id: int):
     db.query(models.PermisosT).filter(models.PermisosT.User_ID == user_id).update(permiso.dict(exclude_unset=True))
@@ -302,10 +301,9 @@ def get_clientes(db: Session, ciudad:Optional[str]=None, departamento:Optional[s
         filtros.append((models.ClientesT.NOMBRE.contains(nombre)))            
     if date1:
         filtros.append(func.DATE(models.ClientesT.FECHA_CONTRATO) >= datetime.strptime(date1,'%Y-%m-%d').date())
-    if len(filtros)>0:
-        return db.query(models.ClientesT).filter(*filtros).all()
-    else:
-        return db.query(models.ClientesT).all()
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.ClientesT).filter(*filtros).all()
 
 def create_cliente(db: Session, cliente: schemas.ClientesU):
     #cliente2 = cliente.pop('ID_CLIENTE')
@@ -417,8 +415,7 @@ def get_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=No
     if id_lote:
         filtros.append(models.LotesT.ID_LOTE == id_lote) 
     if nombre:
-        filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre)))            
-    #if len(filtros)>0:
+        filtros.append((models.LotesT.NOMBRE_LOTE.contains(nombre)))
     return db.query(models.LotesT).join(models.FincaT).filter(*filtros).all()
     #evaluar si se queire con Finca Joined
     
@@ -458,11 +455,10 @@ def get_tipo_cultivo(db: Session, id_cultivo:Optional[int]=None, nombre:Optional
     if nombre:
         filtros.append(models.tipo_cultivoT.nombre.contains(nombre))
     if clase:
-        filtros.append((models.tipo_cultivoT.clase.contains(clase)))            
-    if len(filtros)>0:
-        return db.query(models.tipo_cultivoT).filter(*filtros).all()
-    else:
-         return db.query(models.tipo_cultivoT).all()
+        filtros.append((models.tipo_cultivoT.clase.contains(clase)))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.tipo_cultivoT).filter(*filtros).all()
 
 def create_tipo_cultivo(db: Session, tipo: schemas.tipo_cultivoT):
     db_lote = models.tipo_cultivoT(**tipo.dict(exclude_unset=True))
@@ -480,11 +476,10 @@ def get_variedad_cultivo(db: Session, id_variedad:Optional[int]=None, id_cultivo
         filtros.append(models.variedad_cultivoT.ID_cultivo == id_cultivo)   
     if nombre:
         filtros.append(models.variedad_cultivoT.nombre.contains(nombre))
-               
-    if len(filtros)>0:
-        return db.query(models.variedad_cultivoT).filter(*filtros).all()
-    else:
-         return db.query(models.variedad_cultivoT).all()
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.variedad_cultivoT).filter(*filtros).all()
+
 
 def create_variedad_cultivo(db: Session, variedad: schemas.variedad_cultivoT):
     db_lote = models.variedad_cultivoT(**variedad.dict(exclude_unset=True))
@@ -703,10 +698,10 @@ def get_razas(db: Session, id_raza:Optional[int]=None, nombre:Optional[str]=None
         filtros.append(models.razaT.Nombre.contains(nombre)) 
     if codigo:
         filtros.append(models.razaT.Codigo.contains(codigo))
-    if len(filtros)>0:
-        return db.query(models.razaT).filter(*filtros).all()
-    else:
-        return db.query(models.razaT).all()  
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.razaT).filter(*filtros).all()
+
   
 ### sexo
 def get_sexo(db: Session, id_sexo:Optional[int]=None, nombre:Optional[str]=None, codigo:Optional[str]=None):
@@ -716,11 +711,11 @@ def get_sexo(db: Session, id_sexo:Optional[int]=None, nombre:Optional[str]=None,
     if nombre:
         filtros.append(models.sexoT.Nombre.contains(nombre)) 
     if codigo:
-        filtros.append(models.sexoT.Codigo.contains(codigo)) 
-    if len(filtros)>0:
-        return db.query(models.sexoT).filter(*filtros).all()
-    else:
-        return db.query(models.sexoT).all() 
+        filtros.append(models.sexoT.Codigo.contains(codigo))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.sexoT).filter(*filtros).all()
+
     
 ### Tipo_Destino
 def get_t_destino(db: Session, id_destino:Optional[int]=None, nombre:Optional[str]=None):
@@ -728,11 +723,11 @@ def get_t_destino(db: Session, id_destino:Optional[int]=None, nombre:Optional[st
     if id_destino:
         filtros.append(models.tipo_destinoT.IDTipo_Destino == id_destino)
     if nombre:
-        filtros.append(models.tipo_destinoT.Nombre.contains(nombre)) 
-    if len(filtros)>0:
-        return db.query(models.tipo_destinoT).filter(*filtros).all()
-    else:
-        return db.query(models.tipo_destinoT).all() 
+        filtros.append(models.tipo_destinoT.Nombre.contains(nombre))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.tipo_destinoT).filter(*filtros).all()
+
 
 ### Sires
 def get_sires(db: Session, id_sire:Optional[int]=None, id_oficial:Optional[str]=None, nombre_largo:Optional[str]=None, registro:Optional[str]=None, raza:Optional[int]=None, activa:Optional[int]=None ,id_cliente: str = 0): #id_finca:Optional[int]=None
@@ -751,10 +746,9 @@ def get_sires(db: Session, id_sire:Optional[int]=None, id_oficial:Optional[str]=
         filtros.append(models.siresT.Raza == raza)
     if activa==1:
         filtros.append(models.siresT.Active == activa)
-    if len(filtros)>0:
-        return db.query(models.siresT).filter(*filtros).all()
-    else:
-        return db.query(models.siresT).all()
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.siresT).filter(*filtros).all()
 
 def get_eventos(db: Session):
     return db.query(models.eventosT).all()
@@ -789,11 +783,10 @@ def get_t_operacion(db: Session, id_tipo:Optional[int]=None, nombre:Optional[str
     if nombre:
         filtros.append(models.tipo_operacionesT.Nombre.contains(nombre)) 
     if codigo:
-        filtros.append(models.tipo_operacionesT.Codigo.contains(codigo)) 
-    if len(filtros)>0:
-        return db.query(models.tipo_operacionesT).filter(*filtros).all()
-    else:
-        return db.query(models.tipo_operacionesT).all() 
+        filtros.append(models.tipo_operacionesT.Codigo.contains(codigo))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.tipo_operacionesT).filter(*filtros).all()
 
 
 ### Actividades_vacas_categoria
@@ -802,11 +795,11 @@ def get_av_categoria(db: Session, id_cat:Optional[int]=None, nombre:Optional[str
     if id_cat:
         filtros.append(models.Actividades_vacas_categoriaT.ID_Categoria == id_cat)
     if nombre:
-        filtros.append(models.Actividades_vacas_categoriaT.Nombre.contains(nombre)) 
-    if len(filtros)>0:
-        return db.query(models.Actividades_vacas_categoriaT).filter(*filtros).all()
-    else:
-        return db.query(models.Actividades_vacas_categoriaT).all() 
+        filtros.append(models.Actividades_vacas_categoriaT.Nombre.contains(nombre))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.Actividades_vacas_categoriaT).filter(*filtros).all()
+
     
 ### Actividades_vacas_resultado
 def get_av_resultado(db: Session, id_res:Optional[int]=None, nombre:Optional[str]=None):
@@ -814,11 +807,11 @@ def get_av_resultado(db: Session, id_res:Optional[int]=None, nombre:Optional[str
     if id_res:
         filtros.append(models.Actividades_vacas_resultadoT.ID_Resutlado == id_res)
     if nombre:
-        filtros.append(models.Actividades_vacas_resultadoT.Nombre.contains(nombre)) 
-    if len(filtros)>0:
-        return db.query(models.Actividades_vacas_resultadoT).filter(*filtros).all()
-    else:
-        return db.query(models.Actividades_vacas_resultadoT).all()
+        filtros.append(models.Actividades_vacas_resultadoT.Nombre.contains(nombre))
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.Actividades_vacas_resultadoT).filter(*filtros).all()
+
 
 ### Eventos vs Categorias
 def get_event_categ(db: Session, id_even: Optional[int] = None, id_cate: Optional[int] = None):
