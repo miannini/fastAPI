@@ -495,14 +495,16 @@ def create_variedad_cultivo(db: Session, variedad: schemas.variedad_cultivoT):
 
 #########################################  ACTIVIDADES LOTES  ############################################
 # Acti Lotes
-def get_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, nombre_oper:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0): #
+def get_acti_lotes(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_lote:Optional[int]=None,
+                   nombre_lote:Optional[str]=None, nombre_oper:Optional[str]=None, date1: str = '2020-01-01',
+                   date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0): #
     filtros=[]
     filtros.append(models.FincaT.ID_cliente == id_cliente)
     filtros.append(models.OperarioT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.Actividades_LotesT.FECHA_ACTIVIDAD) >= datetime.strptime(date1,'%Y-%m-%d').date())
     filtros.append(func.DATE(models.Actividades_LotesT.FECHA_ACTIVIDAD) <= datetime.strptime(date2,'%Y-%m-%d').date()) 
     if id_finca:
-        filtros.append(models.LotesT.ID_FINCA == id_finca)   #ID_FINCA 
+        filtros.append(models.LotesT.ID_FINCA.in_(id_finca))   #ID_FINCA
     if id_lote:
         filtros.append(models.LotesT.ID_LOTE == id_lote) 
     if nombre_lote:
@@ -553,11 +555,12 @@ def get_tipo_acti_lotes(db: Session):
 
 
 #Ultimas Actividades Lotes View
-def get_ulti_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None, id_tipo_act:Optional[int]=None, id_cliente: str = 0): #
+def get_ulti_acti_lotes(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_lote:Optional[int]=None,
+                        nombre_lote:Optional[str]=None, id_tipo_act:Optional[int]=None, id_cliente: str = 0): #
     filtros=[]
     filtros.append(models.FincaT.ID_cliente == id_cliente) 
     if id_finca:
-        filtros.append(models.LotesT.ID_FINCA == id_finca)   
+        filtros.append(models.LotesT.ID_FINCA.in_(id_finca))
     if id_lote:
         filtros.append(models.Ultimas_Act_LotesT.ID_LOTE == id_lote) 
     if nombre_lote:
@@ -870,7 +873,8 @@ def get_last_actividad(db: Session):
 
 ## Obtener actividades_vacas Mastitis
 def get_act_vacas(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, 
-                  operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : 
+                  operacion:Optional[int]=None, operario:Optional[int]=None,
+                  id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0) :
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
@@ -881,10 +885,15 @@ def get_act_vacas(db: Session, date1: str = '2020-01-01', date2: str = datetime.
         filtros.append((models.ActividadesVacasT.ID_TipoOperacion == operacion))
     if operario:
         filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
-    return db.query(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
+    return db.query(models.ActividadesVacasT).join(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
 
-def get_view_activacas(db: Session, vaca:Optional[str]=None, cod_oper:Optional[str]=None, operacion:Optional[str]=None, result:Optional[str]=None, categ:Optional[str]=None, operario:Optional[str]=None, 
-                       rol:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+def get_view_activacas(db: Session, vaca:Optional[str]=None, cod_oper:Optional[str]=None, operacion:Optional[str]=None,
+                       result:Optional[str]=None, categ:Optional[str]=None, operario:Optional[str]=None,
+                       rol:Optional[str]=None, date1: str = '2020-01-01',
+                       date2: str = datetime.now().strftime("%Y-%m-%d"),
+                       id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.ActividadesVacasView.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
@@ -903,7 +912,10 @@ def get_view_activacas(db: Session, vaca:Optional[str]=None, cod_oper:Optional[s
         filtros.append(models.ActividadesVacasView.Operario == operario)
     if rol:
         filtros.append(models.ActividadesVacasView.Rol == rol)
-    return db.query(models.ActividadesVacasView).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
+
+    return db.query(models.ActividadesVacasView).join(models.ActividadesVacasT).join(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
     
 '''    
 def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_cliente: str = 0) : # 
@@ -922,7 +934,10 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
 
 #solution to join tables
 #https://stackoverflow.com/questions/27280862/sqlalchemy-getting-a-single-object-from-joining-multiple-tables/60883545#60883545?newreg=418bba09a46f4fe5b0b02ab0e8514acc
-def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None, id_mastitis:Optional[int]=None, id_cliente: str = 0) : # 
+def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),
+                     vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,
+                     id_mastitis:Optional[int]=None, id_finca: Union[List[int], None] = Query(default=None),
+                     id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     filtros.append(func.DATE(models.ActividadesVacasT.Fecha) >= datetime.strptime(date1,'%Y-%m-%d').date())
@@ -935,7 +950,10 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
         filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
     if id_mastitis:
         filtros.append((models.MastitisT.ID_ACTIVIDAD == id_mastitis))
-    res = db.query(models.MastitisT, models.ActividadesVacasT).join(models.ActividadesVacasT).join(models.VacasT).filter(*filtros).all()  
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
+
+    res = db.query(models.MastitisT, models.ActividadesVacasT).join(models.ActividadesVacasT).join(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
     #remover ID_TipoOperacion, ID_Resultado, ID_Categoria, ID_Actividad
     avoid = ['ID_TipoOperacion', 'ID_Resultado', 'ID_Categoria', 'ID_Actividad']
     res_b = flatten_join_av(res, avoid) #res_b = flatten_join(res)
@@ -943,14 +961,18 @@ def get_act_mastitis(db: Session, date1: str = '2020-01-01', date2: str = dateti
     return res_b
 
 #DB View
-def get_last_mastitis(db: Session, vaca:Optional[str]=None, id_cliente: str = 0) : # operario:Optional[int]=None, 
+def get_last_mastitis(db: Session, vaca:Optional[str]=None, id_finca: Union[List[int], None] = Query(default=None),
+                      id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)   
     if vaca:
         filtros.append((models.Result_MastitisT.ID_VACA == vaca))
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
+
     #if operario:
     #    filtros.append((models.ActividadesVacasT.ID_OPERARIO == operario))
-    res = db.query(models.Result_MastitisT).join(models.VacasT).filter(*filtros).all()  
+    res = db.query(models.Result_MastitisT).join(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
     #remover ID_TipoOperacion, ID_Resultado, ID_Categoria, ID_Actividad
     #avoid = ['ID_TipoOperacion', 'ID_Resultado', 'ID_Categoria', 'ID_Actividad']
     #res_b = flatten_join_av(res, avoid) #res_b = flatten_join(res)

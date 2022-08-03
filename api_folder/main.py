@@ -416,8 +416,8 @@ def wr_variedad_culti(variedad: schemas.variedad_cultivoT, db: Session = Depends
 #########################################  ACTIVIDADES LOTES  ############################################
 @app.get("/Acti_Lotes/", response_model=List[schemas.Actividades_LotesT], tags=["Actividades-Lotes"])
 def read_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
-                    id_finca: Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None,
-                    nombre_oper: Optional[str]=None, date1: str = '2020-01-01',
+                    id_finca: Union[List[int], None] = Query(default=None), id_lote:Optional[int]=None,
+                    nombre_lote:Optional[str]=None, nombre_oper: Optional[str]=None, date1: str = '2020-01-01',
                     date2: str = datetime.now().strftime("%Y-%m-%d")):
     acti_lotes = crud.get_acti_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre_lote=nombre_lote,
                                      nombre_oper=nombre_oper, date1=date1, date2=date2, id_cliente=current_user.ID_CLIENTE)
@@ -443,8 +443,8 @@ def read_tip_acti_lotes(db: Session = Depends(get_db), current_user: schemas.Use
 
 @app.get("/Ultimas_Acti_Lotes/", response_model=List[schemas.Ultimas_Act_LotesT], tags=["Actividades-Lotes"])
 def read_ult_acti_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
-                        id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre_lote:Optional[str]=None,
-                        id_tipo_act:Optional[int]=None):
+                        id_finca: Union[List[int], None] = Query(default=None), id_lote:Optional[int]=None,
+                        nombre_lote:Optional[str]=None, id_tipo_act:Optional[int]=None):
     acti_lotes = crud.get_ulti_acti_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre_lote=nombre_lote,
                                           id_tipo_act=id_tipo_act, id_cliente = current_user.ID_CLIENTE)
     return acti_lotes
@@ -654,35 +654,37 @@ async def write_masti_2(data: schemas.Mast_Requi, db: Session = Depends(get_db),
 @app.get("/ActiVacas/", response_model=List[schemas.ActInfo], tags=["Actividades-Vacas"])
 async def read_act_vacas(date1: str='2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),
                          vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,
+                         id_finca: Union[List[int], None] = Query(default=None),
                          db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     act_vacas = crud.get_act_vacas(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario,
-                                   id_cliente = current_user.ID_CLIENTE)
+                                   id_finca=id_finca, id_cliente = current_user.ID_CLIENTE)
     return act_vacas
 
 @app.get("/ActiVacasView/", response_model=List[schemas.ActividadesVacasView], tags=["Actividades-Vacas"])
 async def view_act_vacas(vaca:Optional[str]=None, cod_oper:Optional[str]=None, operacion:Optional[str]=None,
                          result:Optional[str]=None, categ:Optional[str]=None, operario:Optional[str]=None,
                          rol:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),
+                         id_finca: Union[List[int], None] = Query(default=None),
                          db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     view_actvacas = crud.get_view_activacas(db, vaca=vaca, cod_oper=cod_oper, operacion=operacion, result=result,
                                             categ=categ, operario=operario, rol=rol, date1 =date1, date2=date2,
-                                            id_cliente=current_user.ID_CLIENTE)
+                                            id_finca=id_finca, id_cliente=current_user.ID_CLIENTE)
     return view_actvacas
 
 @app.get("/Mastit_get/", status_code=201, tags=["Actividades-Vacas"])#, response_model=List[schemas.Mast_2])
 async def read_mastitis(date1: Optional[str]='2020-01-01', date2: Optional[str] = datetime.now().strftime("%Y-%m-%d"),
                         vaca:Optional[str]=None, operacion:Optional[int]=None, operario:Optional[int]=None,
-                        id_mastitis:Optional[int]=None,   db: Session = Depends(get_db),
-                        current_user: schemas.UserInfo = Depends(get_current_active_user)):
+                        id_mastitis:Optional[int]=None, id_finca: Union[List[int], None] = Query(default=None),
+                        db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
     act_mast = crud.get_act_mastitis(db, date1=date1, date2=date2, vaca=vaca, operacion=operacion, operario=operario,
-                                     id_mastitis=id_mastitis, id_cliente=current_user.ID_CLIENTE)
+                                     id_mastitis=id_mastitis, id_finca=id_finca, id_cliente=current_user.ID_CLIENTE)
     return act_mast
 
 #DB View
 @app.get("/Last_Mastit/", status_code=201, tags=["Actividades-Vacas"])#, response_model=List[schemas.Mast_2])
-async def read_masti_las(vaca:Optional[str]=None, db: Session = Depends(get_db),
-                         current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    act_mast2 = crud.get_last_mastitis(db, vaca=vaca, id_cliente=current_user.ID_CLIENTE)
+async def read_masti_las(vaca:Optional[str]=None, id_finca: Union[List[int], None] = Query(default=None),
+                         db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    act_mast2 = crud.get_last_mastitis(db, vaca=vaca, id_finca=id_finca, id_cliente=current_user.ID_CLIENTE)
     return act_mast2
 
 #patch mastitis
