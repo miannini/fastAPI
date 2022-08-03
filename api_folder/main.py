@@ -239,13 +239,12 @@ def update_permisos(User_ID: int, permiso: schemas.PermisosU, db: Session = Depe
         raise HTTPException(status_code=404, detail="User_ID not found")
     return db_permiso_id
 
-@app.get("/User_priv_finca/{User_ID}", response_model=schemas.New_List_Users_FincasT, tags=["Users"]) #response_model=List[schemas.New_List_Users_FincasT]
-def read_users_priv_finca(User_ID: int, db: Session = Depends(get_db),
-                          current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    fincas_auth = crud.get_fincas_user(db, user_id=User_ID, id_cliente=current_user.ID_CLIENTE)
+@app.get("/User_priv_finca/", response_model=schemas.New_List_Users_FincasT, tags=["Users"]) #{User_ID}
+def read_users_priv_finca(db: Session = Depends(get_db),
+                          current_user: schemas.UserInfo = Depends(get_current_active_user)): # User_ID: int,
+    fincas_auth = crud.get_fincas_user(db, user_id=current_user.id, id_cliente=current_user.ID_CLIENTE)
     if fincas_auth != []:
         new_fincasa = pd.DataFrame.from_records([s.__dict__ for s in fincas_auth])
-        # print(new_fincasa['ID_FINCA'].to_list())
         new_fincas = {"fincas": new_fincasa['ID_FINCA'].to_list()}
         return new_fincas
     else:
@@ -333,18 +332,17 @@ def update_operario(Operario_ID: int, operario: schemas.OperarioC, db: Session =
 #################################     FINCAS     #########################################################
 @app.get("/Fincas/", response_model=List[schemas.FincaT], tags=["Fincas"])
 def read_fincas(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
-                finca:Optional[int]=None, nombre:Optional[str]=None):
+                id_finca: Union[List[int], None] = Query(default=None), nombre:Optional[str]=None):
     #start_time = time.time()
-    fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
+    fincas = crud.get_fincas(db, id_finca=id_finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     # print("Time took to process the request and return response is {} sec".format(time.time() - start_time))
     return fincas
 
 
-
 @app.get("/Fincas_small/", response_model=List[schemas.FincaR], tags=["Fincas"])
 def read_fincass(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
-                 finca:Optional[int]=None, nombre:Optional[str]=None):
-    fincas = crud.get_fincas(db, finca=finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
+                 id_finca: Union[List[int], None] = Query(default=None), nombre:Optional[str]=None):
+    fincas = crud.get_fincas(db, id_finca=id_finca, id_cliente = current_user.ID_CLIENTE, nombre=nombre)
     return fincas
 
 @app.post("/create_finca/", status_code=201, tags=["Fincas"]) #response_model=schemas.Leche_Hatosi)
@@ -374,7 +372,7 @@ def write_lote_for_finca(finca_id: int, lote: schemas.LotesN, db: Session = Depe
 
 @app.get("/Lotes/", response_model=List[schemas.LotesT], tags=["Lotes"])
 def read_lotes(db: Session = Depends(get_db), current_user: schemas.UserInfo = Depends(get_current_active_user),
-               id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre:Optional[str]=None):
+               id_finca: Union[List[int], None] = Query(default=None), id_lote:Optional[int]=None, nombre:Optional[str]=None):
     lotes = crud.get_lotes(db, id_finca=id_finca, id_lote=id_lote, nombre=nombre, id_cliente = current_user.ID_CLIENTE)
     return lotes
 
@@ -456,7 +454,7 @@ def read_ult_acti_lotes(db: Session = Depends(get_db), current_user: schemas.Use
 
 ########################################    HATOS     ####################################################
 @app.get("/Hatos/", response_model=List[schemas.HatosT], tags=["Hatos"])
-def read_hatos(db: Session = Depends(get_db), id_finca:Optional[int]=None, id_hato:Optional[int]=None,
+def read_hatos(db: Session = Depends(get_db), id_finca: Union[List[int], None] = Query(default=None), id_hato:Optional[int]=None,
                nombre:Optional[str]=None, tipo:Optional[str]=None,
                current_user: schemas.UserInfo = Depends(get_current_active_user)):
     hatos = crud.get_hatos(db, id_finca=id_finca, id_hato=id_hato, nombre=nombre, tipo=tipo, id_cliente=current_user.ID_CLIENTE)
@@ -524,16 +522,18 @@ async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = 
 @app.get("/Vacas/", response_model=List[schemas.VacasT], tags=["Vacas"])
 async def read_vacas(db: Session = Depends(get_db), id_vaca:Optional[int]=None, nombre:Optional[str]=None,
                      sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1,
+                     id_finca: Union[List[int], None] = Query(default=None),
                      current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    vacas = crud.get_vacas(db, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa,
+    vacas = crud.get_vacas(db, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_finca=id_finca,
                            id_cliente=current_user.ID_CLIENTE)
     return vacas
 
 @app.get("/Vacas_small/", response_model=List[schemas.VacasR], tags=["Vacas"])
 async def read_vacass(db: Session = Depends(get_db), id_vaca:Optional[int]=None, nombre:Optional[str]=None,
                       sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1,
+                      id_finca: Union[List[int], None] = Query(default=None),
                       current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    vacas = crud.get_vacas(db,  id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa,
+    vacas = crud.get_vacas(db,  id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_finca=id_finca,
                            id_cliente=current_user.ID_CLIENTE)
     return vacas
 
@@ -737,15 +737,19 @@ async def write_parto(data: schemas.Parto_Requi, db: Session = Depends(get_db),
 
 @app.get("/UbicacionVacas/", response_model=List[schemas.Ubicacion_VacasT], tags=["Actividades-Vacas"])
 def read_ubva(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato:Optional[str]=None,
-              id_lote:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    ub_va = crud.get_ubva(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_cliente=current_user.ID_CLIENTE)
+              id_lote:Optional[str]=None, id_finca: Union[List[int], None] = Query(default=None),
+              current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    ub_va = crud.get_ubva(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_finca=id_finca,
+                          id_cliente=current_user.ID_CLIENTE)
     return ub_va
 
 # DB View
 @app.get("/UbicacionVacas_view/", response_model=List[schemas.Ubicacion_Vacas_FullT], tags=["Actividades-Vacas"])
 def read_ubvaf(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hato:Optional[str]=None,
-               id_lote:Optional[str]=None, current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    ub_vaf = crud.get_ubvaf(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_cliente= current_user.ID_CLIENTE)
+               id_lote:Optional[str]=None, id_finca: Union[List[int], None] = Query(default=None),
+               current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    ub_vaf = crud.get_ubvaf(db, id_vaca=id_vaca, id_hato=id_hato, id_lote=id_lote, id_finca=id_finca,
+                            id_cliente= current_user.ID_CLIENTE)
     return ub_vaf
 
 #patch ubicacion vacas
@@ -753,9 +757,10 @@ def read_ubvaf(db: Session = Depends(get_db), id_vaca:Optional[str]=None, id_hat
 @app.get("/TrasVacas/", response_model=List[schemas.Traslado_VacasT], tags=["Actividades-Vacas"])
 async def read_hist_trasvacas(db: Session = Depends(get_db), id_hato:Optional[str]=None, id_vaca:Optional[str]=None,
                               date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),
+                              id_finca: Union[List[int], None] = Query(default=None),
                               current_user: schemas.UserInfo = Depends(get_current_active_user)):
-    hist_trasvacas = crud.get_trasvaca(db, id_hato=id_hato, id_vaca=id_vaca, date1=date1, date2=date2,
-                                       id_cliente = current_user.ID_CLIENTE)
+    hist_trasvacas = crud.get_trasvaca(db, id_hato=id_hato, id_vaca=id_vaca, date1=date1, date2=date2, id_finca=id_finca,
+                                       id_cliente=current_user.ID_CLIENTE)
     return hist_trasvacas
 
 @app.post("/Traslado_vaca/", status_code=201, tags=["Actividades-Vacas"])
@@ -901,9 +906,10 @@ def update_leche_ha(ID_leche: int, leche: schemas.Leche_HatosU, db: Session = De
 @app.get("/Leche_Vacas/", response_model=List[schemas.Leche_Vacai], tags=["Leche"])
 def read_leche_vaca(db: Session = Depends(get_db), id_vaca:Optional[int]=None, id_operario:Optional[int]=None,
                     id_leche_va:Optional[int]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"),
+                    id_finca: Union[List[int], None] = Query(default=None),
                     current_user: schemas.UserInfo = Depends(get_current_active_user)):
     leche_vaca = crud.get_leche_vacas(db, id_vaca=id_vaca, id_operario=id_operario, id_leche_va=id_leche_va, date1=date1,
-                                      date2=date2, id_cliente = current_user.ID_CLIENTE)
+                                      date2=date2, id_finca=id_finca, id_cliente=current_user.ID_CLIENTE)
     return leche_vaca
 
 @app.post("/Wr_Leche_vacas/", status_code=201, tags=["Leche"]) #, response_model=schemas.Leche_Vacai)

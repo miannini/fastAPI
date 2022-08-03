@@ -381,11 +381,12 @@ def update_operario(db: Session, operario: schemas.OperarioC, id_operario: int):
 
 
 #################################     FINCAS     #########################################################  
-def get_fincas(db: Session, finca:Optional[int]=None, id_cliente: str = 0, nombre:Optional[str]=None):
+def get_fincas(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0,
+               nombre:Optional[str]=None):
     filtros=[]
     filtros.append(models.FincaT.ID_cliente == id_cliente)
-    if finca:
-        filtros.append((models.FincaT.ID_FINCA == finca))
+    if id_finca:
+        filtros.append((models.FincaT.ID_FINCA.in_(id_finca)))
     if nombre:
         filtros.append((models.FincaT.NOMBRE.contains(nombre))) 
     return db.query(models.FincaT).filter(*filtros).all()
@@ -407,11 +408,12 @@ def update_finca(db: Session, finca: schemas.FincaU, id_finca: int):
 
 ###########################################    LOTES    ###################################################
 ### Lotes    
-def get_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Optional[int]=None, nombre:Optional[str]=None, id_cliente: str = 0):
+def get_lotes(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_lote:Optional[int]=None,
+              nombre:Optional[str]=None, id_cliente: str = 0):
     filtros=[]
     filtros.append(models.FincaT.ID_cliente == id_cliente)
     if id_finca:
-        filtros.append(models.LotesT.ID_FINCA == id_finca)   
+        filtros.append((models.FincaT.ID_FINCA.in_(id_finca)))
     if id_lote:
         filtros.append(models.LotesT.ID_LOTE == id_lote) 
     if nombre:
@@ -573,7 +575,8 @@ def get_ulti_acti_lotes(db: Session, id_finca:Optional[int]=None, id_lote:Option
 
 
 ########################################    HATOS     ####################################################    
-def get_hatos(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_hato:Optional[int]=None, nombre:Optional[str]=None, tipo:Optional[str]=None,  id_cliente: str = 0):
+def get_hatos(db: Session, id_finca: Union[List[int], None] = Query(default=None), id_hato:Optional[int]=None,
+              nombre:Optional[str]=None, tipo:Optional[str]=None,  id_cliente: str = 0):
     # Optional[int]=None,
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
@@ -660,7 +663,9 @@ def get_ubha(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=None
 
 #############################################   VACAS    ################################################# 
 ### Vacas    
-def get_vacas(db: Session, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None, raza:Optional[int]=None, activa:Optional[int]=None ,id_cliente: str = 0): #id_finca:Optional[int]=None
+def get_vacas(db: Session, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None,
+              raza: Optional[int]=None, activa:Optional[int]=None,
+              id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     #if id_finca:
@@ -675,7 +680,9 @@ def get_vacas(db: Session, id_vaca:Optional[int]=None, nombre:Optional[str]=None
         filtros.append(models.VacasT.Raza == raza)
     if activa==1:
         filtros.append(models.VacasT.FechaSalida.is_(None))
-    return db.query(models.VacasT).filter(*filtros).all()
+    if id_finca:
+        filtros.append(models.HatosT.ID_FINCA.in_(id_finca))
+    return db.query(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
     
 def create_vaca(db: Session, wr_va: schemas.VacaN, id_cliente: str = 0): 
     wr_va.ID_CLIENTE = int(id_cliente)
@@ -1053,7 +1060,8 @@ def registrar_parto(db: Session, data: schemas.Parto_Requi, id_to_use, numero):
     return reg_parto
 
 ### Ubicacion vacas  
-def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, id_cliente: str = 0):
+def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None,
+             id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0):
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
@@ -1063,10 +1071,13 @@ def get_ubva(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None
         filtros.append(models.Ubicacion_VacasT.ID_VACA == id_vaca)
     if id_lote:
         filtros.append(models.Ubicacion_VacasT.ID_LOTE == id_lote)
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
     return db.query(models.Ubicacion_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
 
 #DB View - Ubicacion Full
-def get_ubvaf(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None, id_cliente: str = 0):
+def get_ubvaf(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, id_lote:Optional[str]=None,
+              id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0):
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
@@ -1076,6 +1087,8 @@ def get_ubvaf(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=Non
         filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_vaca)
     if id_lote:
         filtros.append(models.Ubicacion_Vacas_FullT.ID_LOTE == id_lote)
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
     return db.query(models.Ubicacion_Vacas_FullT).join(models.HatosT).join(models.VacasT).filter(*filtros).all() #
 
 ### Traslado vacas    
@@ -1106,7 +1119,9 @@ def write_trasvaca(db: Session, sch_ubi: schemas.Ubicacion_VacasT, Fecha_Traslad
     db.refresh(reg_tv) #descommented
     return  reg_tv #"ok"
 
-def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=None, date1: str = '2020-01-01',
+                 date2: str = datetime.now().strftime("%Y-%m-%d"),
+                 id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0):
     filtros=[]
     filtros.append(models.HatosT.ID_CLIENTE == id_cliente)
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
@@ -1118,6 +1133,8 @@ def get_trasvaca(db: Session, id_vaca:Optional[str]=None, id_hato:Optional[str]=
     if id_vaca:
         #filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
         filtros.append(models.Traslado_VacasT.ID_VACA == id_vaca)
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
     return db.query(models.Traslado_VacasT).join(models.HatosT).join(models.VacasT).filter(*filtros).all()
 
 
@@ -1200,7 +1217,11 @@ def update_leche_ha(db: Session, leche: schemas.Leche_HatosU, id_leche: int):
     
     
 # leche vaca
-def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None, id_leche_va:Optional[int]=None,date1: str = '2020-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), id_cliente: str = 0):
+def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optional[int]=None,
+                    id_leche_va:Optional[int]=None, date1: str = '2020-01-01',
+                    date2: str = datetime.now().strftime("%Y-%m-%d"),
+                    id_finca: Union[List[int], None] = Query(default=None),
+                    id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     if id_operario:
@@ -1209,9 +1230,11 @@ def get_leche_vacas(db: Session, id_vaca:Optional[int]=None, id_operario:Optiona
         filtros.append(models.Leche_VacaT.ID_VACA == id_vaca)
     if id_leche_va:
         filtros.append(models.Leche_VacaT.ID_Leche_vaca== id_leche_va)
-    filtros.append(func.DATE(models.Leche_VacaT.Fecha_c) >= datetime.strptime(date1,'%Y-%m-%d').date())
-    filtros.append(func.DATE(models.Leche_VacaT.Fecha_c) <= datetime.strptime(date2,'%Y-%m-%d').date())
-    return db.query(models.Leche_VacaT).join(models.VacasT).filter(*filtros).all()
+    if id_finca:
+        filtros.append((models.HatosT.ID_FINCA.in_(id_finca)))
+    filtros.append(func.DATE(models.Leche_VacaT.Fecha_c) >= datetime.strptime(date1, '%Y-%m-%d').date())
+    filtros.append(func.DATE(models.Leche_VacaT.Fecha_c) <= datetime.strptime(date2, '%Y-%m-%d').date())
+    return db.query(models.Leche_VacaT).join(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
     
 def create_leche_vacas(db: Session, le_va: schemas.Leche_VacaT):
     db_le_va = models.Leche_VacaT(**le_va.dict(exclude_unset=True))
