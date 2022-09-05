@@ -285,6 +285,32 @@ def update_per_user_finca(db: Session, permiso: schemas.API_Users_FincasU, user_
     db.query(models.API_Users_FincasT).filter(*filtros).update(permiso.dict(exclude_unset=True))
     db.commit()
 
+
+def get_roles_tablas(db: Session, ID:Optional[int]=None, Rol:Optional[str]=None, method:Optional[str]=None,
+                     Permiso:Optional[int]=None):
+    filtros=[]
+    if ID:
+        filtros.append(models.Roles_tablasT.id == ID)
+    if Rol:
+        filtros.append(models.Roles_tablasT.Rol.contains(Rol))
+    if method:
+        filtros.append(models.Roles_tablasT.method.contains(method))
+    if Permiso:
+        filtros.append(models.Roles_tablasT.Permiso == Permiso)
+    if len(filtros) == 0:
+        filtros.append(True)
+    return db.query(models.Roles_tablasT).filter(*filtros).all()
+
+def update_roles_tabla(db: Session, roles: schemas.Roles_tablasU, permiso_id: int):
+    db.query(models.Roles_tablasT).filter(models.Roles_tablasT.id == permiso_id).update(roles.dict(exclude_unset=True))
+    db.commit()
+
+def create_roles_tabla(db: Session, roles: schemas.Roles_tablasU):
+    db_roles = models.Roles_tablasT(**roles.dict(exclude_unset=True))
+    db.add(db_roles)
+    db.commit()
+    db.refresh(db_roles)
+    return "post_roles_tabla=Success"
 ###################################################################################################
 
 

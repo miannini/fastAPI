@@ -139,6 +139,17 @@ class New_List_Users_FincasT(BaseModel):
     class Config:
         orm_mode = True
 
+class Roles_tablasU(BaseModel):
+    Rol: Optional[str] = None
+    API_method: Optional[str] = None
+    Permiso: Optional[int] = 0
+    class Config:
+        orm_mode = True
+
+class Roles_tablasT(Roles_tablasU):
+    id: int
+    class Config:
+        orm_mode = True
 
 ###################################################################################################
 

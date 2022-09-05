@@ -264,6 +264,31 @@ def update_user_finca(User_ID: int, permiso: schemas.API_Users_FincasU, finca_id
     if db_permiso_id is None:
         raise HTTPException(status_code=404, detail="User_ID not found")
     return db_permiso_id
+
+
+### Roles Tablas
+@app.get("/Roles_tablas/", response_model=List[schemas.Roles_tablasT], tags=["Users"])
+def read_roles_tablas(db: Session = Depends(get_db), ID:Optional[int]=None, Rol:Optional[str]=None,
+                      method:Optional[str]=None, Permiso:Optional[int]=None,
+                      current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    roles_tabla = crud.get_roles_tablas(db, ID=ID, Rol=Rol, method=method, Permiso=Permiso)
+    return roles_tabla
+
+@app.post("/Roles_tablas_new/", status_code=201, tags=["Users"])
+async def write_roles_tabla(roles: schemas.Roles_tablasU, db: Session = Depends(get_db),
+                           current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    return crud.create_roles_tabla(db=db, roles=roles)
+
+
+@app.patch("/Permisos_Roles_tablas/{permiso_id}", response_model=List[schemas.Roles_tablasT], tags=["Users"])
+def update_roles_tabla(permiso_id: int, roles: schemas.Roles_tablasT, db: Session = Depends(get_db),
+                       current_user: schemas.UserInfo = Depends(get_current_active_user)):
+    crud.update_roles_tabla(db=db, roles=roles, permiso_id=permiso_id)
+    db_permiso_id = crud.get_roles_tablas(db, ID=permiso_id)
+    if db_permiso_id is None:
+        raise HTTPException(status_code=404, detail="Roles_tablas ID not found")
+    return db_permiso_id
+
 ###################################################################################################
 
 

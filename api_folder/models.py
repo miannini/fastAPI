@@ -33,6 +33,7 @@ class API_UsersT(Base):
     Deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
 
+
 class API_Users_PrivT(Base):
     __tablename__ = "API_Users_Privileges"
     id_user_rol = Column(Integer, primary_key=True, index=True)
@@ -40,7 +41,8 @@ class API_Users_PrivT(Base):
     description= Column(String(45), nullable=True)
     Deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
-    
+
+
 class PermisosT(Base):
     __tablename__ = "Permisos"
     ID_permisos = Column(Integer, primary_key=True, index=True)
@@ -68,7 +70,16 @@ class API_Users_FincasT(Base):
     deshabilitado = Column(Integer, nullable=True)
     Fecha_deshabilitado = Column(DateTime, nullable=True)
 
+
+class Roles_tablasT(Base):
+    __tablename__ = "Roles_tablas"
+    id = Column(Integer, primary_key=True, index=True)
+    Rol = Column(String(32), nullable=True)
+    API_method = Column(String(32), nullable=True)
+    Permiso = Column(Integer)
+
 #Permisos_Tipo
+
 
 ###################################################################################################
 
