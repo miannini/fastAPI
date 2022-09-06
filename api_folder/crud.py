@@ -294,7 +294,7 @@ def get_roles_tablas(db: Session, ID:Optional[int]=None, Rol:Optional[str]=None,
     if Rol:
         filtros.append(models.Roles_tablasT.Rol.contains(Rol))
     if method:
-        filtros.append(models.Roles_tablasT.method.contains(method))
+        filtros.append(models.Roles_tablasT.API_method.contains(method))
     if Permiso:
         filtros.append(models.Roles_tablasT.Permiso == Permiso)
     if len(filtros) == 0:
