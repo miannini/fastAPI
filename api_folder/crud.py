@@ -22,9 +22,15 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email
 from python_http_client.exceptions import HTTPError
 import itertools
+from api_folder.encrypt import decrypt
+import re
 
 
-#CRUD = Create, Read, Update and Delete
+# Twilio Details
+NUMBER = decrypt(str.encode(os.getenv('NUMBER')), secrets.key).decode()
+SID = decrypt(str.encode(os.getenv('SID')), secrets.key).decode()
+TOKEN = decrypt(str.encode(os.getenv('TOKEN')), secrets.key).decode()
+
 
 #################################################   FUNCIONES   ###########################################################
 #encryption
@@ -142,29 +148,83 @@ def email_celo(alpha, tomail, fecha):
     except HTTPError as e:
       return e.message
 
-def sms_celo():
-    hoy = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    client = Client(secrets.account_sid, secrets.auth_token)
-    ID_VACA = 1234
-    texto = "Alerta! Deteccion de Celo en vaca: " + str(ID_VACA) + ', fecha: ' + hoy + ', Celotron:' + str(987654321)
-    NUMBERS = {
-        'Marcelo':'+974 55033811',
-        'Marcelo2':'+57 3124165084',
-        #'Felipe':'+57 3108672598',
-        'Andres':'+57 3173941374',
-        #'Nico':'+57 3102961475',
-        #'Fernando':'+57 3103128204'
-        }
-    for name, number in NUMBERS.items():
+def sms_celo(db: Session):
+    # API GET Twilio -> Twilio ultimo mensaje
+    client = Client(SID, TOKEN)
+    messages = client.messages.list(limit=1)
+
+    # Twilio entrega Body, numero, fecha, etc  API Parsea
+    for record in messages:
+        body = record.body
+        fecha_recibido = record.date_sent
+        fecha_envio = record.date_created
+        numero_envio = record.from_
+        numero_recibido = record.to
+        direccion = record.direction
+        costo = record.price
+        segmentos = record.num_segments
+        status = record.status
+
+        # Body -> verifica columnas(formato OK)
         try:
-            message = client.messages.create(
-                to=number, 
-                from_=secrets.twilioNumber, 
-                body=texto)
-            print('exito')
-            print (message.sid)
-        except TwilioRestException as e:
-            print(e)
+            res = dict(map(str.strip, sub.split(':', 1)) for sub in
+                       body.replace('\n', '').replace(' ', '').replace('%', '').split(';')
+                       if ':' in sub)
+        except:
+            res = {}
+            return print('format not valid')
+        meta = {'fecha_envio': fecha_envio, 'fecha_recibido': fecha_recibido, 'numero_envio': numero_envio,
+                'numero_recibido': numero_recibido, 'direccion': direccion, 'segmentos': segmentos,
+                'status': status, 'costo': costo}
+        parsed = {**res, **meta}
+        celotron_data = pd.DataFrame.from_dict([parsed])
+        celotron_data.rename(columns={'V': 'tag', 'Hr': 'hora', 'Fch': 'fecha', 'Ser': 'sensor',
+                                      'Bat': 'battery'}, inplace=True, errors='ignore')
+        celotron_data['fecha_celo'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
+        celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M')
+        celotron_data['fecha_celo'] = celotron_data['fecha_celo'].astype(str)
+        celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None)
+        celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
+        celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None)
+        celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
+        celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
+        celotron_dict = celotron_data.to_dict('records')
+        #print(celotron_dict[0])
+        #print(celotron_data.dtypes)
+
+        # Guardar en la DB
+        reg_celo = models.celoT(**celotron_dict[0])
+        db.add(reg_celo)
+        db.commit()
+        db.refresh(reg_celo)
+
+        # merge TAG con VACA
+        # merge Celotron con Toro
+        # Capturar numero de contacto de clientes
+        # reenviar mensajes con vaca, toro y fecha/hora
+
+
+        # ID_VACA = 1234
+        texto = "Alerta! Deteccion de Celo en vaca: " + str(celotron_dict[0]['tag']) + ', fecha de celo: ' + celotron_dict[0]['fecha_celo'] + ', Celotron:' + celotron_dict[0]['sensor']
+        NUMBERS = {
+            #'Felipe': '+57 3108672598',
+            'Andres': '+57 3173941374',
+            #'Nico': '+57 3102961475',
+            #'Fernando': '+57 3103128204'
+            }
+        for name, number in NUMBERS.items():
+            try:
+                message = client.messages.create(
+                    to=number,
+                    from_=NUMBER,
+                    body=texto)
+                print('exito')
+                print(message.sid)
+            except TwilioRestException as e:
+                print(e)
+
+        return reg_celo.id_celo
+
     
 #######################     USERS   ###################################################
 #v2 auth
@@ -1546,8 +1606,8 @@ def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
     reg_celo = models.celoT(ID_vaca=1234, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S") , celotron=987654321)
     db.add(reg_celo)
     db.commit()
-    db.refresh(reg_celo) #descommented
-    return reg_celo.id_celo #"ok"
+    db.refresh(reg_celo)
+    return reg_celo.id_celo
 
 def registrar_celo(db: Session, celo: schemas.celo_gsmT):
     reg_celo_gsm = models.celo_gsmT(**celo.dict())

@@ -1229,10 +1229,18 @@ class Meteo_iot(BaseModel):
 ###########################################################################################################
 
 class celoT(BaseModel):
-    #id_celo: int
-    ID_vaca: int
-    date: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    celotron: Optional[int] = None
+    tag: str
+    sensor: Optional[str] = None
+    battery: Optional[float] = None
+    fecha_envio: Optional[datetime] = None
+    fecha_recibido: Optional[datetime] = None
+    numero_envio: Optional[str] = None
+    numero_recibido: Optional[str] = None
+    direccion: Optional[str] = None
+    segmentos: Optional[int] = None
+    status: Optional[str] = None
+    costo: Optional[float] = None
+    fecha_celo: Optional[datetime] = None
     class Config:
         orm_mode = True
 

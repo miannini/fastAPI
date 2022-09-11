@@ -1269,15 +1269,16 @@ async def imagen_multid(clase_id:str, files: List[UploadFile] = File(...) , db: 
 ################################################## CELOTRON   ###########################################################
 @app.post("/Heat_Detection/", status_code=200, tags=["Deteccion Celo"]) #response_model=List[schemas.MeteorologiaT]
 async def celo_detect(db: Session = Depends(get_db)):
-    #write to DB
-    #id_celo = crud.write_celo(db=db, sch_celo=sch_celo)
-    id_celo = crud.write_celo(db)
+
+    ### registrar SMS en DB
+    id_celo = crud.sms_celo(db)
+
+    # implementar
+    # API usando Twilio API -> Reenviar SMS -> Numeros en Colombia (clientes)
+
     # Start our TwiML response
     resp = MessagingResponse()
     resp.message("Mensaje de Celo recibido!, consecutivo: " + str(id_celo))
-    
-    ### reenviar SMS
-    crud.sms_celo()
     return str(resp)
 
 @app.post("/Heat_GSM/", status_code=200, tags=["Deteccion Celo"])

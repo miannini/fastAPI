@@ -3,7 +3,6 @@ from cryptography.fernet import Fernet
 """Run the lines below just once, to generate the key. Then store it safe to encode/decode as required"""
 #key = Fernet.generate_key()  # store in a secure location
 #print("Key:", key.decode())
-
 def encrypt(message: bytes, key: bytes) -> bytes:
     return Fernet(key).encrypt(message)
 
