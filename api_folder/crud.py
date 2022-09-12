@@ -1591,11 +1591,8 @@ def sms_celo(db: Session):
             celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
             celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
             celotron_dict = celotron_data.to_dict('records')
-            # print(celotron_dict[0])
-            # print(celotron_data.dtypes)
 
             # Guardar en la DB
-
             reg_celo = models.celoT(**celotron_dict[0])
             db.add(reg_celo)
             db.commit()
@@ -1650,4 +1647,3 @@ def sms_celo(db: Session):
                     print(e)
     
             return reg_celo.id_celo
-
