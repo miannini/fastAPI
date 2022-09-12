@@ -1264,3 +1264,20 @@ class celo_gsm_get(celo_gsmT):
     id_celo_gsm: int
     class Config:
         orm_mode = True
+
+
+class pref_sms_contactT(BaseModel):
+    id: int
+    id_cliente: Optional[int] = None
+    id_finca: Optional[int] = None
+    numero: Optional[str] = None
+    nombre: Optional[str] = None
+    status: Optional[str] = None
+    class Config:
+        orm_mode = True
+
+
+class pref_sms_get(pref_sms_contactT):
+    id: int
+    class Config:
+        orm_mode = True

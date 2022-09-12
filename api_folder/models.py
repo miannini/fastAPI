@@ -842,3 +842,13 @@ class celo_gsmT(Base):
     duration = Column(Integer, nullable=True)
 
 
+class pref_sms_contactT(Base):
+    __tablename__ = 'Pref_SMS_contact'
+    id = Column(Integer, primary_key=True, index=True)
+    id_cliente = Column(Integer, ForeignKey("clientes.ID_CLIENTE"), nullable=True)
+    id_finca = Column(Integer, ForeignKey("Finca.ID_FINCA"), nullable=True)
+    numero = Column(String(45), nullable=True)
+    nombre = Column(String(45), nullable=True)
+    status = Column(String(45), nullable=True)
+
+

@@ -148,82 +148,6 @@ def email_celo(alpha, tomail, fecha):
     except HTTPError as e:
       return e.message
 
-def sms_celo(db: Session):
-    # API GET Twilio -> Twilio ultimo mensaje
-    client = Client(SID, TOKEN)
-    messages = client.messages.list(limit=1)
-
-    # Twilio entrega Body, numero, fecha, etc  API Parsea
-    for record in messages:
-        body = record.body
-        fecha_recibido = record.date_sent
-        fecha_envio = record.date_created
-        numero_envio = record.from_
-        numero_recibido = record.to
-        direccion = record.direction
-        costo = record.price
-        segmentos = record.num_segments
-        status = record.status
-
-        # Body -> verifica columnas(formato OK)
-        try:
-            res = dict(map(str.strip, sub.split(':', 1)) for sub in
-                       body.replace('\n', '').replace(' ', '').replace('%', '').split(';')
-                       if ':' in sub)
-        except:
-            res = {}
-            return print('format not valid')
-        meta = {'fecha_envio': fecha_envio, 'fecha_recibido': fecha_recibido, 'numero_envio': numero_envio,
-                'numero_recibido': numero_recibido, 'direccion': direccion, 'segmentos': segmentos,
-                'status': status, 'costo': costo}
-        parsed = {**res, **meta}
-        celotron_data = pd.DataFrame.from_dict([parsed])
-        celotron_data.rename(columns={'V': 'tag', 'Hr': 'hora', 'Fch': 'fecha', 'Ser': 'sensor',
-                                      'Bat': 'battery'}, inplace=True, errors='ignore')
-        celotron_data['fecha_celo'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
-        celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M')
-        celotron_data['fecha_celo'] = celotron_data['fecha_celo'].astype(str)
-        celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None)
-        celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
-        celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None)
-        celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
-        celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
-        celotron_dict = celotron_data.to_dict('records')
-        #print(celotron_dict[0])
-        #print(celotron_data.dtypes)
-
-        # Guardar en la DB
-        reg_celo = models.celoT(**celotron_dict[0])
-        db.add(reg_celo)
-        db.commit()
-        db.refresh(reg_celo)
-
-        # merge TAG con VACA
-        # merge Celotron con Toro
-        # Capturar numero de contacto de clientes
-        # reenviar mensajes con vaca, toro y fecha/hora
-
-
-        # ID_VACA = 1234
-        texto = "Alerta! Deteccion de Celo en vaca: " + str(celotron_dict[0]['tag']) + ', fecha de celo: ' + celotron_dict[0]['fecha_celo'] + ', Celotron:' + celotron_dict[0]['sensor']
-        NUMBERS = {
-            #'Felipe': '+57 3108672598',
-            'Andres': '+57 3173941374',
-            #'Nico': '+57 3102961475',
-            #'Fernando': '+57 3103128204'
-            }
-        for name, number in NUMBERS.items():
-            try:
-                message = client.messages.create(
-                    to=number,
-                    from_=NUMBER,
-                    body=texto)
-                print('exito')
-                print(message.sid)
-            except TwilioRestException as e:
-                print(e)
-
-        return reg_celo.id_celo
 
     
 #######################     USERS   ###################################################
@@ -754,7 +678,7 @@ def get_ubha(db: Session, id_hato:Optional[str]=None, id_lote:Optional[str]=None
 ### Vacas    
 def get_vacas(db: Session, id_vaca:Optional[int]=None, nombre:Optional[str]=None, sexo:Optional[int]=None,
               raza: Optional[int]=None, activa:Optional[int]=None,
-              id_finca: Union[List[int], None] = Query(default=None), id_cliente: str = 0):
+              id_finca: Union[List[int], None] = Query(default=None), id_tag: Optional[str]=None, id_cliente: str = 0):
     filtros=[]
     filtros.append(models.VacasT.ID_CLIENTE == id_cliente)
     #if id_finca:
@@ -771,6 +695,8 @@ def get_vacas(db: Session, id_vaca:Optional[int]=None, nombre:Optional[str]=None
         filtros.append(models.VacasT.FechaSalida.is_(None))
     if id_finca:
         filtros.append(models.HatosT.ID_FINCA.in_(id_finca))
+    if id_tag:
+        filtros.append(models.VacasT.ElectronicID == id_tag)
     return db.query(models.VacasT).join(models.Ubicacion_VacasT).join(models.HatosT).filter(*filtros).all()
     
 def create_vaca(db: Session, wr_va: schemas.VacaN, id_cliente: str = 0): 
@@ -1601,6 +1527,7 @@ def registrar_meteo_iot(db: Session, met_iot: List[schemas.Meteo_iot]):
 
 ###########################################################################################################
 
+#################################################### CELOTRON  ############################################
 def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
     #reg_celo = models.celoT(**sch_celo.dict())
     reg_celo = models.celoT(ID_vaca=1234, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S") , celotron=987654321)
@@ -1609,6 +1536,7 @@ def write_celo(db: Session): # sch_celo: schemas.celoT, id_cliente: str = 0):
     db.refresh(reg_celo)
     return reg_celo.id_celo
 
+
 def registrar_celo(db: Session, celo: schemas.celo_gsmT):
     reg_celo_gsm = models.celo_gsmT(**celo.dict())
     db.add(reg_celo_gsm)
@@ -1616,5 +1544,110 @@ def registrar_celo(db: Session, celo: schemas.celo_gsmT):
     #db.refresh(reg_celo_gsm)
     return "post_celo_gsm= OK"
 
+
 def get_celo_gsm(db: Session) :
     return db.query(models.celo_gsmT).all()
+
+
+def sms_celo(db: Session):
+    # API GET Twilio -> Twilio ultimo mensaje
+    client = Client(SID, TOKEN)
+    messages = client.messages.list(limit=1)
+
+    # Twilio entrega Body, numero, fecha, etc  API Parsea
+    for record in messages:
+        body = record.body
+        fecha_recibido = record.date_sent
+        fecha_envio = record.date_created
+        numero_envio = record.from_
+        numero_recibido = record.to
+        direccion = record.direction
+        costo = record.price
+        segmentos = record.num_segments
+        status = record.status
+
+        if direccion == 'inbound':
+            # Body -> verifica columnas(formato OK)
+            try:
+                res = dict(map(str.strip, sub.split(':', 1)) for sub in
+                           body.replace('\n', '').replace(' ', '').replace('%', '').split(';')
+                           if ':' in sub)
+            except:
+                res = {}
+                return print('format not valid')
+            meta = {'fecha_envio': fecha_envio, 'fecha_recibido': fecha_recibido, 'numero_envio': numero_envio,
+                    'numero_recibido': numero_recibido, 'direccion': direccion, 'segmentos': segmentos,
+                    'status': status, 'costo': costo}
+            parsed = {**res, **meta}
+            celotron_data = pd.DataFrame.from_dict([parsed])
+            celotron_data.rename(columns={'V': 'tag', 'Hr': 'hora', 'Fch': 'fecha', 'Ser': 'sensor',
+                                          'Bat': 'battery'}, inplace=True, errors='ignore')
+            celotron_data['fecha_celo'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
+            celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M')
+            celotron_data['fecha_celo'] = celotron_data['fecha_celo'].astype(str)
+            celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None)
+            celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
+            celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None)
+            celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
+            celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
+            celotron_dict = celotron_data.to_dict('records')
+            # print(celotron_dict[0])
+            # print(celotron_data.dtypes)
+
+            # Guardar en la DB
+
+            reg_celo = models.celoT(**celotron_dict[0])
+            db.add(reg_celo)
+            db.commit()
+            db.refresh(reg_celo)
+
+
+            # merge TAG con VACA
+            vaca_filtros = []
+            vaca_filtros.append(models.VacasT.ElectronicID == celotron_data['tag'][0])
+            vaca = db.query(models.VacasT).filter(*vaca_filtros).all()
+            if vaca != []:
+                vaca_df = pd.DataFrame.from_records([s.__dict__ for s in vaca])
+                # print(vaca_df)
+                print(f'id_vaca: {vaca_df.ID_VACA[0]}, cliente: {vaca_df.ID_CLIENTE[0]}, '
+                      f'nombre_vaca: {vaca_df.Nombre_Vaca[0]}')
+
+            # merge Celotron con Toro
+            toro_filtros = []
+            toro_filtros.append(models.VacasT.ElectronicID == celotron_data['sensor'][0])
+            toro_filtros.append(models.VacasT.Sexo.in_([3, 4]))
+            toro = db.query(models.VacasT).filter(*toro_filtros).all()
+            if toro != []:
+                toro_df = pd.DataFrame.from_records([s.__dict__ for s in toro])
+                print(f'id_toro: {toro_df.ID_VACA[0]}, cliente: {toro_df.ID_CLIENTE[0]}, '
+                      f'nombre_toro: {toro_df.Nombre_Vaca[0]}')
+            
+            # Capturar numero de contacto de clientes
+            cliente_filtros = []
+            cliente_filtros.append(models.pref_sms_contactT.status == 'Activo')
+            if vaca != []:
+                cliente_filtros.append(models.pref_sms_contactT.id_cliente == int(vaca_df.ID_CLIENTE[0]))
+            cliente = db.query(models.pref_sms_contactT).filter(*cliente_filtros).all()
+            if cliente != []:
+                cliente_df = pd.DataFrame.from_records([s.__dict__ for s in cliente])
+                numeros_destino = cliente_df['numero'].values.tolist()
+                print(numeros_destino)
+
+
+            # reenviar mensajes con vaca, toro y fecha/hora
+            texto = f"Celo en vaca: {vaca_df.Nombre_Vaca[0]}, Tag: {str(celotron_dict[0]['tag'])}, " \
+                    f"Fecha de celo: {celotron_dict[0]['fecha_celo']}, " \
+                    f"Toro: {toro_df.Nombre_Vaca[0]}, Celotron: {celotron_dict[0]['sensor']}"
+
+            for number in numeros_destino:
+                try:
+                    message = client.messages.create(
+                        to=number,
+                        from_=NUMBER,
+                        body=texto)
+                    print(f'exito: {message.sid}')
+                except TwilioRestException as e:
+                    print(e)
+    
+            return reg_celo.id_celo
+

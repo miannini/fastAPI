@@ -547,19 +547,19 @@ async def tras_ubica_hatos(sch_ubi: schemas.Ubicacion_VacasBasic, db: Session = 
 @app.get("/Vacas/", response_model=List[schemas.VacasT], tags=["Vacas"])
 async def read_vacas(db: Session = Depends(get_db), id_vaca:Optional[int]=None, nombre:Optional[str]=None,
                      sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1,
-                     id_finca: Union[List[int], None] = Query(default=None),
+                     id_finca: Union[List[int], None] = Query(default=None), id_tag: Optional[str]=None,
                      current_user: schemas.UserInfo = Depends(get_current_active_user)):
     vacas = crud.get_vacas(db, id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_finca=id_finca,
-                           id_cliente=current_user.ID_CLIENTE)
+                           id_tag=id_tag, id_cliente=current_user.ID_CLIENTE)
     return vacas
 
 @app.get("/Vacas_small/", response_model=List[schemas.VacasR], tags=["Vacas"])
 async def read_vacass(db: Session = Depends(get_db), id_vaca:Optional[int]=None, nombre:Optional[str]=None,
                       sexo:Optional[int]=None, raza:Optional[int]=None, activa:int=1,
-                      id_finca: Union[List[int], None] = Query(default=None),
+                      id_finca: Union[List[int], None] = Query(default=None), id_tag: Optional[str]=None,
                       current_user: schemas.UserInfo = Depends(get_current_active_user)):
     vacas = crud.get_vacas(db,  id_vaca=id_vaca, nombre=nombre, sexo=sexo, raza=raza, activa=activa, id_finca=id_finca,
-                           id_cliente=current_user.ID_CLIENTE)
+                           id_tag=id_tag, id_cliente=current_user.ID_CLIENTE)
     return vacas
 
 @app.post("/Wr_Vaca/", status_code=201, tags=["Vacas"])
