@@ -1600,7 +1600,7 @@ def sms_celo(db: Session):
             celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None, ambiguous='infer')
             celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
             print(celotron_data['fecha_envio'], celotron_data['fecha_recibido'])
-            """
+
             celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
             celotron_dict = celotron_data.to_dict('records')
 
@@ -1696,4 +1696,3 @@ def sms_celo(db: Session):
                     print(e)
     
             return reg_celo.id_celo
-            """
