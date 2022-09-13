@@ -1587,7 +1587,8 @@ def sms_celo(db: Session):
                 continue
 
             celotron_data['fecha_celo'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
-            celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M')
+            celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M',
+                                                         errors='coerce')
             celotron_data['fecha_celo'] = celotron_data['fecha_celo'].astype(str)
             celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None)
             celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
@@ -1597,7 +1598,7 @@ def sms_celo(db: Session):
             celotron_dict = celotron_data.to_dict('records')
 
             # Guardar en la DB
-            reg_celo = models.celoT(**celotron_dict[0])
+            reg_celo = models.celoT(**celotron_dict[0].dict(exclude_unset=True))
             db.add(reg_celo)
             db.commit()
             db.refresh(reg_celo)
