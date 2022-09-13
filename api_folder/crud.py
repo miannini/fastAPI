@@ -1552,7 +1552,7 @@ def get_celo_gsm(db: Session) :
 def sms_celo(db: Session):
     # API GET Twilio -> Twilio ultimo mensaje
     client = Client(SID, TOKEN)
-    messages = client.messages.list(limit=2)
+    messages = client.messages.list(limit=1)
     time.sleep(5)
     # Twilio entrega Body, numero, fecha, etc  API Parsea
     for record in messages:
