@@ -1602,7 +1602,6 @@ def sms_celo(db: Session):
             db.commit()
             db.refresh(reg_celo)
 
-
             # merge TAG con VACA
             vaca_filtros = []
             vaca_filtros.append(models.VacasT.ElectronicID == celotron_data['tag'][0])
@@ -1639,12 +1638,11 @@ def sms_celo(db: Session):
 
             # merge vaca / toro con Ubicacion Vacas
             ubicacion_filtros = []
-            ubicacion_filtros.append(models.VacasT.ID_CLIENTE == cliente_identificado)
             if id_vaca:
                 ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_vaca)
             elif id_toro:
                 ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_toro)
-            ubicacion = db.query(models.Ubicacion_Vacas_FullT).join(models.VacasT).filter(*ubicacion_filtros).all()
+            ubicacion = db.query(models.Ubicacion_Vacas_FullT).filter(*ubicacion_filtros).all()
             if ubicacion != []:
                 ubicacion_df = pd.DataFrame.from_records([s.__dict__ for s in ubicacion])
                 print(f'id_lote: {ubicacion_df.ID_LOTE[0]}, LOTE: {ubicacion_df.NOMBRE_LOTE[0]}, '
@@ -1655,6 +1653,7 @@ def sms_celo(db: Session):
                 print("Ubicacion not found")
                 lote = 'UNKNOWN'
                 hato = 'UNKNOWN'
+
 
             # Capturar numero de contacto de clientes
             cliente_filtros = []
@@ -1684,4 +1683,3 @@ def sms_celo(db: Session):
                     print(e)
     
             return reg_celo.id_celo
-            #break
