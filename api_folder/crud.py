@@ -1639,9 +1639,9 @@ def sms_celo(db: Session):
             # merge vaca / toro con Ubicacion Vacas
             ubicacion_filtros = []
             if id_vaca:
-                ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_vaca)
+                ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == int(id_vaca))
             elif id_toro:
-                ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_toro)
+                ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == int(id_toro))
 
             if ubicacion_filtros != []:
                 ubicacion = db.query(models.Ubicacion_Vacas_FullT).filter(*ubicacion_filtros).all()
