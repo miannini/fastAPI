@@ -1605,7 +1605,7 @@ def sms_celo(db: Session):
             celotron_dict = celotron_data.to_dict('records')
 
             # Guardar en la DB
-            reg_celo = models.celoT(**celotron_dict[0].dict(exclude_unset=True))
+            reg_celo = models.celoT(**celotron_dict[0])  # .dict(exclude_unset=True)
             db.add(reg_celo)
             db.commit()
             db.refresh(reg_celo)
