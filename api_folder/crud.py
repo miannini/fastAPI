@@ -23,7 +23,7 @@ from sendgrid.helpers.mail import Mail, Email
 from python_http_client.exceptions import HTTPError
 import itertools
 from api_folder.encrypt import decrypt
-import re
+import time
 
 
 # Twilio Details
@@ -1552,8 +1552,8 @@ def get_celo_gsm(db: Session) :
 def sms_celo(db: Session):
     # API GET Twilio -> Twilio ultimo mensaje
     client = Client(SID, TOKEN)
-    messages = client.messages.list(limit=1)
-
+    messages = client.messages.list(limit=2)
+    time.sleep(5)
     # Twilio entrega Body, numero, fecha, etc  API Parsea
     for record in messages:
         body = record.body
