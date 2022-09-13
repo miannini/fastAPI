@@ -1642,7 +1642,12 @@ def sms_celo(db: Session):
                 ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_vaca)
             elif id_toro:
                 ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == id_toro)
-            ubicacion = db.query(models.Ubicacion_Vacas_FullT).filter(*ubicacion_filtros).all()
+
+            if ubicacion_filtros != []:
+                ubicacion = db.query(models.Ubicacion_Vacas_FullT).filter(*ubicacion_filtros).all()
+            else:
+                ubicacion = []
+
             if ubicacion != []:
                 ubicacion_df = pd.DataFrame.from_records([s.__dict__ for s in ubicacion])
                 print(f'id_lote: {ubicacion_df.ID_LOTE[0]}, LOTE: {ubicacion_df.NOMBRE_LOTE[0]}, '
