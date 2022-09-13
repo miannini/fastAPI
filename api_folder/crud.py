@@ -1595,11 +1595,13 @@ def sms_celo(db: Session):
             celotron_data['fecha_recibido'] = pd.to_datetime(celotron_data['fecha_recibido'],
                                                              format='%Y-%m-%d %H:%M:%S+00:00', errors='coerce')
 
-            celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None, ambiguous='infer')
+            #celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None)
+            # celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None)
             celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
-            celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None, ambiguous='infer')
             celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
-            print(celotron_data['fecha_envio'], celotron_data['fecha_recibido'])
+            celotron_data['fecha_envio'][0] = celotron_data['fecha_envio'][0][:-6]
+            celotron_data['fecha_recibido'][0] = celotron_data['fecha_recibido'][0][:-6]
+            # print(celotron_data['fecha_celo'], celotron_data['fecha_envio'], celotron_data['fecha_recibido'])
 
             celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
             celotron_dict = celotron_data.to_dict('records')
