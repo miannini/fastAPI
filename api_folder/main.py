@@ -1273,13 +1273,10 @@ async def celo_detect(db: Session = Depends(get_db)):
     ### registrar SMS en DB
     id_celo = crud.sms_celo(db)
 
-    # implementar
-    # API usando Twilio API -> Reenviar SMS -> Numeros en Colombia (clientes)
-
     # Start our TwiML response
     resp = MessagingResponse()
-    resp.message("Mensaje de Celo recibido!, consecutivo: " + str(id_celo))
-    return str(resp)
+    response = resp.message(f"Mensaje de Celo recibido!, consecutivo: {str(id_celo)}")
+    return Response(str(response), media_type="application/xml")
 
 @app.post("/Heat_GSM/", status_code=200, tags=["Deteccion Celo"])
 def write_celo(celo: schemas.celo_gsmT, db: Session = Depends(get_db)):
