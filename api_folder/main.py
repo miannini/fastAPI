@@ -7,7 +7,7 @@ Created on Tue Dec 15 20:25:17 2020
 
 from typing import List, Union
 
-from fastapi import Depends, FastAPI, HTTPException, status, Response, File, UploadFile, Query
+from fastapi import Depends, FastAPI, HTTPException, status, Response, File, UploadFile, Query, Form, Request
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +29,8 @@ from google.oauth2 import service_account
 from google.cloud import storage
 import asyncio
 from twilio.twiml.messaging_response import MessagingResponse
+from twilio.request_validator import RequestValidator
+from api_folder.encrypt import decrypt
 #import zipfile
 #import StringIO
 
@@ -41,6 +43,10 @@ with open('GCP_secrets/data-science-proj-280908-e7130591b0d5.json') as source:
 storage_credentials = service_account.Credentials.from_service_account_info(info)
 storage_client = storage.Client(project=project_id, credentials=storage_credentials)
 
+# Twilio Details
+NUMBER = decrypt(str.encode(os.getenv('NUMBER')), secrets.key).decode()
+SID = decrypt(str.encode(os.getenv('SID')), secrets.key).decode()
+TOKEN = decrypt(str.encode(os.getenv('TOKEN')), secrets.key).decode()
 #########################################################################################
 
 
@@ -1267,7 +1273,25 @@ async def imagen_multid(clase_id:str, files: List[UploadFile] = File(...) , db: 
 #########################################################################################################################
 
 ################################################## CELOTRON   ###########################################################
-@app.post("/Heat_Detection/", status_code=200, tags=["Deteccion Celo"]) #response_model=List[schemas.MeteorologiaT]
+@app.post("/Heat_Detection/", status_code=200, tags=["Deteccion Celo"])
+async def celo_detect(request: Request, From: str = Form(...), To: str = Form(...), NumSegments: str = Form(...), Body: str = Form(...), db: Session = Depends(get_db)):
+    ### validate request
+    validator = RequestValidator(TOKEN)
+    form_ = await request.form()
+    if not validator.validate(str(request.url), form_, request.headers.get("X-Twilio-Signature", "")):
+        raise HTTPException(status_code=400, detail="Error in Twilio Signature")
+
+    ### registrar SMS en DB
+    id_celo = crud.sms_celo2(db, numero_envio=From, numero_recibido=To, segmentos=NumSegments, body=Body)
+
+    # Start our TwiML response
+    resp = MessagingResponse()
+    response = resp.message(f"Mensaje de Celo recibido!, consecutivo: {str(id_celo)}")
+    return Response(content=str(response), media_type="application/xml")
+
+
+"""
+@app.post("/Heat_Detection/", status_code=200, tags=["Deteccion Celo"])
 async def celo_detect(db: Session = Depends(get_db)):
 
     ### registrar SMS en DB
@@ -1276,7 +1300,8 @@ async def celo_detect(db: Session = Depends(get_db)):
     # Start our TwiML response
     resp = MessagingResponse()
     response = resp.message(f"Mensaje de Celo recibido!, consecutivo: {str(id_celo)}")
-    return Response(str(response), media_type="application/xml")
+    return Response(content=str(response), media_type="application/xml")
+"""
 
 @app.post("/Heat_GSM/", status_code=200, tags=["Deteccion Celo"])
 def write_celo(celo: schemas.celo_gsmT, db: Session = Depends(get_db)):

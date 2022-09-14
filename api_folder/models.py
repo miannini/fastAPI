@@ -818,18 +818,15 @@ class celoT(Base):
     tag = Column(String(45), ForeignKey("vacas.ElectronicID"))
     sensor = Column(String(45), nullable=True) #, ForeignKey("celotron_tags.TAG_NAME"))
     battery = Column(Float, nullable=True)
-    fecha_envio = Column(DateTime, nullable=True)
+    #fecha_envio = Column(DateTime, nullable=True)
     fecha_recibido = Column(DateTime, nullable=True)
     numero_envio = Column(String(32), nullable=True)
     numero_recibido = Column(String(32), nullable=True)
-    direccion = Column(String(32), nullable=True)
+    #direccion = Column(String(32), nullable=True)
     segmentos = Column(Integer, nullable=True)
-    status = Column(String(32), nullable=True)
-    costo = Column(Float, nullable=True)
+    #status = Column(String(32), nullable=True)
+    #costo = Column(Float, nullable=True)
     fecha_celo = Column(DateTime, nullable=True)
-    #ID_vaca = Column(Integer, ForeignKey("vacas.ID_VACA"))
-    #date = Column(DateTime, nullable=True)
-    #celotron = Column(Integer, nullable=True)
 
 
 class celo_gsmT(Base):

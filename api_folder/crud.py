@@ -1548,10 +1548,10 @@ def registrar_celo(db: Session, celo: schemas.celo_gsmT):
 def get_celo_gsm(db: Session) :
     return db.query(models.celo_gsmT).all()
 
-
+"""
 def sms_celo(db: Session):
     # API GET Twilio -> Twilio ultimo mensaje
-    client = Client(SID, TOKEN)
+    
     messages = client.messages.list(limit=1)
     time.sleep(5)
     # Twilio entrega Body, numero, fecha, etc  API Parsea
@@ -1565,136 +1565,138 @@ def sms_celo(db: Session):
         costo = record.price
         segmentos = record.num_segments
         status = record.status
-
         if direccion == 'inbound':
-            # Body -> verifica columnas(formato OK)
-            try:
-                res = dict(map(str.strip, sub.split(':', 1)) for sub in
-                           body.replace('\n', '').replace(' ', '').replace('%', '').split(';')
-                           if ':' in sub)
-            except:
-                res = {}
-                print('format not valid')
-            meta = {'fecha_envio': fecha_envio, 'fecha_recibido': fecha_recibido, 'numero_envio': numero_envio,
-                    'numero_recibido': numero_recibido, 'direccion': direccion, 'segmentos': segmentos,
-                    'status': status, 'costo': costo}
-            parsed = {**res, **meta}
-            celotron_data = pd.DataFrame.from_dict([parsed])
-            celotron_data.rename(columns={'V': 'tag', 'Hora': 'hora', 'Fecha': 'fecha', 'Ser': 'sensor',
-                                          'Bat': 'battery'}, inplace=True, errors='ignore')
+        meta = {'fecha_envio': fecha_envio, 'fecha_recibido': fecha_recibido, 'numero_envio': numero_envio,
+            'numero_recibido': numero_recibido, 'direccion': direccion, 'segmentos': segmentos,
+            'status': status, 'costo': costo}
+        if 'fecha' not in celotron_data.columns:
+            continue
+        celotron_data['fecha_envio'] = pd.to_datetime(celotron_data['fecha_envio'],
+                                                  format='%Y-%m-%d %H:%M:%S+00:00', errors='coerce')
+        celotron_data['fecha_recibido'] = pd.to_datetime(celotron_data['fecha_recibido'],
+                                                     format='%Y-%m-%d %H:%M:%S+00:00', errors='coerce')
+        celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
+    celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
+    celotron_data['fecha_envio'][0] = celotron_data['fecha_envio'][0][:-6]
+    celotron_data['fecha_recibido'][0] = celotron_data['fecha_recibido'][0][:-6]
+    # print(celotron_data['fecha_celo'], celotron_data['fecha_envio'], celotron_data['fecha_recibido'])
+"""
 
-            if 'fecha' not in celotron_data.columns:
-                continue
+def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
 
-            celotron_data['fecha_celo'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
-            celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M',
-                                                         errors='coerce')
-            celotron_data['fecha_celo'] = celotron_data['fecha_celo'].astype(str)
-            celotron_data['fecha_envio'] = pd.to_datetime(celotron_data['fecha_envio'],
-                                                          format='%Y-%m-%d %H:%M:%S+00:00', errors='coerce')
-            celotron_data['fecha_recibido'] = pd.to_datetime(celotron_data['fecha_recibido'],
-                                                             format='%Y-%m-%d %H:%M:%S+00:00', errors='coerce')
+    # Twilio entrega Body, numero, fecha, etc  API Parsea
 
-            #celotron_data['fecha_envio'] = celotron_data['fecha_envio'].dt.tz_localize(None)
-            # celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].dt.tz_localize(None)
-            celotron_data['fecha_envio'] = celotron_data['fecha_envio'].astype(str)
-            celotron_data['fecha_recibido'] = celotron_data['fecha_recibido'].astype(str)
-            celotron_data['fecha_envio'][0] = celotron_data['fecha_envio'][0][:-6]
-            celotron_data['fecha_recibido'][0] = celotron_data['fecha_recibido'][0][:-6]
-            # print(celotron_data['fecha_celo'], celotron_data['fecha_envio'], celotron_data['fecha_recibido'])
+    # Body -> verifica columnas(formato OK)
+    try:
+        res = dict(map(str.strip, sub.split(':', 1)) for sub in
+                   body.replace('\n', '').replace(' ', '').replace('%', '').split(';')
+                   if ':' in sub)
+    except:
+        res = {}
+        print('format not valid')
+    meta = {'numero_envio': numero_envio, 'numero_recibido': numero_recibido, 'segmentos': segmentos}
+    parsed = {**res, **meta}
+    celotron_data = pd.DataFrame.from_dict([parsed])
+    celotron_data.rename(columns={'V': 'tag', 'Hora': 'hora', 'Fecha': 'fecha', 'Ser': 'sensor',
+                                  'Bat': 'battery'}, inplace=True, errors='ignore')
 
-            celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
-            celotron_dict = celotron_data.to_dict('records')
+    celotron_data['fecha_celo'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
+    celotron_data['fecha_celo'] = pd.to_datetime(celotron_data['fecha_celo'], format='%d/%m/%Y %H:%M', errors='coerce')
+    celotron_data['fecha_celo'] = celotron_data['fecha_celo'].astype(str)
+    celotron_data['fecha_recibido'] = str(datetime.now())
+    celotron_data.drop(columns=['hora', 'fecha'], inplace=True, errors='ignore')
+    celotron_dict = celotron_data.to_dict('records')
 
-            # Guardar en la DB
-            reg_celo = models.celoT(**celotron_dict[0])  # .dict(exclude_unset=True)
-            db.add(reg_celo)
-            db.commit()
-            db.refresh(reg_celo)
+    # Guardar en la DB
+    reg_celo = models.celoT(**celotron_dict[0])  # .dict(exclude_unset=True)
+    db.add(reg_celo)
+    db.commit()
+    db.refresh(reg_celo)
 
-            # merge TAG con VACA
-            vaca_filtros = []
-            vaca_filtros.append(models.VacasT.ElectronicID == celotron_data['tag'][0])
-            vaca = db.query(models.VacasT).filter(*vaca_filtros).all()
-            if vaca != []:
-                vaca_df = pd.DataFrame.from_records([s.__dict__ for s in vaca])
-                # print(vaca_df)
-                print(f'id_vaca: {vaca_df.ID_VACA[0]}, cliente: {vaca_df.ID_CLIENTE[0]}, '
-                      f'nombre_vaca: {vaca_df.Nombre_Vaca[0]}')
-                cliente_identificado = vaca_df.ID_CLIENTE[0]
-                nombre_vaca = vaca_df.Nombre_Vaca[0]
-                id_vaca = vaca_df.ID_VACA[0]
-            else:
-                print(f"vaca not found, with tag: {celotron_data['tag'][0]}")
-                nombre_vaca = 'UNKNOWN'
-                id_vaca = None
+    # merge TAG con VACA
+    vaca_filtros = []
+    vaca_filtros.append(models.VacasT.ElectronicID == celotron_data['tag'][0])
+    vaca = db.query(models.VacasT).filter(*vaca_filtros).all()
+    if vaca != []:
+        vaca_df = pd.DataFrame.from_records([s.__dict__ for s in vaca])
+        # print(vaca_df)
+        print(f'id_vaca: {vaca_df.ID_VACA[0]}, cliente: {vaca_df.ID_CLIENTE[0]}, '
+              f'nombre_vaca: {vaca_df.Nombre_Vaca[0]}')
+        cliente_identificado = vaca_df.ID_CLIENTE[0]
+        nombre_vaca = vaca_df.Nombre_Vaca[0]
+        id_vaca = vaca_df.ID_VACA[0]
+    else:
+        print(f"vaca not found, with tag: {celotron_data['tag'][0]}")
+        nombre_vaca = 'UNKNOWN'
+        id_vaca = None
 
-            # merge Celotron con Toro
-            toro_filtros = []
-            toro_filtros.append(models.VacasT.ElectronicID == celotron_data['sensor'][0])
-            toro_filtros.append(models.VacasT.Sexo.in_([3, 4]))
-            toro = db.query(models.VacasT).filter(*toro_filtros).all()
-            if toro != []:
-                toro_df = pd.DataFrame.from_records([s.__dict__ for s in toro])
-                print(f'id_toro: {toro_df.ID_VACA[0]}, cliente: {toro_df.ID_CLIENTE[0]}, '
-                      f'nombre_toro: {toro_df.Nombre_Vaca[0]}')
-                cliente_identificado = toro_df.ID_CLIENTE[0]
-                nombre_toro = toro_df.Nombre_Vaca[0]
-                id_toro = toro_df.ID_VACA[0]
-            else:
-                print(f"Toro not found, with Sensor: {celotron_data['sensor'][0]}")
-                nombre_toro = 'UNKNOWN'
-                id_toro = None
+    # merge Celotron con Toro
+    toro_filtros = []
+    toro_filtros.append(models.VacasT.ElectronicID == celotron_data['sensor'][0])
+    toro_filtros.append(models.VacasT.Sexo.in_([3, 4]))
+    toro = db.query(models.VacasT).filter(*toro_filtros).all()
+    if toro != []:
+        toro_df = pd.DataFrame.from_records([s.__dict__ for s in toro])
+        print(f'id_toro: {toro_df.ID_VACA[0]}, cliente: {toro_df.ID_CLIENTE[0]}, '
+              f'nombre_toro: {toro_df.Nombre_Vaca[0]}')
+        cliente_identificado = toro_df.ID_CLIENTE[0]
+        nombre_toro = toro_df.Nombre_Vaca[0]
+        id_toro = toro_df.ID_VACA[0]
+    else:
+        print(f"Toro not found, with Sensor: {celotron_data['sensor'][0]}")
+        nombre_toro = 'UNKNOWN'
+        id_toro = None
 
-            # merge vaca / toro con Ubicacion Vacas
-            ubicacion_filtros = []
-            if id_vaca:
-                ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == int(id_vaca))
-            elif id_toro:
-                ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == int(id_toro))
+    # merge vaca / toro con Ubicacion Vacas
+    ubicacion_filtros = []
+    if id_vaca:
+        ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == int(id_vaca))
+    elif id_toro:
+        ubicacion_filtros.append(models.Ubicacion_Vacas_FullT.ID_VACA == int(id_toro))
 
-            if ubicacion_filtros != []:
-                ubicacion = db.query(models.Ubicacion_Vacas_FullT).filter(*ubicacion_filtros).all()
-            else:
-                ubicacion = []
+    if ubicacion_filtros != []:
+        ubicacion = db.query(models.Ubicacion_Vacas_FullT).filter(*ubicacion_filtros).all()
+    else:
+        ubicacion = []
 
-            if ubicacion != []:
-                ubicacion_df = pd.DataFrame.from_records([s.__dict__ for s in ubicacion])
-                print(f'id_lote: {ubicacion_df.ID_LOTE[0]}, LOTE: {ubicacion_df.NOMBRE_LOTE[0]}, '
-                      f'id_hato: {ubicacion_df.ID_HATO[0]}, HATO: {ubicacion_df.Nombre_Hato[0]}')
-                lote = ubicacion_df.NOMBRE_LOTE[0]
-                hato = ubicacion_df.Nombre_Hato[0]
-            else:
-                print("Ubicacion not found")
-                lote = 'UNKNOWN'
-                hato = 'UNKNOWN'
-
-
-            # Capturar numero de contacto de clientes
-            cliente_filtros = []
-            cliente_filtros.append(models.pref_sms_contactT.status == 'Activo')
-            if vaca != []:
-                cliente_filtros.append(models.pref_sms_contactT.id_cliente == int(cliente_identificado))
-            cliente = db.query(models.pref_sms_contactT).filter(*cliente_filtros).all()
-            if cliente != []:
-                cliente_df = pd.DataFrame.from_records([s.__dict__ for s in cliente])
-                numeros_destino = cliente_df['numero'].values.tolist()
-                print(numeros_destino)
+    if ubicacion != []:
+        ubicacion_df = pd.DataFrame.from_records([s.__dict__ for s in ubicacion])
+        print(f'id_lote: {ubicacion_df.ID_LOTE[0]}, LOTE: {ubicacion_df.NOMBRE_LOTE[0]}, '
+              f'id_hato: {ubicacion_df.ID_HATO[0]}, HATO: {ubicacion_df.Nombre_Hato[0]}')
+        lote = ubicacion_df.NOMBRE_LOTE[0]
+        hato = ubicacion_df.Nombre_Hato[0]
+    else:
+        print("Ubicacion not found")
+        lote = 'UNKNOWN'
+        hato = 'UNKNOWN'
 
 
-            # reenviar mensajes con vaca, toro y fecha/hora
-            texto = f"Vaca: {nombre_vaca}, Tag: {str(celotron_dict[0]['tag'])}, " \
-                    f"Fecha: {celotron_dict[0]['fecha_celo']}, " \
-                    f"Toro: {nombre_toro}, Celotron: {celotron_dict[0]['sensor']}, Ubicacion: {lote}, Hato: {hato}"
+    # Capturar numero de contacto de clientes
+    cliente_filtros = []
+    cliente_filtros.append(models.pref_sms_contactT.status == 'Activo')
+    if vaca != []:
+        cliente_filtros.append(models.pref_sms_contactT.id_cliente == int(cliente_identificado))
+    cliente = db.query(models.pref_sms_contactT).filter(*cliente_filtros).all()
+    if cliente != []:
+        cliente_df = pd.DataFrame.from_records([s.__dict__ for s in cliente])
+        numeros_destino = cliente_df['numero'].values.tolist()
+        print(numeros_destino)
 
-            for number in numeros_destino:
-                try:
-                    message = client.messages.create(
-                        to=number,
-                        from_=NUMBER,
-                        body=texto)
-                    print(f'exito: {message.sid}')
-                except TwilioRestException as e:
-                    print(e)
-    
-            return reg_celo.id_celo
+
+    # reenviar mensajes con vaca, toro y fecha/hora
+    texto = f"Vaca: {nombre_vaca}, Tag: {str(celotron_dict[0]['tag'])}, " \
+            f"Fecha: {celotron_dict[0]['fecha_celo']}, " \
+            f"Toro: {nombre_toro}, Celotron: {celotron_dict[0]['sensor']}, Ubicacion: {lote}, Hato: {hato}"
+
+    client = Client(SID, TOKEN)
+    for number in numeros_destino:
+        try:
+            message = client.messages.create(
+                to=number,
+                from_=NUMBER,
+                body=texto)
+            print(f'exito: {message.sid}')
+        except TwilioRestException as e:
+            print(e)
+
+    return reg_celo.id_celo
