@@ -1623,9 +1623,10 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
                                                         errors='coerce')
         celotron_data['fecha_mensaje'] = celotron_data['fecha_mensaje'].astype(str)
         celotron_data['fecha_recibido'] = str(datetime.now())
-        celotron_data.drop(columns=['hora', 'fecha', 'mensaje'], inplace=True, errors='ignore')
+        celotron_data.drop(columns=['hora', 'fecha', 'mensaje', 'status'], inplace=True, errors='ignore')
         estado_dict = celotron_data.to_dict('records')
 
+        print(estado_dict)
         # Guardar en la DB
         reg_estado = models.celotron_estadoT(**estado_dict[0])
         db.add(reg_estado)
