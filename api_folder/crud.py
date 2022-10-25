@@ -1598,7 +1598,7 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
     celotron_data = pd.DataFrame.from_dict([parsed])
 
 
-    if len(result) > 0 and result[0] == 'bateria':
+    if len(result) > 0 and result['M'] == 'bateria':
         celotron_data.rename(columns={'M': 'mensaje', 'Hora': 'hora', 'Fecha': 'fecha', 'Ser': 'sensor',
                                       'Bat': 'battery'}, inplace=True, errors='ignore')
         celotron_data['fecha_bat'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
@@ -1609,7 +1609,13 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
         celotron_data.drop(columns=['hora', 'fecha', 'mensaje'], inplace=True, errors='ignore')
         bat_dict = celotron_data.to_dict('records')
 
-    elif len(result) > 0 and result[0] == 'estado':
+        # Guardar en la DB
+        reg_baterry = models.celotron_bateriaT(**bat_dict[0])
+        db.add(reg_baterry)
+        db.commit()
+        db.refresh(reg_baterry)
+
+    elif len(result) > 0 and result['M'] == 'estado':
         celotron_data.rename(columns={'M': 'mensaje', 'Status': 'status', 'Hora': 'hora', 'Fecha': 'fecha',
                                       'Ser': 'sensor', 'Bat': 'battery'}, inplace=True, errors='ignore')
         celotron_data['fecha_estado'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
@@ -1619,6 +1625,12 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
         celotron_data['fecha_recibido'] = str(datetime.now())
         celotron_data.drop(columns=['hora', 'fecha', 'mensaje'], inplace=True, errors='ignore')
         estado_dict = celotron_data.to_dict('records')
+
+        # Guardar en la DB
+        reg_estado = models.celotron_estadoT(**estado_dict[0])
+        db.add(reg_estado)
+        db.commit()
+        db.refresh(reg_estado)
 
     else:
         celotron_data.rename(columns={'M': 'mensaje', 'V': 'tag', 'Hora': 'hora', 'Fecha': 'fecha', 'Ser': 'sensor',
