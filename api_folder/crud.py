@@ -1601,10 +1601,10 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
     if len(result) > 0 and result['M'] == 'bateria':
         celotron_data.rename(columns={'M': 'mensaje', 'Hora': 'hora', 'Fecha': 'fecha', 'Ser': 'sensor',
                                       'Bat': 'battery'}, inplace=True, errors='ignore')
-        celotron_data['fecha_bat'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
-        celotron_data['fecha_bat'] = pd.to_datetime(celotron_data['fecha_bat'], format='%d/%m/%Y %H:%M',
+        celotron_data['fecha_mensaje'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
+        celotron_data['fecha_mensaje'] = pd.to_datetime(celotron_data['fecha_mensaje'], format='%d/%m/%Y %H:%M',
                                                      errors='coerce')
-        celotron_data['fecha_bat'] = celotron_data['fecha_bat'].astype(str)
+        celotron_data['fecha_mensaje'] = celotron_data['fecha_mensaje'].astype(str)
         celotron_data['fecha_recibido'] = str(datetime.now())
         celotron_data.drop(columns=['hora', 'fecha', 'mensaje'], inplace=True, errors='ignore')
         bat_dict = celotron_data.to_dict('records')
@@ -1618,10 +1618,10 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
     elif len(result) > 0 and result['M'] == 'estado':
         celotron_data.rename(columns={'M': 'mensaje', 'Status': 'status', 'Hora': 'hora', 'Fecha': 'fecha',
                                       'Ser': 'sensor', 'Bat': 'battery'}, inplace=True, errors='ignore')
-        celotron_data['fecha_estado'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
-        celotron_data['fecha_estado'] = pd.to_datetime(celotron_data['fecha_estado'], format='%d/%m/%Y %H:%M',
+        celotron_data['fecha_mensaje'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
+        celotron_data['fecha_mensaje'] = pd.to_datetime(celotron_data['fecha_mensaje'], format='%d/%m/%Y %H:%M',
                                                     errors='coerce')
-        celotron_data['fecha_estado'] = celotron_data['fecha_estado'].astype(str)
+        celotron_data['fecha_mensaje'] = celotron_data['fecha_mensaje'].astype(str)
         celotron_data['fecha_recibido'] = str(datetime.now())
         celotron_data.drop(columns=['hora', 'fecha', 'mensaje'], inplace=True, errors='ignore')
         estado_dict = celotron_data.to_dict('records')
