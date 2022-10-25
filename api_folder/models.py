@@ -827,6 +827,7 @@ class celoT(Base):
     #status = Column(String(32), nullable=True)
     #costo = Column(Float, nullable=True)
     fecha_celo = Column(DateTime, nullable=True)
+    time = Column(String(32), nullable=True)
 
 
 class celo_gsmT(Base):
@@ -849,3 +850,24 @@ class pref_sms_contactT(Base):
     status = Column(String(45), nullable=True)
 
 
+class celotron_bateriaT(Base):
+    __tablename__ = "celotron_bateria"
+    id_bateria = Column(Integer, primary_key=True, index=True)
+    sensor = Column(String(45), nullable=True) #, ForeignKey("celotron_tags.TAG_NAME"))
+    battery = Column(Float, nullable=True)
+    fecha_recibido = Column(DateTime, nullable=True)
+    numero_envio = Column(String(32), nullable=True)
+    numero_recibido = Column(String(32), nullable=True)
+    segmentos = Column(Integer, nullable=True)
+    fecha_mensaje = Column(DateTime, nullable=True)
+
+class celotron_estadoT(Base):
+    __tablename__ = "celotron_status"
+    id_status = Column(Integer, primary_key=True, index=True)
+    sensor = Column(String(45), nullable=True) #, ForeignKey("celotron_tags.TAG_NAME"))
+    battery = Column(Float, nullable=True)
+    fecha_recibido = Column(DateTime, nullable=True)
+    numero_envio = Column(String(32), nullable=True)
+    numero_recibido = Column(String(32), nullable=True)
+    segmentos = Column(Integer, nullable=True)
+    fecha_mensaje = Column(DateTime, nullable=True)
