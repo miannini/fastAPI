@@ -861,6 +861,7 @@ class celotron_bateriaT(Base):
     segmentos = Column(Integer, nullable=True)
     fecha_mensaje = Column(DateTime, nullable=True)
 
+
 class celotron_estadoT(Base):
     __tablename__ = "celotron_status"
     id_status = Column(Integer, primary_key=True, index=True)

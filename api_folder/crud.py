@@ -1620,7 +1620,7 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
                                       'Ser': 'sensor', 'Bat': 'battery'}, inplace=True, errors='ignore')
         celotron_data['fecha_mensaje'] = celotron_data['fecha'].astype(str) + ' ' + celotron_data['hora'].astype(str)
         celotron_data['fecha_mensaje'] = pd.to_datetime(celotron_data['fecha_mensaje'], format='%d/%m/%Y %H:%M',
-                                                    errors='coerce')
+                                                        errors='coerce')
         celotron_data['fecha_mensaje'] = celotron_data['fecha_mensaje'].astype(str)
         celotron_data['fecha_recibido'] = str(datetime.now())
         celotron_data.drop(columns=['hora', 'fecha', 'mensaje'], inplace=True, errors='ignore')
