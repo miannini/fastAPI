@@ -383,6 +383,18 @@ class MastitisT(Base):
     Calificacion = Column(Float, nullable=True)
     GAP = Column(Float, nullable=True)
 
+class CalorT(Base):
+    __tablename__ = "Calor"
+    ID_ACTIVIDAD = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), primary_key=True, index=True)#, ForeignKey("Actividades_Vacas.ID_FINCA"))
+    id_vaca = Column(Integer, nullable=True)
+    id_toro = Column(Integer, nullable=True)
+    id_lote = Column(Integer, nullable=True)
+    id_hato = Column(Integer, nullable=True)
+    id_celo = Column(Integer, nullable=True)
+    celotron = Column(String(45), nullable=True)
+    tag = Column(String(45), nullable=True)
+
+
 class Result_MastitisT(Base):
     __tablename__ = "Result_Mastitis"
     ID_Actividad = Column(Integer, ForeignKey("Actividades_Vacas.ID_Actividad"), primary_key=True, index=True)#, ForeignKey("Actividades_Vacas.ID_FINCA"))

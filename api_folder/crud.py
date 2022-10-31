@@ -1039,6 +1039,17 @@ def registrar_masti_2(db: Session, data: schemas.Mast_Requi, id_to_use):
     db.refresh(reg_mastitis)
     return "post_Registrar_mastitis_2"
 
+### registrar calor
+def registrar_calor(db: Session, id_to_use, data: Optional[dict] = None):
+
+    # subida de datos a la API
+    reg_calor = models.CalorT(ID_ACTIVIDAD=id_to_use, id_vaca=data.id_vaca, id_toro=data.id_toro, id_lote=data.id_lote,
+                              id_hato=data.id_hato, celotron=data.celotron, tag=data.tag)
+    db.add(reg_calor)
+    db.commit()
+    db.refresh(reg_calor)
+    return "post_Registrar_calor"
+
 
 ### partos
 def get_act_partos(db: Session, date1: str = '2000-01-01', date2: str = datetime.now().strftime("%Y-%m-%d"), vaca:Optional[str]=None, categoria:Optional[int]=None, operario:Optional[int]=None, comentario:Optional[str]=None, id_cliente: str = 0) : # 
@@ -1701,10 +1712,14 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
                   f'id_hato: {ubicacion_df.ID_HATO[0]}, HATO: {ubicacion_df.Nombre_Hato[0]}')
             lote = ubicacion_df.NOMBRE_LOTE[0]
             hato = ubicacion_df.Nombre_Hato[0]
+            id_lote = ubicacion_df.ID_LOTE[0]
+            id_hato = ubicacion_df.ID_HATO[0]
         else:
             print("Ubicacion not found")
             lote = 'UNKNOWN'
             hato = 'UNKNOWN'
+            id_lote = None
+            id_hato = None
 
 
         # Capturar numero de contacto de clientes
@@ -1725,6 +1740,11 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
                 f"Toro: {nombre_toro}, Celotron: {celotron_dict[0]['sensor']}, Ubicacion: {lote}, Hato: {hato}"
 
         # TODO Registrar en DB datos procesados
+        data = {'ID_VACA': id_vaca, 'ID_TipoOperacion': 38, 'ID_Resultado': 1, 'ID_OPERARIO': 35, 'ID_Categoria': 1,
+                'Fecha': celotron_dict[0]['fecha_celo'], 'Comentario': 'celotron_'+celotron_dict[0]['sensor'],
+                'id_toro': id_toro, 'celotron': celotron_dict[0]['sensor'], 'id_lote': id_lote, 'id_hato': id_hato,
+                'id_celo': reg_celo.id_celo}
+
 
         client = Client(SID, TOKEN)
         for number in numeros_destino:
@@ -1737,4 +1757,6 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
             except TwilioRestException as e:
                 print(e)
 
-        return reg_celo.id_celo
+        return data  # reg_celo.id_celo,
+
+

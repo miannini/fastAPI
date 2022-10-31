@@ -828,7 +828,24 @@ class Result_MastitisT(BaseModel):
     Chequeo_revision: Optional[str] = None
     class Config:
         orm_mode = True
-        
+
+
+class Calor_Requi(BaseModel):
+    ID_VACA: int
+    ID_TipoOperacion: int = 9
+    ID_Resultado: int = 34
+    ID_OPERARIO: int = 35
+    ID_Categoria: int = 1
+    Fecha: Optional[datetime] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #None
+    Comentario: Optional[str] = None
+    AI: Optional[int] = None
+    AD: Optional[int] = None
+    PI: Optional[int] = None
+    PD: Optional[int] = None
+    Chequeo_revision: Optional[str] = None
+    class Config:
+        orm_mode = True
+
 class PartosT(BaseModel):
     IDparto: int
     ID_VACA: int

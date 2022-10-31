@@ -1282,11 +1282,23 @@ async def celo_detect(request: Request, From: str = Form(...), To: str = Form(..
         raise HTTPException(status_code=400, detail="Error in Twilio Signature")
 
     ### registrar SMS en DB
-    id_celo = crud.sms_celo2(db, numero_envio=From, numero_recibido=To, segmentos=NumSegments, body=Body)
+    data = crud.sms_celo2(db, numero_envio=From, numero_recibido=To, segmentos=NumSegments, body=Body) #  id_celo,
 
     # Start our TwiML response
     resp = MessagingResponse()
-    response = resp.message(f"Mensaje de Celo recibido!, consecutivo: {str(id_celo)}")
+
+    if data is not None:
+        extra_keys = ['id_toro', 'celotron', 'id_lote', 'id_hato', 'id_celo']
+        full_dict = data.copy()
+        for key in extra_keys:
+            data.pop(key)
+        resp = crud.reg_acti_2(db=db, data=data)
+
+        crud.registrar_calor(db=db, id_to_use=resp.ID_Actividad, data=full_dict)
+
+        response = resp.message(f"Mensaje de Celo recibido!, consecutivo: {str(full_dict['id_celo'])}")
+    else:
+        response = resp.message("otro Mensaje recibido!")
     return Response(content=str(response), media_type="application/xml")
 
 
