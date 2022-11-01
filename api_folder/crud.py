@@ -999,8 +999,15 @@ def update_mastitis(db: Session, mastitis: schemas.MastitisU, acts:schemas.Activ
 
 ### Registrar Actividad - cualquiera
 def reg_acti_2(db: Session, data: schemas.ActInfo): #Mast_Requi
-    reg_av = models.ActividadesVacasT(ID_VACA=data.ID_VACA, ID_TipoOperacion=data.ID_TipoOperacion, ID_Resultado=data.ID_Resultado,
-                                      ID_OPERARIO=data.ID_OPERARIO, ID_Categoria=data.ID_Categoria, Fecha=data.Fecha, Comentario=data.Comentario)  
+    try:
+        reg_av = models.ActividadesVacasT(ID_VACA=data.ID_VACA, ID_TipoOperacion=data.ID_TipoOperacion,
+                                          ID_Resultado=data.ID_Resultado, ID_OPERARIO=data.ID_OPERARIO,
+                                          ID_Categoria=data.ID_Categoria, Fecha=data.Fecha, Comentario=data.Comentario)
+    except: #para mensaje de celotron
+        reg_av = models.ActividadesVacasT(ID_VACA=data['ID_VACA'], ID_TipoOperacion=data['ID_TipoOperacion'],
+                                          ID_Resultado=data['ID_Resultado'], ID_OPERARIO=data['ID_OPERARIO'],
+                                          ID_Categoria=data['ID_Categoria'], Fecha=data['Fecha'],
+                                          Comentario=data['Comentario'])
     db.add(reg_av)
     db.commit()
     db.refresh(reg_av)
