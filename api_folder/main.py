@@ -1285,7 +1285,7 @@ async def celo_detect(request: Request, From: str = Form(...), To: str = Form(..
     data = crud.sms_celo2(db, numero_envio=From, numero_recibido=To, segmentos=NumSegments, body=Body) #  id_celo,
 
     # Start our TwiML response
-    resp = MessagingResponse()
+    twi_response = MessagingResponse()
 
     if data is not None:
         extra_keys = ['id_toro', 'celotron', 'id_lote', 'id_hato', 'id_celo', 'tag']
@@ -1296,9 +1296,9 @@ async def celo_detect(request: Request, From: str = Form(...), To: str = Form(..
 
         crud.registrar_calor(db=db, id_to_use=resp.ID_Actividad, data=full_dict)
 
-        response = resp.message(f"Mensaje de Celo recibido!, consecutivo: {str(full_dict['id_celo'])}")
+        response = twi_response.message(f"Mensaje de Celo recibido!, consecutivo: {str(full_dict['id_celo'])}")
     else:
-        response = resp.message("otro Mensaje recibido!")
+        response = twi_response.message("otro Mensaje recibido!")
     return Response(content=str(response), media_type="application/xml")
 
 

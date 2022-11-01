@@ -1051,8 +1051,8 @@ def registrar_calor(db: Session, id_to_use, data: Optional[dict] = None):
 
     # subida de datos a la API
     reg_calor = models.CalorT(ID_ACTIVIDAD=int(id_to_use), id_vaca=int(data['ID_VACA']), id_toro=int(data['id_toro']),
-                              id_lote=int(data['id_lote']), id_hato=int(data['id_hato']), celotron=str(data['celotron']),
-                              tag=str(data['tag']))
+                              id_lote=int(data['id_lote']), id_hato=int(data['id_hato']), id_celo=int(data['id_celo']),
+                              celotron=str(data['celotron']), tag=str(data['tag']))
     db.add(reg_calor)
     db.commit()
     db.refresh(reg_calor)
