@@ -1004,10 +1004,10 @@ def reg_acti_2(db: Session, data: schemas.ActInfo): #Mast_Requi
                                           ID_Resultado=data.ID_Resultado, ID_OPERARIO=data.ID_OPERARIO,
                                           ID_Categoria=data.ID_Categoria, Fecha=data.Fecha, Comentario=data.Comentario)
     except: #para mensaje de celotron
-        reg_av = models.ActividadesVacasT(ID_VACA=data['ID_VACA'], ID_TipoOperacion=data['ID_TipoOperacion'],
-                                          ID_Resultado=data['ID_Resultado'], ID_OPERARIO=data['ID_OPERARIO'],
-                                          ID_Categoria=data['ID_Categoria'], Fecha=data['Fecha'],
-                                          Comentario=data['Comentario'])
+        reg_av = models.ActividadesVacasT(ID_VACA=int(data['ID_VACA']), ID_TipoOperacion=int(data['ID_TipoOperacion']),
+                                          ID_Resultado=int(data['ID_Resultado']), ID_OPERARIO=int(data['ID_OPERARIO']),
+                                          ID_Categoria=int(data['ID_Categoria']), Fecha=data['Fecha'],
+                                          Comentario=str(data['Comentario']))
     db.add(reg_av)
     db.commit()
     db.refresh(reg_av)
