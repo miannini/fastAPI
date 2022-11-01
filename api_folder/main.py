@@ -1288,7 +1288,7 @@ async def celo_detect(request: Request, From: str = Form(...), To: str = Form(..
     resp = MessagingResponse()
 
     if data is not None:
-        extra_keys = ['id_toro', 'celotron', 'id_lote', 'id_hato', 'id_celo']
+        extra_keys = ['id_toro', 'celotron', 'id_lote', 'id_hato', 'id_celo', 'tag']
         full_dict = data.copy()
         for key in extra_keys:
             data.pop(key)

@@ -1050,8 +1050,9 @@ def registrar_masti_2(db: Session, data: schemas.Mast_Requi, id_to_use):
 def registrar_calor(db: Session, id_to_use, data: Optional[dict] = None):
 
     # subida de datos a la API
-    reg_calor = models.CalorT(ID_ACTIVIDAD=id_to_use, id_vaca=data.id_vaca, id_toro=data.id_toro, id_lote=data.id_lote,
-                              id_hato=data.id_hato, celotron=data.celotron, tag=data.tag)
+    reg_calor = models.CalorT(ID_ACTIVIDAD=id_to_use, id_vaca=data['ID_VACA'], id_toro=data['id_toro'],
+                              id_lote=data['id_lote'], id_hato=data['id_hato'], celotron=data['celotron'],
+                              tag=data['tag'])
     db.add(reg_calor)
     db.commit()
     db.refresh(reg_calor)
@@ -1750,7 +1751,7 @@ def sms_celo2(db: Session, numero_envio, numero_recibido, segmentos, body):
         data = {'ID_VACA': id_vaca, 'ID_TipoOperacion': 38, 'ID_Resultado': 1, 'ID_OPERARIO': 35, 'ID_Categoria': 1,
                 'Fecha': celotron_dict[0]['fecha_celo'], 'Comentario': 'celotron_'+celotron_dict[0]['sensor'],
                 'id_toro': id_toro, 'celotron': celotron_dict[0]['sensor'], 'id_lote': id_lote, 'id_hato': id_hato,
-                'id_celo': reg_celo.id_celo}
+                'id_celo': reg_celo.id_celo, 'tag': str(celotron_dict[0]['tag'])}
 
 
         client = Client(SID, TOKEN)
