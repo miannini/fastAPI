@@ -1050,9 +1050,9 @@ def registrar_masti_2(db: Session, data: schemas.Mast_Requi, id_to_use):
 def registrar_calor(db: Session, id_to_use, data: Optional[dict] = None):
 
     # subida de datos a la API
-    reg_calor = models.CalorT(ID_ACTIVIDAD=id_to_use, id_vaca=data['ID_VACA'], id_toro=data['id_toro'],
-                              id_lote=data['id_lote'], id_hato=data['id_hato'], celotron=data['celotron'],
-                              tag=data['tag'])
+    reg_calor = models.CalorT(ID_ACTIVIDAD=int(id_to_use), id_vaca=int(data['ID_VACA']), id_toro=int(data['id_toro']),
+                              id_lote=int(data['id_lote']), id_hato=int(data['id_hato']), celotron=str(data['celotron']),
+                              tag=str(data['tag']))
     db.add(reg_calor)
     db.commit()
     db.refresh(reg_calor)
